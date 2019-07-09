@@ -1,0 +1,205 @@
+﻿<UserControl x:Class="SavescumBuddy.Views.BackupView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             mc:Ignorable="d" 
+             d:DesignHeight="110" d:DesignWidth="388">
+
+    <UserControl.Resources>
+        <!--TextBox Style Flat-->
+        <Style x:Key="TextBoxStyleFlat" TargetType="{x:Type TextBox}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" 
+                                Background="{TemplateBinding Background}" SnapsToDevicePixels="True" CornerRadius="7">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="#FFE1E1E1"/>
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="#FFE1E1E1"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid x:Name="MainGrid" Height="110" Width="388" Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="1.65*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="189"/>
+            <ColumnDefinition Width="199"/>
+        </Grid.ColumnDefinitions>
+        <Grid.InputBindings>
+            <MouseBinding Gesture="LeftDoubleClick" Command="{Binding ShowInExplorerCommand}"/>
+        </Grid.InputBindings>
+        <!--Thumbnail-->
+        <Grid HorizontalAlignment="Center" Height="100" VerticalAlignment="Center" Width="179" Grid.Column="0" Grid.RowSpan="3" >
+            <Border Background="White">
+                <TextBlock Text="NO IMAGE" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource Grayish}"
+                       FontWeight="Bold" Visibility="{Binding Picture, Converter={StaticResource ExistsToVisibilityConverter}}"/>
+            </Border>
+            <Image Source="{Binding Path=Picture, Converter={StaticResource UriToImgConverter}}"/>
+        </Grid>
+        <!--NoteBox-->
+        <TextBox x:Name="NoteBox" Text="{Binding Path=Note, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MaxLength="180" TextWrapping="Wrap"  
+                         Margin="5,3,5,5" Grid.Column="1" MaxLines="2" Padding="4,0,0,0" BorderBrush="#FFDCDCDC" Foreground="{StaticResource Dark}" Style="{StaticResource TextBoxStyleFlat}" Grid.Row="2">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="LostFocus">
+                    <i:InvokeCommandAction Command="{Binding UpdateNoteCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </TextBox>
+        <!--Helper text-->
+        <TextBlock IsHitTestVisible="False" Text="Click to enter your note..." VerticalAlignment="Top" HorizontalAlignment="Left" 
+                   Foreground="{StaticResource Ash}" Margin="{Binding Margin, ElementName=NoteBox}" Padding="7,5,0,0" Grid.Column="1" Grid.Row="2">
+            <TextBlock.Style>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Text, ElementName=NoteBox}" Value="">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+        <!--DateTimeTag-->
+        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock Foreground="{StaticResource Dark}" Text="{Binding DateTimeTag, FallbackValue=1020304020304020}"
+                   ToolTipService.ShowDuration="30000" Cursor="Help">
+                <TextBlock.ToolTip>
+                    <ToolTip>
+                        <Grid Margin="3" >
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center">Double-click to show in windows explorer.</TextBlock>
+                            <TextBlock Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center">————— INFO —————</TextBlock>
+                            <TextBlock Grid.Column="0" Grid.Row="2" HorizontalAlignment="Right" Margin="0,2,4,0">Game:</TextBlock>
+                            <TextBlock Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left" Margin="0,2,4,0" TextWrapping="Wrap" Text="{Binding GameId}"/>
+                            <TextBlock Grid.Column="0" Grid.Row="3" HorizontalAlignment="Right" Margin="0,2,4,0">Origin:</TextBlock>
+                            <TextBlock Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left" Margin="0,2,4,0" TextWrapping="Wrap" Text="{Binding Origin}"/>
+                            <TextBlock Grid.Column="0" Grid.Row="4" HorizontalAlignment="Right" Margin="0,2,4,0">File:</TextBlock>
+                            <TextBlock Grid.Column="1" Grid.Row="4" HorizontalAlignment="Left" Margin="0,2,4,0" TextWrapping="Wrap" Text="{Binding FilePath}"/>
+                        </Grid>
+                    </ToolTip>
+                </TextBlock.ToolTip>
+            </TextBlock>
+            <!--Question mark-->
+            <TextBlock Text="&#xF142;" FontFamily="Segoe MDL2 Assets">
+                <TextBlock.Style>
+                    <Style TargetType="{x:Type TextBlock}">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=MainGrid, Path=IsMouseOver}" Value="false">
+                                <Setter Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </StackPanel>
+        <!--Heart button-->
+        <ToggleButton FontFamily="Segoe MDL2 Assets" Command="{Binding UpdateIsLikedCommand}" Grid.Column="1" Grid.Row="1"
+                        Width="22" FontSize="16" Height="20" IsChecked="{Binding Path=IsLiked, Mode=TwoWay, Converter={StaticResource IntToBoolConverter}}" >
+            <ToggleButton.Style>
+                <Style TargetType="{x:Type ToggleButton}">
+                    <Setter Property="Content" Value="&#x0000EB51;"/>
+                    <Setter Property="Foreground" Value="#FFDAC6E0"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ToggleButton}">
+                                <Border Background="{x:Null}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Style.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="Foreground" Value="#FFEEA6F1"/>
+                            <Setter Property="Content" Value="&#xEB52;"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="#FFEEA6F1"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ToggleButton.Style>
+        </ToggleButton>
+        <!--Caution icon-->
+        <Border Grid.Column="0" Grid.RowSpan="3" VerticalAlignment="Center" HorizontalAlignment="Center" CornerRadius="3"
+                     Visibility="{Binding FilePath, Converter={StaticResource ExistsToVisibilityConverter}}" Background="White" >
+            <Border.RenderTransform>
+                <SkewTransform AngleX="-12"/>
+            </Border.RenderTransform>
+            <StackPanel Orientation="Horizontal">
+                <Border Margin="1" BorderBrush="Transparent" BorderThickness="1" CornerRadius="3">
+                    <StackPanel Orientation="Horizontal" Margin="5,0,10,0" >
+                        <StackPanel.RenderTransform>
+                            <SkewTransform AngleX="12"/>
+                        </StackPanel.RenderTransform>
+                        <TextBlock Text="&#xE7BA;" FontFamily="Segoe MDL2 Assets" FontSize="26" Margin="0,0,5,0" 
+                        Foreground="{StaticResource Ash}" Visibility="Visible" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBlock Text="SAVEFILE &#xA;MISSING" FontFamily="Segoe UI" FontSize="12" 
+                                   Foreground="{StaticResource Ash}" VerticalAlignment="Center" FontStyle="Italic"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Border>
+        <!--Char counter-->
+        <TextBlock Grid.Column="1" FontSize="10" Foreground="#FF969696" TextAlignment="Right" Grid.Row="1"
+                   VerticalAlignment="Bottom" Margin="0,0,10,0" >
+            <Run Text="{Binding Text.Length, ElementName=NoteBox, Mode=OneWay}"/>
+            <Run Text="/"/>
+            <Run Text="{Binding MaxLength, ElementName=NoteBox, Mode=OneWay}"/>
+            <TextBlock.Style>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Visibility" Value="Visible"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsFocused, ElementName=NoteBox}" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+        <!--Autobackup label-->
+        <Border BorderThickness="0" Margin="10,8,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="0,0,0,2" Height="16" CornerRadius="2" Opacity=".85" Grid.Column="0" Grid.Row="0">
+            <Border.Style>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Setter Property="Background" Value="#FFF0F0F0"/>
+                    <Setter Property="Opacity" Value="1"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsAutobackup, Converter={StaticResource IntToBoolConverter}}" Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <TextBlock x:Name="AutosaveLabel" IsHitTestVisible="False" Text=" Autosave " VerticalAlignment="Center" HorizontalAlignment="Left" 
+                            Foreground="#FF969696" Grid.Column="0" FontWeight="SemiBold"/>
+        </Border>
+    </Grid>
+</UserControl>
