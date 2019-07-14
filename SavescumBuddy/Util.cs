@@ -59,6 +59,11 @@ namespace SavescumBuddy
         #region Misc
         public static void PlaySound(string path)
         {
+            if (!Properties.Settings.Default.SoundCuesOn)
+            {
+                return;
+            }
+
             try
             {
                 using (var sound = new SoundPlayer(path))

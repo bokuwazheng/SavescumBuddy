@@ -78,7 +78,7 @@ namespace SavescumBuddy.ViewModels
                                     GameId = game.Title,
                                     Origin = game.SavefilePath,
                                     DateTimeTag = dateTimeTag.ToString(DateTimeFormat.UserFriendly, CultureInfo.CreateSpecificCulture("en-US")),
-                                    Picture = picture != null ? picture : dateTimeNow.ToString(DateTimeFormat.WindowsFriendly),
+                                    Picture = picture != null ? picture : "",
                                     FilePath = filePath
                                 });
 

@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Data;
 using System.Data.SQLite;
 using System.Linq;
+using System;
 
 namespace SavescumBuddy
 {
@@ -11,9 +12,10 @@ namespace SavescumBuddy
 
     class SqliteDataAccess
     {
-        private static string LoadConnectionString(string id = "Default")
+        private static string LoadConnectionString(string id = "Debug") // string id = "Debug" for debugging, otherwise "Default"
         {
-            return ConfigurationManager.ConnectionStrings[id].ConnectionString;
+            var cnnstr = ConfigurationManager.ConnectionStrings[id].ConnectionString;
+            return cnnstr.Replace("%APPDATA%", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)); 
         }
 
         private static readonly object _locker = new object();
@@ -29,13 +31,13 @@ namespace SavescumBuddy
             }
         }
 
-        private static IDbEntity QueryFirstOrDefault<IDbEntity>(string sql)
+        private static IDbEntity QueryFirstOrDefault<IDbEntity>(string sql, object args = null)
         {
             lock (_locker)
             {
                 using (IDbConnection cnn = new SQLiteConnection(LoadConnectionString()))
                 {
-                    var output = cnn.QueryFirstOrDefault<IDbEntity>(sql);
+                    var output = cnn.QueryFirstOrDefault<IDbEntity>(sql, args);
                     return output;
                 }
             }
@@ -66,7 +68,7 @@ namespace SavescumBuddy
 
         public static Backup GetLatestBackup()
         {
-            return QueryFirstOrDefault<Backup>("select * from Backup order by Id desc");
+            return QueryFirstOrDefault<Backup>("select * from Backup where GameId = @GameId and IsAutobackup = 0 order by Id desc", new { GameId = GetCurrentGame().Title });
         }
 
         public static Backup GetLatestAutobackup()

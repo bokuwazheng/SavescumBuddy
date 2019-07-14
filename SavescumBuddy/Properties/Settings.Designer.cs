@@ -25,7 +25,7 @@ namespace SavescumBuddy.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool SoundCuesOn {
             get {
                 return ((bool)(this["SoundCuesOn"]));
@@ -37,7 +37,7 @@ namespace SavescumBuddy.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool HotkeysOn {
             get {
                 return ((bool)(this["HotkeysOn"]));
@@ -49,7 +49,7 @@ namespace SavescumBuddy.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool AutobackupsOn {
             get {
                 return ((bool)(this["AutobackupsOn"]));
@@ -61,7 +61,7 @@ namespace SavescumBuddy.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("118")]
         public int QSKey {
             get {
                 return ((int)(this["QSKey"]));
@@ -73,7 +73,7 @@ namespace SavescumBuddy.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("119")]
         public int QLKey {
             get {
                 return ((int)(this["QLKey"]));
@@ -109,7 +109,7 @@ namespace SavescumBuddy.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("15")]
         public int Interval {
             get {
                 return ((int)(this["Interval"]));

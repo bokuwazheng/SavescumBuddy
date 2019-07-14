@@ -113,9 +113,9 @@
                                     <Setter Property="Foreground" Value="{StaticResource HeartButtonBrush}"/>
                                     <Setter Property="Content" Value="&#xEB52;"/>
                                 </Trigger>
-                                <Trigger Property="IsMouseOver" Value="True">
+                                <!--<Trigger Property="IsMouseOver" Value="True">
                                     <Setter Property="Foreground" Value="{StaticResource HeartButtonBrush}"/>
-                                </Trigger>
+                                </Trigger>-->
                             </Style.Triggers>
                         </Style>
                     </ToggleButton.Style>
@@ -131,9 +131,6 @@
                         <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                             <Style.Triggers>
                                 <Trigger Property="IsChecked" Value="True">
-                                    <Setter Property="Foreground" Value="{StaticResource AutobackupsButtonBrush}"/>
-                                </Trigger>
-                                <Trigger Property="IsMouseOver" Value="True">
                                     <Setter Property="Foreground" Value="{StaticResource AutobackupsButtonBrush}"/>
                                 </Trigger>
                             </Style.Triggers>
@@ -153,9 +150,6 @@
                                 <Trigger Property="IsChecked" Value="True">
                                     <Setter Property="Foreground" Value="{StaticResource CurrentButtonBrush}"/>
                                 </Trigger>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Foreground" Value="{StaticResource CurrentButtonBrush}"/>
-                                </Trigger>
                             </Style.Triggers>
                         </Style>
                     </ToggleButton.Style>
@@ -173,9 +167,6 @@
                                 <Trigger Property="IsChecked" Value="True">
                                     <Setter Property="Foreground" Value="{StaticResource LimitButtonBrush}"/>
                                 </Trigger>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Foreground" Value="{StaticResource LimitButtonBrush}"/>
-                                </Trigger>
                             </Style.Triggers>
                         </Style>
                     </ToggleButton.Style>
@@ -187,9 +178,6 @@
                         <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                             <Style.Triggers>
                                 <Trigger Property="IsChecked" Value="True">
-                                    <Setter Property="Foreground" Value="{StaticResource OrderButtonBrush}"/>
-                                </Trigger>
-                                <Trigger Property="IsMouseOver" Value="True">
                                     <Setter Property="Foreground" Value="{StaticResource OrderButtonBrush}"/>
                                 </Trigger>
                             </Style.Triggers>

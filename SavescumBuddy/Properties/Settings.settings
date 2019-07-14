@@ -3,19 +3,19 @@
   <Profiles />
   <Settings>
     <Setting Name="SoundCuesOn" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="HotkeysOn" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="AutobackupsOn" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="QSKey" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">118</Value>
     </Setting>
     <Setting Name="QLKey" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">119</Value>
     </Setting>
     <Setting Name="QSMod" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
@@ -24,7 +24,7 @@
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="Interval" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">15</Value>
     </Setting>
     <Setting Name="Skip" Type="System.String" Scope="User">
       <Value Profile="(Default)">"Never"</Value>

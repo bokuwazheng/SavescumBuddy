@@ -76,35 +76,36 @@
             </TextBlock.Style>
         </TextBlock>
         <!--DateTimeTag-->
-        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <TextBlock Foreground="{StaticResource Dark}" Text="{Binding DateTimeTag, FallbackValue=1020304020304020}"
-                   ToolTipService.ShowDuration="30000" Cursor="Help">
-                <TextBlock.ToolTip>
-                    <ToolTip>
-                        <Grid Margin="3" >
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center">Double-click to show in windows explorer.</TextBlock>
-                            <TextBlock Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center">————— INFO —————</TextBlock>
-                            <TextBlock Grid.Column="0" Grid.Row="2" HorizontalAlignment="Right" Margin="0,2,4,0">Game:</TextBlock>
-                            <TextBlock Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left" Margin="0,2,4,0" TextWrapping="Wrap" Text="{Binding GameId}"/>
-                            <TextBlock Grid.Column="0" Grid.Row="3" HorizontalAlignment="Right" Margin="0,2,4,0">Origin:</TextBlock>
-                            <TextBlock Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left" Margin="0,2,4,0" TextWrapping="Wrap" Text="{Binding Origin}"/>
-                            <TextBlock Grid.Column="0" Grid.Row="4" HorizontalAlignment="Right" Margin="0,2,4,0">File:</TextBlock>
-                            <TextBlock Grid.Column="1" Grid.Row="4" HorizontalAlignment="Left" Margin="0,2,4,0" TextWrapping="Wrap" Text="{Binding FilePath}"/>
-                        </Grid>
-                    </ToolTip>
-                </TextBlock.ToolTip>
-            </TextBlock>
+        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center"
+                    ToolTipService.ShowDuration="30000" Cursor="Help">
+            <StackPanel.ToolTip>
+                <ToolTip>
+                    <Grid Margin="3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Row="0" HorizontalAlignment="Center" Margin="0,2">Double-click to show in windows explorer.</TextBlock>
+                        <TextBlock Grid.Row="1" HorizontalAlignment="Center">————— INFO —————</TextBlock>
+                        <TextBlock Grid.Row="2" HorizontalAlignment="Center" Margin="0,2" FontWeight="Medium">Game:</TextBlock>
+                        <TextBlock Grid.Row="3" HorizontalAlignment="Center" Margin="0,2" TextWrapping="Wrap" Text="{Binding GameId}"/>
+                        <TextBlock Grid.Row="4" HorizontalAlignment="Center" Margin="0,2" FontWeight="Medium">Origin:</TextBlock>
+                        <TextBlock Grid.Row="5" HorizontalAlignment="Center" Margin="0,2" TextWrapping="Wrap" Text="{Binding Origin}"/>
+                        <TextBlock Grid.Row="6" HorizontalAlignment="Center" Margin="0,2" FontWeight="Medium">File:</TextBlock>
+                        <TextBlock Grid.Row="7" HorizontalAlignment="Center" Margin="0,2" TextWrapping="Wrap" Text="{Binding FilePath}"/>
+                    </Grid>
+                </ToolTip>
+            </StackPanel.ToolTip>
+            <TextBlock Foreground="{StaticResource Dark}" Text="{Binding DateTimeTag, FallbackValue=1020304020304020}"/>
             <!--Question mark-->
             <TextBlock Text="&#xF142;" FontFamily="Segoe MDL2 Assets">
                 <TextBlock.Style>
