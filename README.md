@@ -1,5 +1,10 @@
-# <img src="https://user-images.githubusercontent.com/46743297/61076153-3cf55600-a424-11e9-8daf-c6332aac6f4d.png" alt="cat_icon" width="36" height="36"> SavescumBuddy ([download](https://github.com/bokuwazheng/SavescumBuddy/releases/download/v1.0/Setup.msi))
+# <img src="https://user-images.githubusercontent.com/46743297/61076153-3cf55600-a424-11e9-8daf-c6332aac6f4d.png" alt="cat_icon" width="36" height="36"> SavescumBuddy ([download](https://github.com/bokuwazheng/SavescumBuddy/releases/download/v1.1/Setup.msi))
 Helps keep your game savefile backups organized. Works with any game that has only a single savefile.
+
+### New in v1.1: 
+* Improved performance.
+* Google Drive integration.
+* and [more...](https://github.com/bokuwazheng/SavescumBuddy/releases/tag/v1.1)
 
 ![main](https://user-images.githubusercontent.com/46743297/61174768-73121180-a5ad-11e9-8fde-8b8f8e1623c9.jpg)
 
@@ -37,7 +42,7 @@ Also, you might want to sync your backup folder with a write-only cloud storage 
 
 ## Installation
 Note: installer also will install Segoe MDL2 Assets (version 1.75).
-* Download [Setup.msi](https://github.com/bokuwazheng/SavescumBuddy/releases/download/v1.0/Setup.msi).
+* Download [Setup.msi](https://github.com/bokuwazheng/SavescumBuddy/releases/download/v1.1/Setup.msi).
 * Run the Setup.msi and follow the instructions.
 
 ## How to build
