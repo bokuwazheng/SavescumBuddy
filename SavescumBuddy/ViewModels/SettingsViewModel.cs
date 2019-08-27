@@ -10,16 +10,38 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using System.Threading.Tasks;
 
 namespace SavescumBuddy.ViewModels
 {
     public class SettingsViewModel : BaseViewModel, Game.IListItemEventListener
     {
+        public string AuthorizedAs
+        {
+            get
+            {
+                try
+                {
+                    var service = GoogleDrive.Current.CreateDriveApiService();
+                    var request = service.About.Get();
+                    request.Fields = "*";
+                    return request.Execute().User.EmailAddress;
+                }
+                catch
+                {
+                    return "not authorized";
+                }
+            }
+        }
+
+        public int ImportProgress { get; set; } = 0;
+        public bool ImportInProgress { get; set; }
+
         public SettingsViewModel()
         {
             this.PropertyChanged += (s, e) =>
             {
-                CheckIfValid(e.PropertyName);
+                CheckHotkeysValidity(e.PropertyName);
                 Properties.Settings.Default.Save();
             };
 
@@ -28,7 +50,7 @@ namespace SavescumBuddy.ViewModels
                 AddGame();
             });
 
-            UploadCustomCommand = new DelegateCommand(() =>
+            UploadCustomCommand = new DelegateCommand(async() =>
             {
                 var game = SqliteDataAccess.GetCurrentGame();
 
@@ -52,49 +74,69 @@ namespace SavescumBuddy.ViewModels
                         var sb = new StringBuilder();
                         var handled = false;
 
-                        foreach (string folder in folders)
+                        var importQ = folders.Count();
+                        var itemsImported = 0;
+
+                        ImportInProgress = true;
+                        RaisePropertyChanged("ImportInProgress");
+
+                        await Task.Run(() => 
                         {
-                            var folderItems = Directory.GetFiles(folder);
-                            if (folderItems.Length == 0)
+                            foreach (string folder in folders)
                             {
-                                sb.Append($"Error: {folder} is empty.\n");
-                                continue;
-                            }
-                            var filePath = folderItems.FirstOrDefault(s => s.EndsWith(savefileName));
-                            if (filePath == null)
-                            {
-                                sb.Append($"Error: {savefileName} expected.\n");
-                                continue;
-                            }
-                            var picture = folderItems.FirstOrDefault(s => s.EndsWith(".jpg"));
-                            var dateTimeTag = dateTimeNow + TimeSpan.FromSeconds(sec);
-                            sec++;
+                                // Report progress.
+                                itemsImported++;
+                                ImportProgress = (itemsImported * 100) / importQ;
+                                RaisePropertyChanged("ImportProgress");
 
-                            try
-                            {
-                                SqliteDataAccess.SaveBackup(new Backup()
+                                var folderItems = Directory.GetFiles(folder);
+                                if (folderItems.Length == 0)
                                 {
-                                    IsAutobackup = 0,
-                                    GameId = game.Title,
-                                    Origin = game.SavefilePath,
-                                    DateTimeTag = dateTimeTag.ToString(DateTimeFormat.UserFriendly, CultureInfo.CreateSpecificCulture("en-US")),
-                                    Picture = picture != null ? picture : "",
-                                    FilePath = filePath
-                                });
+                                    sb.Append($"Error: {folder} is empty.\n");
+                                    continue;
+                                }
+                                var filePath = folderItems.FirstOrDefault(s => s.EndsWith(savefileName));
+                                if (filePath == null)
+                                {
+                                    sb.Append($"Error: {savefileName} expected.\n");
+                                    continue;
+                                }
+                                var picture = folderItems.FirstOrDefault(s => s.EndsWith(".jpg"));
+                                var dateTimeTag = dateTimeNow + TimeSpan.FromSeconds(sec);
+                                sec++;
 
-                                handled = true;
+                                try
+                                {
+                                    SqliteDataAccess.SaveBackup(new Backup()
+                                    {
+                                        IsAutobackup = 0,
+                                        GameId = game.Title,
+                                        Origin = game.SavefilePath,
+                                        DateTimeTag = dateTimeTag.ToString(DateTimeFormat.UserFriendly, CultureInfo.CreateSpecificCulture("en-US")),
+                                        Picture = picture != null ? picture : "",
+                                        FilePath = filePath
+                                    });
+
+                                    handled = true;
+                                }
+                                catch
+                                {
+                                    sb.Append($"Error: {filePath} is already in the list.\n");
+                                    continue;
+                                }
                             }
-                            catch
-                            {
-                                sb.Append($"Error: {filePath} is already in the list.\n");
-                                continue;
-                            }
-                        }
+                        });
+
+                        // Reset progress.
+                        ImportInProgress = false;
+                        ImportProgress = 0;
+                        RaisePropertyChanged("ImportInProgress");
+                        RaisePropertyChanged("ImportProgress");
 
                         if (sb.Length != 0)
                         {
                             sb.Append("\nTip: Savefiles must be located in separate folders. " +
-                                "To attach an image put it in the folder next to savefile.");
+                                "To attach an image put it in the folder next to the savefile.");
 
                             Util.PopUp(sb.ToString());
                         }
@@ -102,10 +144,24 @@ namespace SavescumBuddy.ViewModels
                         if (handled)
                         {
                             BackupRepository.Current.Backups.Clear();
-                            BackupRepository.Current.LoadSortedList();
+                            BackupRepository.Current.LoadSortedList("0");
                         }
                     }
                 }
+            });
+
+            AuthorizeCommand = new DelegateCommand(async() =>
+            {
+                try
+                {
+                    await GoogleDrive.Current.AuthorizeAsync();
+                }
+                catch (Exception ex)
+                {
+                    Util.PopUp($"Error from SettingsViewModel: { ex.Message }");
+                }
+
+                RaisePropertyChanged("AuthorizedAs");
             });
 
             if (Games.Count == 0) AddGame();
@@ -115,6 +171,7 @@ namespace SavescumBuddy.ViewModels
 
         public DelegateCommand AddGameCommand { get; }
         public DelegateCommand UploadCustomCommand { get; }
+        public DelegateCommand AuthorizeCommand { get; }
 
         #region Game MGMT
         public string CurrentGameTitle => SqliteDataAccess.GetCurrentGame() != null ? SqliteDataAccess.GetCurrentGame().Title : "none";
@@ -156,6 +213,7 @@ namespace SavescumBuddy.ViewModels
             Keys.C,
             Keys.S,
             Keys.V,
+            Keys.F6,
             Keys.F7,
             Keys.F8
         };
@@ -169,6 +227,11 @@ namespace SavescumBuddy.ViewModels
         {
             get { return (Keys)Properties.Settings.Default.QSKey; }
             set { Properties.Settings.Default.QSKey = (int)value; RaisePropertyChanged("SelectedQSKey"); }
+        }
+        public Keys SelectedSOKey
+        {
+            get { return (Keys)Properties.Settings.Default.SOKey; }
+            set { Properties.Settings.Default.SOKey = (int)value; RaisePropertyChanged("SelectedSOKey"); }
         }
 
         //Modifiers 
@@ -184,6 +247,11 @@ namespace SavescumBuddy.ViewModels
             get { return (Keys)Properties.Settings.Default.QSMod; }
             set { Properties.Settings.Default.QSMod = (int)value; RaisePropertyChanged("SelectedQSMod"); }
         }
+        public Keys SelectedSOMod
+        {
+            get { return (Keys)Properties.Settings.Default.SOMod; }
+            set { Properties.Settings.Default.SOMod = (int)value; RaisePropertyChanged("SelectedSOMod"); }
+        }
 
         // On/off
         public bool HotkeysOn
@@ -193,8 +261,9 @@ namespace SavescumBuddy.ViewModels
         }
 
         // Selected keys validation method
-        private void CheckIfValid(string key)
+        private void CheckHotkeysValidity(string key)
         {
+            // compare QL and QS
             if (SelectedQLKey == SelectedQSKey && SelectedQLMod == SelectedQSMod)
             {
                 if (key.Equals("SelectedQLKey") || key.Equals("SelectedQLMod"))
@@ -222,6 +291,70 @@ namespace SavescumBuddy.ViewModels
                     else
                     {
                         SelectedQLKey = HotKeys[0];
+                    }
+                }
+            }
+
+            // compare QL and SO
+            if (SelectedQLKey == SelectedSOKey && SelectedQLMod == SelectedSOMod)
+            {
+                if (key.Equals("SelectedQLKey") || key.Equals("SelectedQLMod"))
+                {
+                    var keyIndex = HotKeys.FindIndex(k => k.Equals(SelectedQLKey));
+
+                    if (keyIndex > -1 && keyIndex < HotKeys.Count - 1)
+                    {
+                        SelectedSOKey = HotKeys[keyIndex + 1];
+                    }
+                    else
+                    {
+                        SelectedSOKey = HotKeys[0];
+                    }
+                }
+
+                if (key.Equals("SelectedSOKey") || key.Equals("SelectedSOMod"))
+                {
+                    var keyIndex = HotKeys.FindIndex(k => k.Equals(SelectedSOKey));
+
+                    if (keyIndex > -1 && keyIndex < HotKeys.Count - 1)
+                    {
+                        SelectedQLKey = HotKeys[keyIndex + 1];
+                    }
+                    else
+                    {
+                        SelectedQLKey = HotKeys[0];
+                    }
+                }
+            }
+
+            // compare QS and SO
+            if (SelectedQSKey == SelectedSOKey && SelectedQSMod == SelectedSOMod)
+            {
+                if (key.Equals("SelectedQSKey") || key.Equals("SelectedQSMod"))
+                {
+                    var keyIndex = HotKeys.FindIndex(k => k.Equals(SelectedQSKey));
+
+                    if (keyIndex > -1 && keyIndex < HotKeys.Count - 1)
+                    {
+                        SelectedSOKey = HotKeys[keyIndex + 1];
+                    }
+                    else
+                    {
+                        SelectedSOKey = HotKeys[0];
+                    }
+                }
+
+                if (key.Equals("SelectedSOKey") || key.Equals("SelectedSOMod"))
+                {
+                    var keyIndex = HotKeys.FindIndex(k => k.Equals(SelectedSOKey));
+
+                    if (keyIndex > -1 && keyIndex < HotKeys.Count - 1)
+                    {
+                        SelectedQSKey = HotKeys[keyIndex + 1];
+                    }
+                    else
+                    {
+                        SelectedQSKey = HotKeys[0];
                     }
                 }
             }

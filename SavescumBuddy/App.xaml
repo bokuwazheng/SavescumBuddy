@@ -18,7 +18,7 @@
             <GradientStop Color="#FFD2ABE8"/>
             <GradientStop Color="#FFB39CDC" Offset="1"/>
         </LinearGradientBrush>
-        <LinearGradientBrush x:Key="LimitButtonBrush" StartPoint="0,0.5" EndPoint="1,0.5">
+        <LinearGradientBrush x:Key="GroupByGameButtonBrush" StartPoint="0,0.5" EndPoint="1,0.5">
             <GradientStop Color="#FFB39CDC"/>
             <GradientStop Color="#FF6AA5EC" Offset="1"/>
         </LinearGradientBrush>
@@ -163,7 +163,7 @@
         </ControlTemplate>
         <Style x:Key="{x:Type ComboBox}" TargetType="ComboBox">
             <Setter Property="Foreground" Value="{StaticResource Ash}" />
-            <Setter Property="BorderBrush" Value="Gray" />
+            <Setter Property="BorderBrush" Value="Transparent" />
             <Setter Property="Background" Value="White" />
             <Setter Property="SnapsToDevicePixels" Value="true"/>
             <Setter Property="OverridesDefaultStyle" Value="true"/>

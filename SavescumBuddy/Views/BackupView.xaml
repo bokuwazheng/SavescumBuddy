@@ -80,28 +80,14 @@
                     ToolTipService.ShowDuration="30000" Cursor="Help">
             <StackPanel.ToolTip>
                 <ToolTip>
-                    <Grid Margin="3">
+                    <Grid Margin="3,0,3,0" >
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Row="0" HorizontalAlignment="Center" Margin="0,2">Double-click to show in windows explorer.</TextBlock>
-                        <TextBlock Grid.Row="1" HorizontalAlignment="Center">————— INFO —————</TextBlock>
-                        <TextBlock Grid.Row="2" HorizontalAlignment="Center" Margin="0,2" FontWeight="Medium">Game:</TextBlock>
-                        <TextBlock Grid.Row="3" HorizontalAlignment="Center" Margin="0,2" TextWrapping="Wrap" Text="{Binding GameId}"/>
-                        <TextBlock Grid.Row="4" HorizontalAlignment="Center" Margin="0,2" FontWeight="Medium">Origin:</TextBlock>
-                        <TextBlock Grid.Row="5" HorizontalAlignment="Center" Margin="0,2" TextWrapping="Wrap" Text="{Binding Origin}"/>
-                        <TextBlock Grid.Row="6" HorizontalAlignment="Center" Margin="0,2" FontWeight="Medium">File:</TextBlock>
-                        <TextBlock Grid.Row="7" HorizontalAlignment="Center" Margin="0,2" TextWrapping="Wrap" Text="{Binding FilePath}"/>
                     </Grid>
                 </ToolTip>
             </StackPanel.ToolTip>
@@ -120,34 +106,64 @@
                 </TextBlock.Style>
             </TextBlock>
         </StackPanel>
-        <!--Heart button-->
-        <ToggleButton FontFamily="Segoe MDL2 Assets" Command="{Binding UpdateIsLikedCommand}" Grid.Column="1" Grid.Row="1"
+        <!--Buttons-->
+        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" >
+            <!--Heart button-->
+            <ToggleButton FontFamily="Segoe MDL2 Assets" Command="{Binding UpdateIsLikedCommand}" 
                         Width="22" FontSize="16" Height="20" IsChecked="{Binding Path=IsLiked, Mode=TwoWay, Converter={StaticResource IntToBoolConverter}}" >
-            <ToggleButton.Style>
-                <Style TargetType="{x:Type ToggleButton}">
-                    <Setter Property="Content" Value="&#x0000EB51;"/>
-                    <Setter Property="Foreground" Value="#FFDAC6E0"/>
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="{x:Type ToggleButton}">
-                                <Border Background="{x:Null}">
-                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                    <Style.Triggers>
-                        <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Foreground" Value="#FFEEA6F1"/>
-                            <Setter Property="Content" Value="&#xEB52;"/>
-                        </Trigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Foreground" Value="#FFEEA6F1"/>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </ToggleButton.Style>
-        </ToggleButton>
+                <ToggleButton.Style>
+                    <Style TargetType="{x:Type ToggleButton}">
+                        <Setter Property="Content" Value="&#x0000EB51;"/>
+                        <Setter Property="Foreground" Value="#FFDAC6E0"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type ToggleButton}">
+                                    <Border Background="{x:Null}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="Foreground" Value="#FFEEA6F1"/>
+                                <Setter Property="Content" Value="&#xEB52;"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="#FFEEA6F1"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ToggleButton.Style>
+            </ToggleButton>
+            <!--Cloud button-->
+            <ToggleButton FontFamily="Segoe MDL2 Assets" Command="{Binding UpdateInCloudCommand}" Margin="5,0,0,0"
+                        Width="22" FontSize="20" Height="20" IsChecked="{Binding Path=InCloud, Mode=TwoWay, Converter={StaticResource IntToBoolConverter}}" >
+                <ToggleButton.Style>
+                    <Style TargetType="{x:Type ToggleButton}">
+                        <Setter Property="Content" Value="&#xE753;"/>
+                        <Setter Property="Foreground" Value="{StaticResource Ash}"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type ToggleButton}">
+                                    <Border Background="{x:Null}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="Foreground" Value="{StaticResource SkyBlue}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="{StaticResource SkyBlue}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ToggleButton.Style>
+            </ToggleButton>
+        </StackPanel>
         <!--Caution icon-->
         <Border Grid.Column="0" Grid.RowSpan="3" VerticalAlignment="Center" HorizontalAlignment="Center" CornerRadius="3"
                      Visibility="{Binding FilePath, Converter={StaticResource ExistsToVisibilityConverter}}" Background="White" >

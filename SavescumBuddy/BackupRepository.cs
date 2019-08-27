@@ -1,9 +1,11 @@
 ﻿using Prism.Mvvm;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SavescumBuddy
 {
@@ -11,13 +13,15 @@ namespace SavescumBuddy
     {
         public ObservableCollection<Backup> Backups = new ObservableCollection<Backup>();
 
+        #region Singleton implementaion
         private static readonly BackupRepository _instance = new BackupRepository();
         public static BackupRepository Current => _instance;
 
         static BackupRepository()
         {
 
-        }
+        } 
+        #endregion
 
         public void Add(int isAutobackup = 0)
         {
@@ -71,7 +75,7 @@ namespace SavescumBuddy
             Util.Restore(SqliteDataAccess.GetLatestBackup());
         }
 
-        public void SortByNote(string input)
+        public void SortByNote(string input, string offset)
         {
             if (!String.IsNullOrWhiteSpace(input))
             {
@@ -79,19 +83,19 @@ namespace SavescumBuddy
             }
             else
             {
-                LoadSortedList();
+                LoadSortedList(offset);
             }
         }
 
-        public void LoadSortedList()
+        public void LoadSortedList(string offset)
         {
             try
             {
-                Backups = new ObservableCollection<Backup>(SqliteDataAccess.LoadSortedBackupList());
+                Backups = new ObservableCollection<Backup>(SqliteDataAccess.LoadSortedBackupList(offset));
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Util.PopUp(e.Message);
+                Util.PopUp(ex.Message);
             }
         }
     }

@@ -24,6 +24,7 @@ namespace SavescumBuddy
             SetCurrentCommand = new DelegateCommand(() =>
             {
                 SqliteDataAccess.SetGameAsCurrent(this);
+                BackupRepository.Current.LoadSortedList("0");
                 RaiseStateChanged();
             });
 

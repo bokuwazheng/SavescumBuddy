@@ -182,12 +182,12 @@ namespace SavescumBuddy.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool LimitTen {
+        public bool GroupByGame {
             get {
-                return ((bool)(this["LimitTen"]));
+                return ((bool)(this["GroupByGame"]));
             }
             set {
-                this["LimitTen"] = value;
+                this["GroupByGame"] = value;
             }
         }
         
@@ -200,6 +200,51 @@ namespace SavescumBuddy.Properties {
             }
             set {
                 this["OrderByDesc"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string CloudRootId {
+            get {
+                return ((string)(this["CloudRootId"]));
+            }
+            set {
+                this["CloudRootId"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public int PageLimit {
+            get {
+                return ((int)(this["PageLimit"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("117")]
+        public int SOKey {
+            get {
+                return ((int)(this["SOKey"]));
+            }
+            set {
+                this["SOKey"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int SOMod {
+            get {
+                return ((int)(this["SOMod"]));
+            }
+            set {
+                this["SOMod"] = value;
             }
         }
     }

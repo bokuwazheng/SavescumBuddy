@@ -1,17 +1,38 @@
 ﻿using Prism.Commands;
+using System;
 using System.Collections.ObjectModel;
-
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace SavescumBuddy.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
+        // Backing fields
+        private string _currentPage = "1";
         private AutobackupManager _mngr = new AutobackupManager();
+
+        // Properties
         public ObservableCollection<Backup> Backups => BackupRepository.Current.Backups;
         public double Interval => Properties.Settings.Default.Interval * 60;
         public int Progress => _mngr.Progress;
         public bool CurrentGameIsSet => SqliteDataAccess.GetCurrentGame() != null;
         public string SearchQuery { get; set; }
+        private int PageLimit => Properties.Settings.Default.PageLimit;
+        public string CurrentPage
+        {
+            get
+            {
+                return _currentPage;
+            }
+            set
+            {
+                if (value != _currentPage)
+                {
+                    _currentPage = value;
+                }
+            }
+        }
 
         #region Sorting options
         public bool LikedOnly
@@ -32,10 +53,10 @@ namespace SavescumBuddy.ViewModels
             set { Properties.Settings.Default.CurrentOnly = value; RaisePropertyChanged(); }
         }
 
-        public bool TopTen
+        public bool GroupByGame
         {
-            get { return Properties.Settings.Default.LimitTen; }
-            set { Properties.Settings.Default.LimitTen = value; RaisePropertyChanged(); }
+            get { return Properties.Settings.Default.GroupByGame; }
+            set { Properties.Settings.Default.GroupByGame = value; RaisePropertyChanged(); }
         }
 
         public bool OrderByDesc
@@ -47,7 +68,7 @@ namespace SavescumBuddy.ViewModels
 
         public MainViewModel()
         {
-            BackupRepository.Current.LoadSortedList();
+            BackupRepository.Current.LoadSortedList(((int.Parse(CurrentPage) - 1) * PageLimit).ToString());
 
             _mngr.PropertyChanged += (s, e) =>
             {
@@ -56,7 +77,7 @@ namespace SavescumBuddy.ViewModels
 
             BackupRepository.Current.PropertyChanged += (s, e) =>
             {
-                BackupRepository.Current.LoadSortedList();
+                BackupRepository.Current.LoadSortedList(((int.Parse(CurrentPage) - 1) * PageLimit).ToString());
                 RaisePropertyChanged(e.PropertyName);
             };
 
@@ -78,14 +99,68 @@ namespace SavescumBuddy.ViewModels
             SortByNoteCommand = new DelegateCommand<string>(s =>
             {
                 BackupRepository.Current.Backups.Clear();
-                BackupRepository.Current.SortByNote(s);
+                BackupRepository.Current.SortByNote(s, ((int.Parse(CurrentPage) - 1) * PageLimit).ToString());
                 RaisePropertyChanged("Backups");
             });
 
             SortCommand = new DelegateCommand(() =>
             {
                 BackupRepository.Current.Backups.Clear();
-                BackupRepository.Current.LoadSortedList();
+                BackupRepository.Current.LoadSortedList(((int.Parse(CurrentPage) - 1) * PageLimit).ToString());
+                RaisePropertyChanged("Backups");
+            });
+
+            FirstPageCommand = new DelegateCommand(() => 
+            {
+                CurrentPage = "1";
+                RaisePropertyChanged("CurrentPage");
+                BackupRepository.Current.LoadSortedList("0");
+                RaisePropertyChanged("Backups");
+            });
+
+            PreviousPageCommand = new DelegateCommand(() => 
+            {
+                var i = int.Parse(CurrentPage) - 1;
+                if (i == 0) i = 99;
+                CurrentPage = i.ToString();
+                RaisePropertyChanged("CurrentPage");
+                BackupRepository.Current.LoadSortedList(((i - 1) * PageLimit).ToString());
+                RaisePropertyChanged("Backups");
+            });
+
+            NextPageCommand = new DelegateCommand(() => 
+            {
+                var i = int.Parse(CurrentPage) + 1;
+                if (i == 100) i = 1;
+                CurrentPage = i.ToString();
+                RaisePropertyChanged("CurrentPage");
+                BackupRepository.Current.LoadSortedList(((i - 1) * PageLimit).ToString());
+                RaisePropertyChanged("Backups");
+            });
+
+            LastPageCommand = new DelegateCommand(() => 
+            {
+                var offset = 0;
+                var backups = 0;
+                do
+                {
+                    BackupRepository.Current.LoadSortedList(((offset) * PageLimit).ToString());
+                    backups = BackupRepository.Current.Backups.Count();
+                    offset++;
+                }
+                while (backups == PageLimit);
+                CurrentPage = offset.ToString();
+                RaisePropertyChanged("CurrentPage");
+                RaisePropertyChanged("Backups");
+            });
+
+            SetCurrentPageCommand = new DelegateCommand<string>((s) =>
+            {
+                if (string.IsNullOrWhiteSpace(s)) return;
+                CurrentPage = s;
+                RaisePropertyChanged("CurrentPage");
+                var i = int.Parse(CurrentPage);
+                BackupRepository.Current.LoadSortedList(((i - 1) * PageLimit).ToString());
                 RaisePropertyChanged("Backups");
             });
         }
@@ -93,7 +168,12 @@ namespace SavescumBuddy.ViewModels
         public DelegateCommand<int?> RestoreCommand { get; }
         public DelegateCommand<int?> RemoveCommand { get; }
         public DelegateCommand AddCommand { get; }
-        public DelegateCommand SortCommand { get; }
         public DelegateCommand<string> SortByNoteCommand { get; }
+        public DelegateCommand SortCommand { get; }
+        public DelegateCommand FirstPageCommand { get; }
+        public DelegateCommand PreviousPageCommand { get; }
+        public DelegateCommand NextPageCommand { get; }
+        public DelegateCommand LastPageCommand { get; }
+        public DelegateCommand<string> SetCurrentPageCommand { get; }
     }
 }

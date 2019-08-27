@@ -27,19 +27,43 @@
             <ColumnDefinition Width="720"/>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
-
-        <!--ListView-->
-        <ListView x:Name="ListView" ItemsSource="{Binding Backups}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" SelectionMode="Single"
-                  IsSynchronizedWithCurrentItem="True" Grid.Column="1" Grid.RowSpan="2" BorderBrush="{x:Null}" Background="{x:Null}" ScrollViewer.CanContentScroll="False">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <local:BackupView/>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-            <ListView.InputBindings>
-                <KeyBinding Command="{Binding RemoveCommand}" CommandParameter="{Binding SelectedIndex, ElementName=ListView}" Key="Delete" />
-            </ListView.InputBindings>
-        </ListView>
+        <!--List grid-->
+        <Grid Grid.Column="1" Grid.RowSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <!--ListView-->
+            <ListView x:Name="ListView" ItemsSource="{Binding Backups}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" SelectionMode="Single" 
+                  IsSynchronizedWithCurrentItem="True" Grid.RowSpan="2" BorderBrush="{x:Null}" Background="{x:Null}" ScrollViewer.CanContentScroll="False">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <local:BackupView/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.InputBindings>
+                    <KeyBinding Command="{Binding RemoveCommand}" CommandParameter="{Binding SelectedIndex, ElementName=ListView}" Key="Delete" />
+                </ListView.InputBindings>
+            </ListView>
+            <!--Paging panel-->
+            <Grid Margin="150,0,150,0" Grid.Row="1" >
+                <Border Background="{StaticResource Bright}" CornerRadius="7" Opacity=".5" />
+                <Button Content="&#xE96F;" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Left" Command="{Binding FirstPageCommand}" Margin="5,0,0,0"/>
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                    <Button Content="&#xE973;" FontFamily="Segoe MDL2 Assets" Command="{Binding PreviousPageCommand}"/>
+                    <TextBox x:Name="PageBox" Text="{Binding CurrentPage, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                             BorderThickness="0" Width="30" Margin="5,0,5,0" TextAlignment="Center" TextChanged="PageBox_TextChanged"
+                             Foreground="{StaticResource Ash}" MaxLines="1" MaxLength="2" Background="Transparent" >
+                        <TextBox.InputBindings>
+                            <KeyBinding Command="{Binding SetCurrentPageCommand}" CommandParameter="{Binding Path=Text, ElementName=PageBox}" Key="Return" />
+                            <KeyBinding Command="{Binding SetCurrentPageCommand}" CommandParameter="{Binding Path=Text, ElementName=PageBox}" Key="Enter" />
+                        </TextBox.InputBindings>
+                    </TextBox>
+                    <Button Content="&#xE974;" FontFamily="Segoe MDL2 Assets" Command="{Binding NextPageCommand}"/>
+                </StackPanel>
+                <Button Content="&#xE970;" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Right" Command="{Binding LastPageCommand}" Margin="0,0,5,0" />
+            </Grid>
+        </Grid>
         <!--Button panel-->
         <Grid  Grid.Column="1" Grid.Row="3" >
             <Grid.ColumnDefinitions>
@@ -154,23 +178,6 @@
                         </Style>
                     </ToggleButton.Style>
                 </ToggleButton>
-                <!--Limit button-->
-                <ToggleButton Command="{Binding SortCommand}" FontFamily="Segoe UI" FontSize="12"
-                         Width="40" Margin="5,0,5,0" IsChecked="{Binding TopTen}" >
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock Text="Limit to" TextAlignment="Center"/>
-                        <TextBlock Text="first 10" TextAlignment="Center"/>
-                    </StackPanel>
-                    <ToggleButton.Style>
-                        <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                            <Style.Triggers>
-                                <Trigger Property="IsChecked" Value="True">
-                                    <Setter Property="Foreground" Value="{StaticResource LimitButtonBrush}"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ToggleButton.Style>
-                </ToggleButton>
                 <!--Order button-->
                 <ToggleButton Command="{Binding SortCommand}" FontFamily="Segoe MDL2 Assets" Content="&#xE8CB;" 
                          Width="25" Height="25" Margin="5,0,5,0" IsChecked="{Binding OrderByDesc}"  >
@@ -178,7 +185,7 @@
                         <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                             <Style.Triggers>
                                 <Trigger Property="IsChecked" Value="True">
-                                    <Setter Property="Foreground" Value="{StaticResource OrderButtonBrush}"/>
+                                    <Setter Property="Foreground" Value="{StaticResource GroupByGameButtonBrush}"/>
                                 </Trigger>
                             </Style.Triggers>
                         </Style>
@@ -288,11 +295,11 @@
         <Image DataContext="{Binding Backups}" Source="{Binding /Picture, Converter={StaticResource UriToImgConverter}}" HorizontalAlignment="Stretch"  
                VerticalAlignment="Stretch" Margin="15,0,10,0" Grid.Column="0" Grid.Row="0" />
         <!--No current game sign-->
-        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Margin="15,10,10,0" 
+        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Margin="15,10,10,0" TextAlignment="Center"
                    Grid.Column="0" Grid.Row="0" FontSize="18" Foreground="{StaticResource Ash}" >
             <TextBlock.Style>
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource Caption}">
-                    <Setter Property="Text" Value="No game is set as current yet (click that gear icon in the right-bottom corner)!"/>
+                    <Setter Property="Text" Value="No game is set as current yet. &#xA;Please, go to Settings, add a game and set it as current."/>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding CurrentGameIsSet}" Value="True">
                             <Setter Property="Text" Value=""/>

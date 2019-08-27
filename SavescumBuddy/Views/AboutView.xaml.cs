@@ -16,8 +16,15 @@ namespace SavescumBuddy.Views
 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
-            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
-            e.Handled = true;
+            try
+            {
+                Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+                e.Handled = true;
+            }
+            catch (System.Exception ex)
+            {
+                Util.PopUp($"Exception message: { ex.Message }");
+            }
         }
     }
 }

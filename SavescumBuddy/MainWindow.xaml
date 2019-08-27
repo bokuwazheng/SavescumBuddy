@@ -8,7 +8,7 @@
         xmlns:viewmodels="clr-namespace:SavescumBuddy.ViewModels"
         mc:Ignorable="d"
         Height="700" Width="1160" ResizeMode="CanMinimize" Title="Savescum Buddy" 
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
     
     <Window.DataContext>
         <viewmodels:ApplicationViewModel/>

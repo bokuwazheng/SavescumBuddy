@@ -55,6 +55,25 @@ namespace SavescumBuddy.Views
                     e.Handled = true;
                 }
             }
+
+            if (e.KeyValue == Properties.Settings.Default.SOKey)
+            {
+                if ((int)e.Modifiers == Properties.Settings.Default.SOMod)
+                {
+                    try
+                    {
+                        BackupRepository.Current.Remove(SqliteDataAccess.GetLatestBackup());
+                        BackupRepository.Current.Add();
+                        Util.PlaySound(WavLocator.backup_cue);
+                    }
+                    catch
+                    {
+                        Util.PopUp("There is no backup to overwrite yet.");
+                    }
+
+                    e.Handled = true;
+                }
+            }
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -70,6 +89,15 @@ namespace SavescumBuddy.Views
         {
             _klistener.Unhook();
             _klistener.KeyDown -= _klistener_KeyDown;
+        }
+
+        private void PageBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            if (System.Text.RegularExpressions.Regex.IsMatch(PageBox.Text, "[^0-9]"))
+            {
+                PageBox.Text = PageBox.Text.Remove(PageBox.Text.Length - 1);
+                PageBox.SelectionStart = PageBox.Text.Length;
+            }
         }
     }
 }

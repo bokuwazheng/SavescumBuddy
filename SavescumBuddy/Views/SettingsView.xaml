@@ -119,13 +119,14 @@
                     <RowDefinition Height="50"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="64"/>
+                    <RowDefinition Height="84"/>
                     <RowDefinition Height="Auto" MinHeight="50"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="50"/>
                     <RowDefinition />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
@@ -155,7 +156,7 @@
                     </StackPanel>
                 </StackPanel>
                 <!--Autobackup ToggleButton-->
-                <Canvas Grid.Column="1" Grid.Row="0" Margin="5,8" Width="40" HorizontalAlignment="Right">
+                <Canvas Grid.Column="1" Grid.Row="0" Width="40" Margin="5" HorizontalAlignment="Right">
                     <ToggleButton x:Name="AutobackupButton" Content="&#xEC11;" FontSize="34" FontFamily="Segoe MDL2 Assets" 
                                   Height="34" Width="34" Canvas.Left="5" Canvas.Top="0" Style="{StaticResource SlidingToggleButton}"
                                   IsChecked="{Binding AutobackupsOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -212,9 +213,9 @@
                     <!--Header-->
                     <TextBlock Text="Hotkeys" Style="{StaticResource Header}"/>
                     <!--Caption-->
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal" Width="435">
                         <!--QS caption-->
-                        <TextBlock Text="Quicksave: " Style="{StaticResource Caption}"/>
+                        <TextBlock Text="Save: " Style="{StaticResource Caption}"/>
                         <TextBlock>
                                 <Run Text="{Binding SelectedQSMod, FallbackValue=Ctrl, Converter={StaticResource StringToModifierConverter}}"/>
                                 <Run Text="+ "/>
@@ -231,7 +232,7 @@
                         </TextBlock>
                         <TextBlock Text="{Binding SelectedQSKey, FallbackValue=J}" Style="{StaticResource Caption}"/>
                         <!--QL caption-->
-                        <TextBlock Text=". Quickload: " Style="{StaticResource Caption}"/>
+                        <TextBlock Text=". Load: " Style="{StaticResource Caption}"/>
                         <TextBlock>
                                 <Run Text="{Binding SelectedQLMod, FallbackValue=Shift, Converter={StaticResource StringToModifierConverter}}"/>
                                 <Run Text="+ "/>
@@ -247,12 +248,31 @@
                             </TextBlock.Style>
                         </TextBlock>
                         <TextBlock Style="{StaticResource Caption}">
-                            <Run Text="{Binding SelectedQLKey, FallbackValue=O}"/>.
+                            <Run Text="{Binding SelectedQLKey, FallbackValue=O}"/>
+                        </TextBlock>
+                        <!--SO caption-->
+                        <TextBlock Text=". Overwrite prev.: " Style="{StaticResource Caption}"/>
+                        <TextBlock>
+                                <Run Text="{Binding SelectedSOMod, FallbackValue=Alt, Converter={StaticResource StringToModifierConverter}}"/>
+                                <Run Text="+ "/>
+                            <TextBlock.Style>
+                                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource Caption}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=QLMod}" Value="None">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource Caption}">
+                            <Run Text="{Binding SelectedSOKey, FallbackValue=U}"/>.
                         </TextBlock>
                     </StackPanel>
                 </StackPanel>
                 <!--Toggle Hotkeys Buttons-->
-                <Canvas Background="Transparent" Grid.Column="1" Grid.Row="2" Margin="5,8" Width="40" HorizontalAlignment="Right">
+                <Canvas Grid.Column="1" Grid.Row="2" Margin="5" Width="40" HorizontalAlignment="Right" >
                     <ToggleButton x:Name="HotkeysButton" Content="&#xEC11;" FontSize="34" FontFamily="Segoe MDL2 Assets" Grid.Column="1"
                               IsChecked="{Binding HotkeysOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SlidingToggleButton}"
                                   Height="34" Width="34" Canvas.Left="5" Canvas.Top="0" />
@@ -279,9 +299,9 @@
                 <!--Shortcuts Expander-->
                 <Expander Header="Show more..." ExpandDirection="Down" Grid.ColumnSpan="2" Grid.Row="3" Margin="0,0,0,15" Foreground="{StaticResource Ash}"
                           FontSize="{StaticResource CaptionFontSize}" >
-                    <StackPanel Orientation="Vertical" Margin="23,7,0,10">
+                    <StackPanel Orientation="Vertical" Margin="5">
                         <!--Quick save-->
-                        <GroupBox Header="Quick save" Padding="3" BorderBrush="{StaticResource Ash}" FontSize="{StaticResource СommonFontSize}" >
+                        <GroupBox Header="Backup" Padding="3" BorderBrush="{StaticResource Ash}" FontSize="{StaticResource СommonFontSize}" >
                             <Grid Margin="0,0,0,2" >
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
@@ -297,9 +317,8 @@
                                               ItemsSource="{Binding HotKeys}" SelectedValue="{Binding SelectedQSKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             </Grid>
                         </GroupBox>
-
                         <!--Quick load-->
-                        <GroupBox Header="Quick load" Padding="3" BorderBrush="{StaticResource Ash}" FontSize="{StaticResource СommonFontSize}">
+                        <GroupBox Header="Restore previous" Padding="3" BorderBrush="{StaticResource Ash}" FontSize="{StaticResource СommonFontSize}">
                             <Grid Margin="0,0,0,2" >
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
@@ -315,21 +334,61 @@
                                               ItemsSource="{Binding HotKeys}" SelectedValue="{Binding SelectedQLKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             </Grid>
                         </GroupBox>
+                        <!--Save and overwrite-->
+                        <GroupBox Header="Backup and overwrite previous" Padding="3" BorderBrush="{StaticResource Ash}" FontSize="{StaticResource СommonFontSize}" >
+                            <Grid Margin="0,0,0,2" >
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Modifier" Margin="0,0,10,0" Style="{StaticResource Caption}" VerticalAlignment="Center" Grid.Column="0"/>
+                                <ComboBox x:Name="QSRMod" IsSynchronizedWithCurrentItem="True" HorizontalAlignment="Stretch" Grid.Column="1" Foreground="{StaticResource Ash}"
+                                              ItemsSource="{Binding Modifiers}" SelectedValue="{Binding SelectedSOMod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToModifierConverter}}" />
+                                <TextBlock Text="Key*" Margin="20,0,10,0" Style="{StaticResource Caption}" FontSize="{StaticResource CaptionFontSize}" VerticalAlignment="Center" Grid.Column="2"/>
+                                <ComboBox IsSynchronizedWithCurrentItem="True" Grid.Column="3" Foreground="{StaticResource Ash}"
+                                              ItemsSource="{Binding HotKeys}" SelectedValue="{Binding SelectedSOKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
+                        </GroupBox>
                     </StackPanel>
-
                 </Expander>
-
 
                 <!--Title (header + caption)-->
                 <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="4" >
                     <!--Header-->
                     <TextBlock Text="Sound cues" TextAlignment="Left" Style="{StaticResource Header}" />
                     <!--Caption-->
-                    <TextBlock Text="Play a sound cue when hotkey is pressed." TextAlignment="Left" Style="{StaticResource Caption}"/>
+                    <TextBlock Text="Play a sound cue when a hotkey is pressed." TextAlignment="Left" Style="{StaticResource Caption}"/>
+                </StackPanel>
+
+                <!--Title (header + caption)-->
+                <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="5" >
+                    <!--Header-->
+                    <TextBlock Text="Google drive" TextAlignment="Left" Style="{StaticResource Header}" />
+                    <!--Caption-->
+                    <TextBlock TextAlignment="Left" Style="{StaticResource Caption}"> 
+                        <Hyperlink Command="{Binding AuthorizeCommand}">
+                                <Hyperlink.Style>
+                                    <Style TargetType="{x:Type Hyperlink}">
+                                        <Setter Property="Foreground" Value="{StaticResource SkyBlue}"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsEnabled" Value="False">
+                                                <Setter Property="Foreground" Value="{StaticResource Ash}"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Hyperlink.Style>
+                       Authorize</Hyperlink> to store your backups on Google drive.
+                    </TextBlock>
+                    <TextBlock Style="{StaticResource Caption}" Width="435">
+                        <Run Text="Currently authorized as:"/>
+                        <Run Text="{Binding AuthorizedAs, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>.
+                    </TextBlock>
                 </StackPanel>
 
                 <!--Toggle Hotkeys Buttons-->
-                <Canvas Background="Transparent" Grid.Column="1" Grid.Row="4" Margin="5,8" Width="40" HorizontalAlignment="Right">
+                <Canvas Grid.Column="1" Grid.Row="4" Margin="5" Width="40" HorizontalAlignment="Right">
                     <ToggleButton x:Name="SoundCuesButton" Content="&#xEC11;" FontSize="34" FontFamily="Segoe MDL2 Assets" Grid.Column="1"
                               IsChecked="{Binding SoundCuesOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SlidingToggleButton}"
                                   Height="34" Width="34" Canvas.Left="5" Canvas.Top="0" />
@@ -357,7 +416,7 @@
 
                 <!--Game mgmt-->
                 <!--Title-->
-                <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="5">
+                <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="6">
                     <TextBlock Text="Games" Style="{StaticResource Header}" />
                     <TextBlock Style="{StaticResource Caption}" TextWrapping="Wrap" MaxWidth="475" HorizontalAlignment="Left">
             Current game: <Run Text="{Binding CurrentGameTitle, Mode=OneWay, 
@@ -376,12 +435,31 @@
                                         </Style.Triggers>
                                     </Style>
                                 </Hyperlink.Style>
+                                <Hyperlink.ToolTip>
+                                    <ToolTip>
+                                        <TextBlock Margin="3,0" Text="Savefiles must be located in separate folders.&#xA;To attach an image put it in the folder next to the savefile."/>
+                                    </ToolTip>
+                                </Hyperlink.ToolTip>
                        import</Hyperlink> backups of current game.
                     </TextBlock>
+                    <!--Import progress bar-->
+                    <ProgressBar Value="{Binding ImportProgress, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="100" BorderThickness="0"
+                                 Height="2" Foreground="{StaticResource SkyBlue}" Margin="5" >
+                        <ProgressBar.Style>
+                            <Style TargetType="{x:Type ProgressBar}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ImportInProgress}" Value="true">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ProgressBar.Style>
+                    </ProgressBar>
                 </StackPanel>
                 <!--Expander-->
                 <ListView x:Name="GamesListView" ItemsSource="{Binding Games}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" SelectionMode="Single"
-                  Margin="0,5" IsSynchronizedWithCurrentItem="True" Grid.ColumnSpan="2" Grid.Row="6" BorderBrush="{x:Null}" Background="{x:Null}" 
+                  Margin="0,5" IsSynchronizedWithCurrentItem="True" Grid.ColumnSpan="2" Grid.Row="7" BorderBrush="{x:Null}" Background="{x:Null}" 
                           ScrollViewer.CanContentScroll="True" Style="{DynamicResource ListViewNoScrollView}" MinWidth="485">
                     <ListView.ItemTemplate>
                         <DataTemplate>
@@ -390,7 +468,7 @@
                     </ListView.ItemTemplate>
                 </ListView>
 
-                <Grid Grid.ColumnSpan="2" Grid.Row="7" Margin="5">
+                <Grid Grid.ColumnSpan="2" Grid.Row="8" Margin="5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition/>

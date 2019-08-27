@@ -47,10 +47,11 @@
             </TextBlock>
             <TextBlock FontSize="14" Foreground="{StaticResource Dark}" TextWrapping="Wrap" Margin="0,4" Width="300" >
                 Tecnically what this software does is provide a neat way to "savescum" in
-                any game that has only a single savefile. <Run Text="&#xA;NB:" FontWeight="Medium"/>
-                Though presence of multiple savefile copies on your computer can't get you banned,
-                possession of items your character wasn't supposed to have can (at least in "Souls" series).
-                Anyways, do your research before attempting anything.
+                any game that has only a single savefile. <Run Text="&#xA;"/>IN 
+                NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR
+                OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+                ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+                OTHER DEALINGS IN THE SOFTWARE.
             </TextBlock>
             <TextBlock FontSize="14" Foreground="{StaticResource Dark}" Margin="0,4">
                 Source code is available on 

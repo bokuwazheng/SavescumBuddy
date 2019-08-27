@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.SQLite;
 using System.Linq;
 using System;
+using System.Threading.Tasks;
 
 namespace SavescumBuddy
 {
@@ -12,7 +13,7 @@ namespace SavescumBuddy
 
     class SqliteDataAccess
     {
-        private static string LoadConnectionString(string id = "Debug") // string id = "Debug" for debugging, otherwise "Default"
+        private static string LoadConnectionString(string id = "Default") // string id = "Debug" for debugging, otherwise "Default"
         {
             var cnnstr = ConfigurationManager.ConnectionStrings[id].ConnectionString;
             return cnnstr.Replace("%APPDATA%", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)); 
@@ -55,6 +56,15 @@ namespace SavescumBuddy
             }
         }
 
+        private static async Task<List<IDbEntity>> QueryAsync<IDbEntity>(string sql, object args = null)
+        {
+            using (IDbConnection cnn = new SQLiteConnection(LoadConnectionString()))
+            {
+                var output = await cnn.QueryAsync<IDbEntity>(sql, args);
+                return output.ToList();
+            }
+        }
+
         #region Backup table
         public static void SaveBackup(Backup backup)
         {
@@ -86,6 +96,11 @@ namespace SavescumBuddy
             Execute("update Backup set IsLiked = @IsLiked where Id = @Id;", new { Id = backup.Id, IsLiked = backup.IsLiked });
         }
 
+        public static void UpdateInCloud(Backup backup)
+        {
+            Execute("update Backup set InCloud = @InCloud where Id = @Id;", new { Id = backup.Id, InCloud = backup.InCloud });
+        }
+
         public static List<Backup> LoadBackupList()
         {
             return Query<Backup>("select * from Backup order by Id desc");
@@ -98,17 +113,17 @@ namespace SavescumBuddy
             return Query<Backup>("select * from Backup where (Note like @lc or Note like @uc) order by Id desc;", new { lc = "%" + input.ToLower() + "%", uc = "%" + input.ToUpper() + "%" });
         }
 
-        public static List<Backup> LoadSortedBackupList()
+        public static List<Backup> LoadSortedBackupList(string offset)
         {
             var game = GetCurrentGame();
 
             var isLiked = Properties.Settings.Default.LikedOnly ? "1" : "0";
             var isAutobackup = Properties.Settings.Default.HideAutobackups ? "0" : "1";
             var gameId = Properties.Settings.Default.CurrentOnly && game != null ? $"{ game.Title }" : "";
-            var limit = Properties.Settings.Default.LimitTen ? "limit 10" : "";
             var order = Properties.Settings.Default.OrderByDesc ? "desc" : "asc";
+            var limit = Properties.Settings.Default.PageLimit.ToString();
 
-            var sql = $"select * from Backup where IsLiked >= @IsLiked and IsAutobackup <= @IsAutobackup and GameId like @GameId order by Id { order } { limit }";
+            var sql = $"select * from Backup where IsLiked >= @IsLiked and IsAutobackup <= @IsAutobackup and GameId like @GameId order by Id { order } limit { limit } offset { offset }";
             var args = new
             {
                 IsLiked = isLiked,
