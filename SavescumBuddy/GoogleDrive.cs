@@ -84,7 +84,6 @@ namespace SavescumBuddy
                         Util.PopUp("Error: timeout. Authorization canceled after 180 seconds. \n \n" +
                             "Please click 'Authorize' again to complete authorization. \n \n" +
                             $"Exception message: { ex.GetBaseException().ToString() }");
-                        return;
                     }
                 }
 
@@ -117,11 +116,11 @@ namespace SavescumBuddy
                 if (credential == null) return;
 
                 // Create app root folder in drive root and save its id.
-                if (!NameExists("Savescum Buddy", "root", MimeType.Folder))
+                if (!NameExists(ApplicationName, "root", MimeType.Folder))
                 {
                     var fileMetadata = new Google.Apis.Drive.v3.Data.File()
                     {
-                        Name = "Savescum Buddy",
+                        Name = ApplicationName,
                         MimeType = "application/vnd.google-apps.folder",
                     };
                     var request = CreateDriveApiService().Files.Create(fileMetadata);
@@ -130,6 +129,13 @@ namespace SavescumBuddy
                     Properties.Settings.Default.CloudRootId = folder.Id;
                     Properties.Settings.Default.Save();
                 }
+                else
+                {
+                    var folderId = GetIdByName(ApplicationName, MimeType.Folder);
+                    Properties.Settings.Default.CloudRootId = folderId;
+                    Properties.Settings.Default.Save();
+                }
+
             });
         }
 
@@ -213,7 +219,7 @@ namespace SavescumBuddy
             FilesResource.ListRequest listRequest = CreateDriveApiService().Files.List();
             listRequest.Fields = "nextPageToken, files(id, name)";
             listRequest.Spaces = "drive";
-            listRequest.Q = mimeType + " and trashed = false"; 
+            listRequest.Q = mimeType + " and trashed = false";
 
             var result = listRequest.Execute().Files.FirstOrDefault(x => x.Name == name);
 
