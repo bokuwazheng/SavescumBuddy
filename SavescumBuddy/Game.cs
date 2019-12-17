@@ -21,10 +21,11 @@ namespace SavescumBuddy
                 RaiseStateChanged();
             });
 
+            // TODO reload backup list when current game is updated
             SetCurrentCommand = new DelegateCommand(() =>
             {
                 SqliteDataAccess.SetGameAsCurrent(this);
-                BackupRepository.Current.LoadSortedList("0");
+                //BackupRepository.Current.LoadSortedList("0");
                 RaiseStateChanged();
             });
 

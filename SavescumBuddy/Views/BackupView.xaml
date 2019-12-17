@@ -80,15 +80,7 @@
                     ToolTipService.ShowDuration="30000" Cursor="Help">
             <StackPanel.ToolTip>
                 <ToolTip>
-                    <Grid Margin="3,0,3,0" >
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Row="0" HorizontalAlignment="Center" Margin="0,2">Double-click to show in windows explorer.</TextBlock>
-                    </Grid>
+                    <TextBlock Margin="3,2" Text="Double-click to show in windows explorer."/>
                 </ToolTip>
             </StackPanel.ToolTip>
             <TextBlock Foreground="{StaticResource Dark}" Text="{Binding DateTimeTag, FallbackValue=1020304020304020}"/>

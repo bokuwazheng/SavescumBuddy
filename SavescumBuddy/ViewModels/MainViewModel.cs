@@ -3,6 +3,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Linq;
+using Settings = SavescumBuddy.Properties.Settings;
 
 namespace SavescumBuddy.ViewModels
 {
@@ -10,28 +11,24 @@ namespace SavescumBuddy.ViewModels
     {
         // Backing fields
         private string _currentPage = "1";
-        private AutobackupManager _mngr = new AutobackupManager();
+        private AutobackupManager _autobackupManager;
+        private BackupFactory _backupFactory;
+        private BackupRepository _backupRepository;
 
         // Properties
-        public ObservableCollection<Backup> Backups => BackupRepository.Current.Backups;
-        public double Interval => Properties.Settings.Default.Interval * 60;
-        public int Progress => _mngr.Progress;
+        public ObservableCollection<Backup> Backups
+        {
+            get { return _backupRepository.GetBackupList(); }
+        }
+        public double Interval => Settings.Default.Interval * 60;
+        public int Progress => _autobackupManager.Progress;
         public bool CurrentGameIsSet => SqliteDataAccess.GetCurrentGame() != null;
         public string SearchQuery { get; set; }
-        private int PageLimit => Properties.Settings.Default.PageLimit;
+        private int BackupsPerPage => Settings.Default.BackupsPerPage;
         public string CurrentPage
         {
-            get
-            {
-                return _currentPage;
-            }
-            set
-            {
-                if (value != _currentPage)
-                {
-                    _currentPage = value;
-                }
-            }
+            get { return _currentPage; }
+            set { if (value != _currentPage) _currentPage = value; RaisePropertyChanged("CurrentPage"); }
         }
 
         #region Sorting options
@@ -66,56 +63,50 @@ namespace SavescumBuddy.ViewModels
         }
         #endregion
 
-        public MainViewModel()
+        public MainViewModel(BackupRepository repo, BackupFactory factory, AutobackupManager manager)
         {
-            BackupRepository.Current.LoadSortedList(((int.Parse(CurrentPage) - 1) * PageLimit).ToString());
+            _backupRepository = repo;
+            _backupFactory = factory;
+            _autobackupManager = manager;
+            _backupRepository.LoadBackupsFromPage(((int.Parse(CurrentPage) - 1) * BackupsPerPage).ToString());
 
-            _mngr.PropertyChanged += (s, e) =>
+            // TODO figure out what happens here!!
+            _autobackupManager.PropertyChanged += (s, e) =>
             {
-                RaisePropertyChanged(e.PropertyName);
-            };
-
-            BackupRepository.Current.PropertyChanged += (s, e) =>
-            {
-                BackupRepository.Current.LoadSortedList(((int.Parse(CurrentPage) - 1) * PageLimit).ToString());
                 RaisePropertyChanged(e.PropertyName);
             };
 
             AddCommand = new DelegateCommand(() =>
             {
-                BackupRepository.Current.Add();
+                _backupRepository.Add(_backupFactory.CreateBackup());
+                UpdateBackupList(int.Parse(CurrentPage));
             });
 
             RemoveCommand = new DelegateCommand<int?>(i =>
             {
-                if (i.HasValue) BackupRepository.Current.RemoveAt(i.Value);
+                if (i.HasValue) _backupRepository.RemoveAt(i.Value);
+                UpdateBackupList(int.Parse(CurrentPage));
             });
 
             RestoreCommand = new DelegateCommand<int?>(i =>
             {
-                if (i.HasValue) BackupRepository.Current.Restore(i.Value);
+                if (i.HasValue) _backupRepository.Restore(i.Value);
             });
 
             SortByNoteCommand = new DelegateCommand<string>(s =>
             {
-                BackupRepository.Current.Backups.Clear();
-                BackupRepository.Current.SortByNote(s, ((int.Parse(CurrentPage) - 1) * PageLimit).ToString());
-                RaisePropertyChanged("Backups");
+                UpdateBackupList(int.Parse(CurrentPage));
             });
 
             SortCommand = new DelegateCommand(() =>
             {
-                BackupRepository.Current.Backups.Clear();
-                BackupRepository.Current.LoadSortedList(((int.Parse(CurrentPage) - 1) * PageLimit).ToString());
-                RaisePropertyChanged("Backups");
+                UpdateBackupList(int.Parse(CurrentPage));
             });
 
             FirstPageCommand = new DelegateCommand(() => 
             {
                 CurrentPage = "1";
-                RaisePropertyChanged("CurrentPage");
-                BackupRepository.Current.LoadSortedList("0");
-                RaisePropertyChanged("Backups");
+                UpdateBackupList(1);
             });
 
             PreviousPageCommand = new DelegateCommand(() => 
@@ -123,9 +114,7 @@ namespace SavescumBuddy.ViewModels
                 var i = int.Parse(CurrentPage) - 1;
                 if (i == 0) i = 99;
                 CurrentPage = i.ToString();
-                RaisePropertyChanged("CurrentPage");
-                BackupRepository.Current.LoadSortedList(((i - 1) * PageLimit).ToString());
-                RaisePropertyChanged("Backups");
+                UpdateBackupList(i);
             });
 
             NextPageCommand = new DelegateCommand(() => 
@@ -133,9 +122,7 @@ namespace SavescumBuddy.ViewModels
                 var i = int.Parse(CurrentPage) + 1;
                 if (i == 100) i = 1;
                 CurrentPage = i.ToString();
-                RaisePropertyChanged("CurrentPage");
-                BackupRepository.Current.LoadSortedList(((i - 1) * PageLimit).ToString());
-                RaisePropertyChanged("Backups");
+                UpdateBackupList(i);
             });
 
             LastPageCommand = new DelegateCommand(() => 
@@ -144,25 +131,36 @@ namespace SavescumBuddy.ViewModels
                 var backups = 0;
                 do
                 {
-                    BackupRepository.Current.LoadSortedList(((offset) * PageLimit).ToString());
-                    backups = BackupRepository.Current.Backups.Count();
+                    _backupRepository.LoadBackupsFromPage(((offset) * BackupsPerPage).ToString());
+                    backups = _backupRepository.Count();
                     offset++;
                 }
-                while (backups == PageLimit);
+                while (backups == BackupsPerPage);
                 CurrentPage = offset.ToString();
-                RaisePropertyChanged("CurrentPage");
-                RaisePropertyChanged("Backups");
+                UpdateBackupList(int.Parse(CurrentPage));
             });
 
             SetCurrentPageCommand = new DelegateCommand<string>((s) =>
             {
                 if (string.IsNullOrWhiteSpace(s)) return;
                 CurrentPage = s;
-                RaisePropertyChanged("CurrentPage");
                 var i = int.Parse(CurrentPage);
-                BackupRepository.Current.LoadSortedList(((i - 1) * PageLimit).ToString());
-                RaisePropertyChanged("Backups");
+                UpdateBackupList(i);
             });
+        }
+
+        private void UpdateBackupList(int page)
+        {
+            if (string.IsNullOrWhiteSpace(SearchQuery))
+            {
+                _backupRepository.LoadBackupsFromPage(((page - 1) * BackupsPerPage).ToString());
+            }
+            else
+            {
+                _backupRepository.LoadSortedByNoteList(SearchQuery, ((page - 1) * BackupsPerPage).ToString());
+            }
+
+            RaisePropertyChanged("Backups");
         }
 
         public DelegateCommand<int?> RestoreCommand { get; }
