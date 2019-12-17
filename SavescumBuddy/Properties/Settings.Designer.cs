@@ -218,9 +218,9 @@ namespace SavescumBuddy.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("10")]
-        public int PageLimit {
+        public int BackupsPerPage {
             get {
-                return ((int)(this["PageLimit"]));
+                return ((int)(this["BackupsPerPage"]));
             }
         }
         

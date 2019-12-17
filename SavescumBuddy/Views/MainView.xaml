@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:SavescumBuddy.Views"
              mc:Ignorable="d" 
              d:DesignHeight="660" d:DesignWidth="1160"
-             Loaded="UserControl_Loaded" Unloaded="UserControl_Unloaded">
+             >
     <UserControl.Style>
         <Style TargetType="{x:Type UserControl}">
             <Style.Triggers>

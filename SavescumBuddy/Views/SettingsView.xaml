@@ -379,7 +379,7 @@
                                         </Style.Triggers>
                                     </Style>
                                 </Hyperlink.Style>
-                       Authorize</Hyperlink> to store your backups on Google drive.
+                       Authorize</Hyperlink> to store your backups in Google drive.
                     </TextBlock>
                     <TextBlock Style="{StaticResource Caption}" Width="435">
                         <Run Text="Currently authorized as:"/>
@@ -418,10 +418,10 @@
                 <!--Title-->
                 <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="6">
                     <TextBlock Text="Games" Style="{StaticResource Header}" />
-                    <TextBlock Style="{StaticResource Caption}" TextWrapping="Wrap" MaxWidth="475" HorizontalAlignment="Left">
+                    <TextBlock Style="{StaticResource Caption}" TextWrapping="Wrap" MaxWidth="475" HorizontalAlignment="Left" >
             Current game: <Run Text="{Binding CurrentGameTitle, Mode=OneWay, 
                                 UpdateSourceTrigger=PropertyChanged, FallbackValue=none}"/>.
-                    You can <Hyperlink Command="{Binding UploadCustomCommand}" >
+                    You can <Hyperlink Command="{Binding UploadCustomCommand}" ToolTipService.ShowDuration="30000" >
                                 <Hyperlink.Style>
                                     <Style TargetType="{x:Type Hyperlink}">
                                         <Setter Property="Foreground" Value="{StaticResource SkyBlue}"/>
@@ -436,8 +436,8 @@
                                     </Style>
                                 </Hyperlink.Style>
                                 <Hyperlink.ToolTip>
-                                    <ToolTip>
-                                        <TextBlock Margin="3,0" Text="Savefiles must be located in separate folders.&#xA;To attach an image put it in the folder next to the savefile."/>
+                                    <ToolTip >
+                                        <TextBlock Margin="3,2" Text="Savefiles must be located in separate folders.&#xA;To attach an image put it in the folder next to the savefile."/>
                                     </ToolTip>
                                 </Hyperlink.ToolTip>
                        import</Hyperlink> backups of current game.

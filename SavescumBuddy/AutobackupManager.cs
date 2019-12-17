@@ -2,6 +2,7 @@
 using Prism.Mvvm;
 using System;
 using System.Windows.Threading;
+using Settings = SavescumBuddy.Properties.Settings;
 
 namespace SavescumBuddy
 {
@@ -9,40 +10,23 @@ namespace SavescumBuddy
     {
         private DispatcherTimer _backupTimer = new DispatcherTimer();
         private DispatcherTimer _progressBarTimer = new DispatcherTimer();
+        private BackupRepository _backupRepository;
+        private BackupFactory _backupFactory;
         public int Progress { get; private set; }
 
-        public AutobackupManager()
+        public AutobackupManager(BackupRepository repo, BackupFactory factory)
         {
-            SettingsViewModel.Subscribe((object sender, TimerEventArgs e) =>
-            {
-                if (e.EnabledChanged)
-                {
-                    if (Properties.Settings.Default.AutobackupsOn)
-                    {
-                        Start();
-                    }
-                    else
-                    {
-                        Stop();
-                    }
-                }
-                else // meaning that interval has changed
-                {
-                    if (Properties.Settings.Default.AutobackupsOn)
-                    {
-                        Stop(); Start();
-                    }
-                }
-            });
+            _backupRepository = repo;
+            _backupFactory = factory;
 
-            _backupTimer.Interval = TimeSpan.FromMinutes(Properties.Settings.Default.Interval);
+            _backupTimer.Interval = TimeSpan.FromMinutes(Settings.Default.Interval);
             _backupTimer.Tick += (s, ea) =>
             {
                 SmartAutobackup();
                 Progress = 0;
             };
             _backupTimer.Start();
-            _backupTimer.IsEnabled = Properties.Settings.Default.AutobackupsOn; // puts on pause if false
+            _backupTimer.IsEnabled = Settings.Default.AutobackupsOn; // puts on pause if false
 
             _progressBarTimer.Interval = TimeSpan.FromMilliseconds(1000);
             _progressBarTimer.Tick += (s, ea) =>
@@ -51,12 +35,12 @@ namespace SavescumBuddy
                 RaisePropertyChanged("Progress");
             };
             _progressBarTimer.Start();
-            _progressBarTimer.IsEnabled = Properties.Settings.Default.AutobackupsOn;
+            _progressBarTimer.IsEnabled = Settings.Default.AutobackupsOn;
         }
 
         private void Start()
         {
-            _backupTimer.Interval = TimeSpan.FromMinutes(Properties.Settings.Default.Interval);
+            _backupTimer.Interval = TimeSpan.FromMinutes(Settings.Default.Interval);
             _backupTimer.Start();
             _progressBarTimer.Start();
         }
@@ -82,11 +66,11 @@ namespace SavescumBuddy
             {
                 if (PreviousAutobackupShouldBeDeleted(backup))
                 {
-                    BackupRepository.Current.Remove(backup);
+                    _backupRepository.Remove(backup);
                 }
             }
 
-            BackupRepository.Current.Add(1);
+            _backupRepository.Add(_backupFactory.CreateAutobackup());
         }
 
         private bool ItIsTimeToSkip()
@@ -97,11 +81,11 @@ namespace SavescumBuddy
             {
                 var timeSinceLastBackup = (DateTime.Now - DateTime.Parse(lastBackup.DateTimeTag)).Minutes;
 
-                if (Properties.Settings.Default.Skip.Equals(SettingsViewModel.SkipOptionsEnum.FiveMin))
+                if (Settings.Default.Skip.Equals(SettingsViewModel.SkipOptionsEnum.FiveMin))
                 {
                     return timeSinceLastBackup > 5;
                 }
-                else if (Properties.Settings.Default.Skip.Equals(SettingsViewModel.SkipOptionsEnum.TenMin))
+                else if (Settings.Default.Skip.Equals(SettingsViewModel.SkipOptionsEnum.TenMin))
                 {
                     return timeSinceLastBackup > 10;
                 }
@@ -112,16 +96,36 @@ namespace SavescumBuddy
 
         private bool PreviousAutobackupShouldBeDeleted(Backup previous)
         {
-            if (Properties.Settings.Default.Overwrite.Equals(SettingsViewModel.OverwriteOptionsEnum.Always))
+            if (Settings.Default.Overwrite.Equals(SettingsViewModel.OverwriteOptionsEnum.Always))
             {
                 return true;
             }
-            else if (Properties.Settings.Default.Overwrite.Equals(SettingsViewModel.OverwriteOptionsEnum.KeepLiked))
+            else if (Settings.Default.Overwrite.Equals(SettingsViewModel.OverwriteOptionsEnum.KeepLiked))
             {
                 return previous.IsLiked.Equals(1);
             }
 
             return false;
+        }
+
+        internal void OnEnabledChanged(bool value)
+        {
+            if (value)
+            {
+                Start();
+            }
+            else
+            {
+                Stop();
+            }
+        }
+
+        internal void OnIntervalChanged()
+        {
+            if (Settings.Default.AutobackupsOn)
+            {
+                Stop(); Start();
+            }
         }
         #endregion
     }

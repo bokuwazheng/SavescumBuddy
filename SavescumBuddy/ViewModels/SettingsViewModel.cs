@@ -11,6 +11,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Threading.Tasks;
+using Settings = SavescumBuddy.Properties.Settings;
 
 namespace SavescumBuddy.ViewModels
 {
@@ -36,9 +37,14 @@ namespace SavescumBuddy.ViewModels
 
         public int ImportProgress { get; set; } = 0;
         public bool ImportInProgress { get; set; }
+        private BackupRepository _backupRepository;
+        private AutobackupManager _autobackupManager;
 
-        public SettingsViewModel()
+        public SettingsViewModel(BackupRepository repo, AutobackupManager manager)
         {
+            _backupRepository = repo;
+            _autobackupManager = manager;
+
             this.PropertyChanged += (s, e) =>
             {
                 CheckHotkeysValidity(e.PropertyName);
@@ -143,8 +149,7 @@ namespace SavescumBuddy.ViewModels
 
                         if (handled)
                         {
-                            BackupRepository.Current.Backups.Clear();
-                            BackupRepository.Current.LoadSortedList("0");
+                            _backupRepository.LoadBackupsFromPage("1");
                         }
                     }
                 }
@@ -166,7 +171,7 @@ namespace SavescumBuddy.ViewModels
 
             if (Games.Count == 0) AddGame();
 
-            LoadGameList();
+            UpdateGameList();
         }
 
         public DelegateCommand AddGameCommand { get; }
@@ -178,7 +183,7 @@ namespace SavescumBuddy.ViewModels
 
         public ObservableCollection<Game> Games { get; private set; } = new ObservableCollection<Game>(SqliteDataAccess.LoadGames());
 
-        public void LoadGameList()
+        public void UpdateGameList()
         {
             Games = new ObservableCollection<Game>(SqliteDataAccess.LoadGames());
             foreach (Game game in Games) game.SetListener(this);
@@ -196,7 +201,7 @@ namespace SavescumBuddy.ViewModels
             };
 
             SqliteDataAccess.SaveGame(game);
-            LoadGameList();
+            UpdateGameList();
         }
         #endregion
 
@@ -220,18 +225,18 @@ namespace SavescumBuddy.ViewModels
 
         public Keys SelectedQLKey
         {
-            get { return (Keys)Properties.Settings.Default.QLKey; }
-            set { Properties.Settings.Default.QLKey = (int)value; RaisePropertyChanged("SelectedQLKey"); }
+            get { return (Keys)Settings.Default.QLKey; }
+            set { Settings.Default.QLKey = (int)value; RaisePropertyChanged("SelectedQLKey"); }
         }
         public Keys SelectedQSKey
         {
-            get { return (Keys)Properties.Settings.Default.QSKey; }
-            set { Properties.Settings.Default.QSKey = (int)value; RaisePropertyChanged("SelectedQSKey"); }
+            get { return (Keys)Settings.Default.QSKey; }
+            set { Settings.Default.QSKey = (int)value; RaisePropertyChanged("SelectedQSKey"); }
         }
         public Keys SelectedSOKey
         {
-            get { return (Keys)Properties.Settings.Default.SOKey; }
-            set { Properties.Settings.Default.SOKey = (int)value; RaisePropertyChanged("SelectedSOKey"); }
+            get { return (Keys)Settings.Default.SOKey; }
+            set { Settings.Default.SOKey = (int)value; RaisePropertyChanged("SelectedSOKey"); }
         }
 
         //Modifiers 
@@ -239,25 +244,25 @@ namespace SavescumBuddy.ViewModels
 
         public Keys SelectedQLMod
         {
-            get { return (Keys)Properties.Settings.Default.QLMod; }
-            set { Properties.Settings.Default.QLMod = (int)value; RaisePropertyChanged("SelectedQLMod"); }
+            get { return (Keys)Settings.Default.QLMod; }
+            set { Settings.Default.QLMod = (int)value; RaisePropertyChanged("SelectedQLMod"); }
         }
         public Keys SelectedQSMod
         {
-            get { return (Keys)Properties.Settings.Default.QSMod; }
-            set { Properties.Settings.Default.QSMod = (int)value; RaisePropertyChanged("SelectedQSMod"); }
+            get { return (Keys)Settings.Default.QSMod; }
+            set { Settings.Default.QSMod = (int)value; RaisePropertyChanged("SelectedQSMod"); }
         }
         public Keys SelectedSOMod
         {
-            get { return (Keys)Properties.Settings.Default.SOMod; }
-            set { Properties.Settings.Default.SOMod = (int)value; RaisePropertyChanged("SelectedSOMod"); }
+            get { return (Keys)Settings.Default.SOMod; }
+            set { Settings.Default.SOMod = (int)value; RaisePropertyChanged("SelectedSOMod"); }
         }
 
         // On/off
         public bool HotkeysOn
         {
-            get { return Properties.Settings.Default.HotkeysOn; }
-            set { Properties.Settings.Default.HotkeysOn = value; RaisePropertyChanged("HotkeysOn"); }
+            get { return Settings.Default.HotkeysOn; }
+            set { Settings.Default.HotkeysOn = value; RaisePropertyChanged("HotkeysOn"); }
         }
 
         // Selected keys validation method
@@ -412,66 +417,49 @@ namespace SavescumBuddy.ViewModels
 
         public bool AutobackupsOn
         {
-            get { return Properties.Settings.Default.AutobackupsOn; }
+            get { return Settings.Default.AutobackupsOn; }
             set
             {
-                Properties.Settings.Default.AutobackupsOn = value;
-                OnTimerStateUpdated(new TimerEventArgs(true));
+                Settings.Default.AutobackupsOn = value;
+                _autobackupManager.OnEnabledChanged(value);
                 RaisePropertyChanged("AutobackupsOn");
             }
         }
         public string SelectedSkipOption
         {
-            get { return Properties.Settings.Default.Skip; }
-            set { Properties.Settings.Default.Skip = value; RaisePropertyChanged("SelectedSkipOption"); }
+            get { return Settings.Default.Skip; }
+            set { Settings.Default.Skip = value; RaisePropertyChanged("SelectedSkipOption"); }
         }
 
         public string SelectedInterval
         {
-            get { return Properties.Settings.Default.Interval + " min"; }
+            get { return Settings.Default.Interval + " min"; }
             set
             {
-                Properties.Settings.Default.Interval = int.Parse(Regex.Match(value, @"\d+").Value);
-                OnTimerStateUpdated(new TimerEventArgs(false));
+                Settings.Default.Interval = int.Parse(Regex.Match(value, @"\d+").Value);
+                _autobackupManager.OnIntervalChanged();
                 RaisePropertyChanged("SelectedInterval");
             }
         }
 
         public string SelectedOverwriteOption
         {
-            get { return Properties.Settings.Default.Overwrite; }
-            set { Properties.Settings.Default.Overwrite = value; RaisePropertyChanged("SelectedOverwriteOption"); }
+            get { return Settings.Default.Overwrite; }
+            set { Settings.Default.Overwrite = value; RaisePropertyChanged("SelectedOverwriteOption"); }
         }
         #endregion
 
         #region Sound cues
         public bool SoundCuesOn
         {
-            get { return Properties.Settings.Default.SoundCuesOn; }
-            set { Properties.Settings.Default.SoundCuesOn = value; RaisePropertyChanged("SoundCuesOn"); }
+            get { return Settings.Default.SoundCuesOn; }
+            set { Settings.Default.SoundCuesOn = value; RaisePropertyChanged("SoundCuesOn"); }
         }
         #endregion
 
-        public delegate void TimerHandler(object sender, TimerEventArgs e);
-        public static event TimerHandler TimerStateUpdated;
-        protected virtual void OnTimerStateUpdated(TimerEventArgs e)
-        {
-            TimerHandler handler = TimerStateUpdated;
-
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
-
-        public static void Subscribe(TimerHandler handler)
-        {
-            TimerStateUpdated += handler;
-        }
-
         public void StateChanged()
         {
-            LoadGameList();
+            UpdateGameList();
         }
     }
 }

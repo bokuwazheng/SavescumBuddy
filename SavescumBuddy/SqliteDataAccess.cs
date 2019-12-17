@@ -6,6 +6,7 @@ using System.Data.SQLite;
 using System.Linq;
 using System;
 using System.Threading.Tasks;
+using Settings = SavescumBuddy.Properties.Settings;
 
 namespace SavescumBuddy
 {
@@ -13,7 +14,7 @@ namespace SavescumBuddy
 
     class SqliteDataAccess
     {
-        private static string LoadConnectionString(string id = "Default") // string id = "Debug" for debugging, otherwise "Default"
+        private static string LoadConnectionString(string id = "Debug") // string id = "Debug" for debugging, otherwise "Default"
         {
             var cnnstr = ConfigurationManager.ConnectionStrings[id].ConnectionString;
             return cnnstr.Replace("%APPDATA%", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)); 
@@ -108,27 +109,50 @@ namespace SavescumBuddy
         #endregion
 
         #region Backup table sorting
-        public static List<Backup> LoadBackupsWithNoteLike(string input)
+        public static List<Backup> LoadBackupsWithNoteLike(string input, string offset)
         {
-            return Query<Backup>("select * from Backup where (Note like @lc or Note like @uc) order by Id desc;", new { lc = "%" + input.ToLower() + "%", uc = "%" + input.ToUpper() + "%" });
+            var order = Settings.Default.OrderByDesc ? "desc" : "asc";
+            var limit = Settings.Default.BackupsPerPage.ToString();
+
+            var sql = "";
+            if (Settings.Default.CurrentOnly)
+            {
+                sql = $"select * from [Backup] b where (b.Note like @lc or b.Note like @uc) and b.GameId = (select g.Title from [Game] g where g.IsCurrent = 1) order by b.Id { order } limit { limit } offset { offset }";
+            }
+            else
+            {
+                sql = $"select * from Backup where (Note like @lc or Note like @uc) order by Id { order } limit { limit } offset { offset }";
+            }
+                
+            var args = new
+            {
+                lc = "%" + input.ToLower() + "%",
+                uc = "%" + input.ToUpper() + "%"
+            };
+
+            return Query<Backup>(sql, args);
         }
 
-        public static List<Backup> LoadSortedBackupList(string offset)
+        public static List<Backup> LoadBackups(string offset)
         {
-            var game = GetCurrentGame();
+            var isLiked = Settings.Default.LikedOnly ? "1" : "0";
+            var isAutobackup = Settings.Default.HideAutobackups ? "0" : "1";
+            var order = Settings.Default.OrderByDesc ? "desc" : "asc";
+            var limit = Settings.Default.BackupsPerPage.ToString();
 
-            var isLiked = Properties.Settings.Default.LikedOnly ? "1" : "0";
-            var isAutobackup = Properties.Settings.Default.HideAutobackups ? "0" : "1";
-            var gameId = Properties.Settings.Default.CurrentOnly && game != null ? $"{ game.Title }" : "";
-            var order = Properties.Settings.Default.OrderByDesc ? "desc" : "asc";
-            var limit = Properties.Settings.Default.PageLimit.ToString();
-
-            var sql = $"select * from Backup where IsLiked >= @IsLiked and IsAutobackup <= @IsAutobackup and GameId like @GameId order by Id { order } limit { limit } offset { offset }";
+            var sql = "";
+            if (Settings.Default.CurrentOnly)
+            {
+                sql = $"select * from [Backup] b where b.IsLiked >= @IsLiked and b.IsAutobackup <= @IsAutobackup and b.GameId = (select g.Title from [Game] g where g.IsCurrent = 1) order by Id { order } limit { limit } offset { offset }";
+            }
+            else
+            {
+                sql = $"select * from Backup where IsLiked >= @IsLiked and IsAutobackup <= @IsAutobackup order by Id { order } limit { limit } offset { offset }";
+            }
             var args = new
             {
                 IsLiked = isLiked,
-                IsAutobackup = isAutobackup,
-                GameId = "%" + gameId + "%"
+                IsAutobackup = isAutobackup
             };
 
             return Query<Backup>(sql, args);

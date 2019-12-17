@@ -9,41 +9,33 @@ using System.Threading.Tasks;
 
 namespace SavescumBuddy
 {
-    public class BackupRepository : BindableBase
+    public class BackupRepository
     {
-        public ObservableCollection<Backup> Backups = new ObservableCollection<Backup>();
+        public ObservableCollection<Backup> _backups;
 
-        #region Singleton implementaion
-        private static readonly BackupRepository _instance = new BackupRepository();
-        public static BackupRepository Current => _instance;
-
-        static BackupRepository()
+        public BackupRepository()
         {
+            _backups = new ObservableCollection<Backup>();
+        }
 
-        } 
-        #endregion
+        public ObservableCollection<Backup> GetBackupList()
+        {
+            return _backups;
+        }
 
-        public void Add(int isAutobackup = 0)
+        public int Count()
+        {
+            return _backups.Count();
+        }
+
+        public void Add(Backup backup)
         {
             var backups = SqliteDataAccess.LoadBackupList();
-            var game = SqliteDataAccess.GetCurrentGame();
-            var folderName = DateTime.Now.ToString(DateTimeFormat.WindowsFriendly);
-
-            var backup = new Backup()
-            {
-                IsAutobackup = isAutobackup,
-                GameId = game.Title,
-                Origin = game.SavefilePath,
-                DateTimeTag = DateTime.Now.ToString(DateTimeFormat.UserFriendly, CultureInfo.CreateSpecificCulture("en-US")),
-                Picture = Path.Combine(game.BackupFolder, folderName, folderName + ".jpg"),
-                FilePath = Path.Combine(game.BackupFolder, folderName, Path.GetFileName(game.SavefilePath))
-            };
 
             if (backups.FirstOrDefault(b => b.DateTimeTag.Equals(backup.DateTimeTag)) == null)
             {
                 Util.BackupFiles(backup);
                 SqliteDataAccess.SaveBackup(backup);
-                RaisePropertyChanged("Backups");
             }
         }
 
@@ -51,22 +43,21 @@ namespace SavescumBuddy
         {
             Util.MoveToTrash(backup.FilePath);
             SqliteDataAccess.RemoveBackup(backup);
-            RaisePropertyChanged("Backups");
         }
 
         public void RemoveAt(int index)
         {
-            if (index > -1 && index < Backups.Count)
+            if (index > -1 && index < _backups.Count)
             {
-                Remove(Backups[index]);
+                Remove(_backups[index]);
             }
         }
 
         public void Restore(int index)
         {
-            if (index > -1 && index < Backups.Count)
+            if (index > -1 && index < _backups.Count)
             {
-                Util.Restore(Backups[index]);
+                Util.Restore(_backups[index]);
             }
         }
 
@@ -75,23 +66,23 @@ namespace SavescumBuddy
             Util.Restore(SqliteDataAccess.GetLatestBackup());
         }
 
-        public void SortByNote(string input, string offset)
+        public void LoadSortedByNoteList(string input, string offset)
         {
             if (!String.IsNullOrWhiteSpace(input))
             {
-                Backups = new ObservableCollection<Backup>(SqliteDataAccess.LoadBackupsWithNoteLike(input));
+                _backups = new ObservableCollection<Backup>(SqliteDataAccess.LoadBackupsWithNoteLike(input, offset));
             }
             else
             {
-                LoadSortedList(offset);
+                LoadBackupsFromPage(offset);
             }
         }
 
-        public void LoadSortedList(string offset)
+        public void LoadBackupsFromPage(string page)
         {
             try
             {
-                Backups = new ObservableCollection<Backup>(SqliteDataAccess.LoadSortedBackupList(offset));
+                _backups = new ObservableCollection<Backup>(SqliteDataAccess.LoadBackups(page));
             }
             catch (Exception ex)
             {

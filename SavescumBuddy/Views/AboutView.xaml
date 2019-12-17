@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    
     <UserControl.Style>
         <Style TargetType="{x:Type UserControl}">
             <Style.Triggers>
@@ -26,10 +27,10 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!--Escape button-->
+        <!--Return button-->
         <Button Content="&#xE72B;" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Grid.Column="0"
-                Background="{x:Null}" BorderBrush="{x:Null}" FontSize="24" Grid.Row="0" Height="34"
-                Command="{Binding DataContext.ChangeViewModelCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Margin="20,23,0,0"
+                Background="{x:Null}" BorderBrush="{x:Null}" FontSize="24" Grid.Row="0" Height="34" Margin="20,23,0,0"
+                Command="{Binding DataContext.ChangeViewModelCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" 
                 CommandParameter="{Binding DataContext.ToSettings, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
 
         <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" >
