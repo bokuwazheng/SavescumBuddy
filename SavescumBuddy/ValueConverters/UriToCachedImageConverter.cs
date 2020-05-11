@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Globalization;
+using System.Windows.Data;
 using System.Windows.Media.Imaging;
 
 namespace SavescumBuddy.ValueConverters
 {
-    public class UriToCachedImageConverter : System.Windows.Data.IValueConverter
+    public class UriToCachedImageConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null) return null;
+            if (value is null) 
+                return null;
 
             try
             {
@@ -29,9 +32,6 @@ namespace SavescumBuddy.ValueConverters
             return null;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 }

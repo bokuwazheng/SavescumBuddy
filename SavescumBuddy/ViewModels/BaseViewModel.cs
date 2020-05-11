@@ -1,4 +1,10 @@
-﻿namespace SavescumBuddy.ViewModels
+﻿using Prism.Mvvm;
+using System;
+
+namespace SavescumBuddy.ViewModels
 {
-    public abstract class BaseViewModel : Prism.Mvvm.BindableBase { }
+    public abstract class BaseViewModel : BindableBase
+    {
+        
+    }
 }

@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using SavescumBuddy.ViewModels;
+using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace SavescumBuddy.Views
@@ -15,7 +17,17 @@ namespace SavescumBuddy.Views
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.Save();
+            // Disable hotkey recorder.
+            var dc = Application.Current.MainWindow.DataContext;
+            var appVm = dc as ApplicationViewModel;
+            var settingsVm = appVm.ViewModels.OfType<SettingsViewModel>().First();
+            if (settingsVm.HookIsEnabled)
+            {
+                settingsVm.RegisterHotkeyCommand?.Execute(false);
+                settingsVm.SaveHookIsEnabled = false;
+                settingsVm.RestoreHookIsEnabled = false;
+                settingsVm.OverwriteHookIsEnabled = false;
+            }
         }
     }
 }

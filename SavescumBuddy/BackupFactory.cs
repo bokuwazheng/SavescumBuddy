@@ -1,19 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SavescumBuddy.Sqlite;
 
 namespace SavescumBuddy
 {
     public class BackupFactory
     {
-        private Backup CreateBackup(int isAutobackup)
+        private static Backup CreateBackup(int isAutobackup)
         {
-            var game = SqliteDataAccess.GetCurrentGame();
             var folderName = DateTime.Now.ToString(DateTimeFormat.WindowsFriendly);
+            var game = SqliteDataAccess.GetCurrentGame()
+                ?? throw new NullReferenceException("Failed to create a backup: no game is set as current yet.");
 
             var backup = new Backup()
             {
@@ -28,14 +26,8 @@ namespace SavescumBuddy
             return backup;
         }
 
-        public Backup CreateBackup()
-        {
-            return CreateBackup(0);
-        }
+        public static Backup CreateBackup() => CreateBackup(0);
 
-        public Backup CreateAutobackup()
-        {
-            return CreateBackup(1);
-        }
+        public static Backup CreateAutobackup() => CreateBackup(1);
     }
 }

@@ -1,177 +1,164 @@
 ﻿using Prism.Commands;
 using System;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using System.Linq;
 using Settings = SavescumBuddy.Properties.Settings;
+using SavescumBuddy.Models;
+using SavescumBuddy.Sqlite;
 
 namespace SavescumBuddy.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
         // Backing fields
-        private string _currentPage = "1";
-        private AutobackupManager _autobackupManager;
-        private BackupFactory _backupFactory;
         private BackupRepository _backupRepository;
+        private BackupSearchRequest _filter;
+        private BackupModel _selectedBackup;
+        private int _currentPageIndex;
 
         // Properties
-        public ObservableCollection<Backup> Backups
-        {
-            get { return _backupRepository.GetBackupList(); }
-        }
+        public ObservableCollection<BackupModel> Backups => 
+            new ObservableCollection<BackupModel>(_backupRepository.GetBackupList().Select(x => new BackupModel(x)));
         public double Interval => Settings.Default.Interval * 60;
-        public int Progress => _autobackupManager.Progress;
-        public bool CurrentGameIsSet => SqliteDataAccess.GetCurrentGame() != null;
-        public string SearchQuery { get; set; }
-        private int BackupsPerPage => Settings.Default.BackupsPerPage;
-        public string CurrentPage
-        {
-            get { return _currentPage; }
-            set { if (value != _currentPage) _currentPage = value; RaisePropertyChanged("CurrentPage"); }
-        }
+        public AutobackupManager Autobackuper { get; }
+        public bool CurrentGameIsSet => SqliteDataAccess.GetCurrentGame() is object;
+        public int CurrentPageIndex { get => _currentPageIndex; set => SetProperty(ref _currentPageIndex, value, () => Filter.Offset = value * PageSize); }
+        public BackupModel SelectedBackup { get => _selectedBackup; set => SetProperty(ref _selectedBackup, value); }
+        public BackupSearchRequest Filter { get => _filter ?? (_filter = GetFilter()); set => SetProperty(ref _filter, value); }
+        public int TotalNumberOfBackups => SqliteDataAccess.GetTotalNumberOfBackups(Filter);
+        public int PageSize => Settings.Default.BackupsPerPage;
+        public int From => Backups.Count > 0 ? Filter.Offset.Value + 1 : 0;
+        public int To => Filter.Offset.Value + Backups.Count;
 
         #region Sorting options
         public bool LikedOnly
         {
-            get { return Properties.Settings.Default.LikedOnly; }
-            set { Properties.Settings.Default.LikedOnly = value; RaisePropertyChanged(); }
+            get => Settings.Default.LikedOnly;
+            set
+            { 
+                Settings.Default.LikedOnly = value;
+                Filter.LikedOnly = value;
+                RaisePropertyChanged(nameof(LikedOnly));
+            }
         }
 
         public bool HideAutobackups
-        {
-            get { return Properties.Settings.Default.HideAutobackups; }
-            set { Properties.Settings.Default.HideAutobackups = value; RaisePropertyChanged(); }
+        { 
+            get => Settings.Default.HideAutobackups; 
+            set 
+            { 
+                Settings.Default.HideAutobackups = value;
+                Filter.HideAutobackups = value;
+                RaisePropertyChanged(nameof(HideAutobackups));
+            }
         }
 
         public bool CurrentOnly
         {
-            get { return Properties.Settings.Default.CurrentOnly; }
-            set { Properties.Settings.Default.CurrentOnly = value; RaisePropertyChanged(); }
-        }
-
-        public bool GroupByGame
-        {
-            get { return Properties.Settings.Default.GroupByGame; }
-            set { Properties.Settings.Default.GroupByGame = value; RaisePropertyChanged(); }
+            get => Settings.Default.CurrentOnly; 
+            set 
+            { 
+                Settings.Default.CurrentOnly = value;
+                Filter.CurrentOnly = value;
+                RaisePropertyChanged(nameof(CurrentOnly));
+            }
         }
 
         public bool OrderByDesc
         {
-            get { return Properties.Settings.Default.OrderByDesc; }
-            set { Properties.Settings.Default.OrderByDesc = value; RaisePropertyChanged(); }
+            get => Settings.Default.OrderByDesc; 
+            set 
+            { 
+                Settings.Default.OrderByDesc = value;
+                Filter.Order = value ? "desc" : "asc";
+                RaisePropertyChanged(nameof(OrderByDesc));
+            }
         }
         #endregion
 
-        public MainViewModel(BackupRepository repo, BackupFactory factory, AutobackupManager manager)
+        public MainViewModel(BackupRepository repo, AutobackupManager manager)
         {
-            _backupRepository = repo;
-            _backupFactory = factory;
-            _autobackupManager = manager;
-            _backupRepository.LoadBackupsFromPage(((int.Parse(CurrentPage) - 1) * BackupsPerPage).ToString());
+            _backupRepository = repo ?? throw new ArgumentNullException(nameof(repo));
+            Autobackuper = manager ?? throw new ArgumentNullException(nameof(manager));
 
-            // TODO figure out what happens here!!
-            _autobackupManager.PropertyChanged += (s, e) =>
+            Autobackuper.AdditionRequested += x => Add(x);
+            Autobackuper.RemovalRequested += x => Remove(x);
+
+            AddCommand = new DelegateCommand<Backup>(b => Add(b));
+            RemoveCommand = new DelegateCommand<Backup>(b => Remove(b));
+            RestoreCommand = new DelegateCommand<Backup>(b => Util.Restore(b));
+
+            NavigateForwardCommand = new DelegateCommand(() => ++CurrentPageIndex, () => To < TotalNumberOfBackups);
+            NavigateBackwardCommand = new DelegateCommand(() => --CurrentPageIndex, () => From > 1);
+            NavigateToStartCommand = new DelegateCommand(() => CurrentPageIndex = 0, () => From > 1);
+            NavigateToEndCommand = new DelegateCommand(() => CurrentPageIndex = TotalNumberOfBackups / PageSize, () => To < TotalNumberOfBackups);
+
+            Filter.PropertyChanged += (s, e) => OnFilterPropertyChanged(e.PropertyName);
+            UpdateBackupList();
+        }
+
+        private void OnFilterPropertyChanged(string propName)
+        {
+            UpdateBackupList();
+            if (!propName.Equals(nameof(Filter.Offset)))
+                NavigateToStartCommand?.Execute();
+        }
+
+        private void RaiseNavigateCanExecute()
+        {
+            NavigateForwardCommand.RaiseCanExecuteChanged();
+            NavigateBackwardCommand.RaiseCanExecuteChanged();
+            NavigateToStartCommand.RaiseCanExecuteChanged();
+            NavigateToEndCommand.RaiseCanExecuteChanged();
+        }
+
+        private void Add(Backup backup = default)
+        {
+            var b = backup ?? BackupFactory.CreateBackup();
+            _backupRepository.Add(b);
+            UpdateBackupList();
+        }
+
+        private void Remove(Backup backup)
+        {
+            if (backup is null) 
+                return;
+            _backupRepository.Remove(backup);
+            UpdateBackupList();
+        }
+
+        public void UpdateBackupList()
+        {
+            _backupRepository.UpdateBackupList(Filter);
+            RaisePropertyChanged(nameof(Backups));
+            RaisePropertyChanged(nameof(TotalNumberOfBackups));
+            RaisePropertyChanged(nameof(From));
+            RaisePropertyChanged(nameof(To));
+            RaiseNavigateCanExecute();
+        }
+
+        public BackupSearchRequest GetFilter()
+        {
+            var pageSize = Settings.Default.BackupsPerPage;
+
+            return new BackupSearchRequest()
             {
-                RaisePropertyChanged(e.PropertyName);
+                LikedOnly = Settings.Default.LikedOnly,
+                HideAutobackups = Settings.Default.HideAutobackups,
+                CurrentOnly = Settings.Default.CurrentOnly,
+                Order = Settings.Default.OrderByDesc ? "desc" : "asc",
+                Offset = CurrentPageIndex * pageSize,
+                Limit = pageSize,
+                Note = null
             };
-
-            AddCommand = new DelegateCommand(() =>
-            {
-                _backupRepository.Add(_backupFactory.CreateBackup());
-                UpdateBackupList(int.Parse(CurrentPage));
-            });
-
-            RemoveCommand = new DelegateCommand<int?>(i =>
-            {
-                if (i.HasValue) _backupRepository.RemoveAt(i.Value);
-                UpdateBackupList(int.Parse(CurrentPage));
-            });
-
-            RestoreCommand = new DelegateCommand<int?>(i =>
-            {
-                if (i.HasValue) _backupRepository.Restore(i.Value);
-            });
-
-            SortByNoteCommand = new DelegateCommand<string>(s =>
-            {
-                UpdateBackupList(int.Parse(CurrentPage));
-            });
-
-            SortCommand = new DelegateCommand(() =>
-            {
-                UpdateBackupList(int.Parse(CurrentPage));
-            });
-
-            FirstPageCommand = new DelegateCommand(() => 
-            {
-                CurrentPage = "1";
-                UpdateBackupList(1);
-            });
-
-            PreviousPageCommand = new DelegateCommand(() => 
-            {
-                var i = int.Parse(CurrentPage) - 1;
-                if (i == 0) i = 99;
-                CurrentPage = i.ToString();
-                UpdateBackupList(i);
-            });
-
-            NextPageCommand = new DelegateCommand(() => 
-            {
-                var i = int.Parse(CurrentPage) + 1;
-                if (i == 100) i = 1;
-                CurrentPage = i.ToString();
-                UpdateBackupList(i);
-            });
-
-            LastPageCommand = new DelegateCommand(() => 
-            {
-                var offset = 0;
-                var backups = 0;
-                do
-                {
-                    _backupRepository.LoadBackupsFromPage(((offset) * BackupsPerPage).ToString());
-                    backups = _backupRepository.Count();
-                    offset++;
-                }
-                while (backups == BackupsPerPage);
-                CurrentPage = offset.ToString();
-                UpdateBackupList(int.Parse(CurrentPage));
-            });
-
-            SetCurrentPageCommand = new DelegateCommand<string>((s) =>
-            {
-                if (string.IsNullOrWhiteSpace(s)) return;
-                CurrentPage = s;
-                var i = int.Parse(CurrentPage);
-                UpdateBackupList(i);
-            });
         }
 
-        private void UpdateBackupList(int page)
-        {
-            if (string.IsNullOrWhiteSpace(SearchQuery))
-            {
-                _backupRepository.LoadBackupsFromPage(((page - 1) * BackupsPerPage).ToString());
-            }
-            else
-            {
-                _backupRepository.LoadSortedByNoteList(SearchQuery, ((page - 1) * BackupsPerPage).ToString());
-            }
-
-            RaisePropertyChanged("Backups");
-        }
-
-        public DelegateCommand<int?> RestoreCommand { get; }
-        public DelegateCommand<int?> RemoveCommand { get; }
-        public DelegateCommand AddCommand { get; }
-        public DelegateCommand<string> SortByNoteCommand { get; }
-        public DelegateCommand SortCommand { get; }
-        public DelegateCommand FirstPageCommand { get; }
-        public DelegateCommand PreviousPageCommand { get; }
-        public DelegateCommand NextPageCommand { get; }
-        public DelegateCommand LastPageCommand { get; }
-        public DelegateCommand<string> SetCurrentPageCommand { get; }
+        public DelegateCommand<Backup> RemoveCommand { get; }
+        public DelegateCommand<Backup> AddCommand { get; }
+        public DelegateCommand<Backup> RestoreCommand { get; }
+        public DelegateCommand NavigateForwardCommand { get; }
+        public DelegateCommand NavigateBackwardCommand { get; }
+        public DelegateCommand NavigateToEndCommand { get; }
+        public DelegateCommand NavigateToStartCommand { get; }
     }
 }

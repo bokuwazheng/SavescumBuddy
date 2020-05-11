@@ -17,6 +17,7 @@
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -29,7 +30,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -87,6 +87,9 @@
     <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.3.3, Culture=neutral, PublicKeyToken=8985beaab7ea3f04, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft-WindowsAPICodePack-Shell.1.1.3.3\lib\net452\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.19\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -124,12 +127,21 @@
     </ApplicationDefinition>
     <Compile Include="AutobackupManager.cs" />
     <Compile Include="BackupFactory.cs" />
+    <Compile Include="Sqlite\BackupSearchRequest.cs" />
     <Compile Include="GoogleDrive.cs" />
-    <Compile Include="SqliteDataAccess.cs" />
+    <Compile Include="Sqlite\ISearchRequest.cs" />
+    <Compile Include="MarkupExtensions\EnumToCollectionExtension.cs" />
+    <Compile Include="Models\BackupModel.cs" />
+    <Compile Include="Models\GameModel.cs" />
+    <Compile Include="Models\SettingsModel.cs" />
+    <Compile Include="Sqlite\SqliteDataAccess.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="ValueConverters\ExistsToVisibilityConverter.cs" />
     <Compile Include="ValueConverters\IntToBoolConverter.cs" />
-    <Compile Include="ValueConverters\StringToModifierConverter.cs" />
+    <Compile Include="ValueConverters\InverseBooleanConverter.cs" />
+    <Compile Include="ValueConverters\InverseBooleanToVisibilityConverter.cs" />
+    <Compile Include="ValueConverters\KeysToStringConverter.cs" />
+    <Compile Include="ValueConverters\ObjectToBoolConverter.cs" />
     <Compile Include="ValueConverters\UriToCachedImageConverter.cs" />
     <Compile Include="ViewModels\AboutViewModel.cs" />
     <Compile Include="ViewModels\ApplicationViewModel.cs" />
@@ -203,6 +215,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="siegmeyer.jpg" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

@@ -30,8 +30,7 @@
         <!--Return button-->
         <Button Content="&#xE72B;" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Grid.Column="0"
                 Background="{x:Null}" BorderBrush="{x:Null}" FontSize="24" Grid.Row="0" Height="34" Margin="20,23,0,0"
-                Command="{Binding DataContext.ChangeViewModelCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" 
-                CommandParameter="{Binding DataContext.ToSettings, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
+                Command="{Binding DataContext.NavigateToSettingsCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
 
         <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" >
             <!--Header-->
@@ -46,10 +45,12 @@
                     unlicensed
                 </Hyperlink>.
             </TextBlock>
-            <TextBlock FontSize="14" Foreground="{StaticResource Dark}" TextWrapping="Wrap" Margin="0,4" Width="300" >
-                Tecnically what this software does is provide a neat way to "savescum" in
-                any game that has only a single savefile. <Run Text="&#xA;"/>IN 
-                NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR
+            <TextBlock FontSize="14" Foreground="{StaticResource Dark}" TextWrapping="Wrap" Margin="0,4" Width="300">
+                Savescum Buddy provides a convenient way to "savescum" in
+                any game that has only a single savefile.
+            </TextBlock>
+            <TextBlock FontSize="14" Foreground="{StaticResource Dark}" TextWrapping="Wrap" Margin="2,4" Width="300">
+                IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR
                 OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
                 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 OTHER DEALINGS IN THE SOFTWARE.

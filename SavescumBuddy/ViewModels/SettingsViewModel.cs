@@ -1,199 +1,278 @@
-﻿using SavescumBuddy.ValueConverters;
-using Microsoft.WindowsAPICodePack.Dialogs;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using Prism.Commands;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Windows.Forms;
 using System.Threading.Tasks;
-using Settings = SavescumBuddy.Properties.Settings;
+using SavescumBuddy.Models;
+using Common;
+using System.Windows.Forms;
+using SavescumBuddy.Sqlite;
 
 namespace SavescumBuddy.ViewModels
 {
-    public class SettingsViewModel : BaseViewModel, Game.IListItemEventListener
+    public class SettingsViewModel : BaseViewModel
     {
-        public string AuthorizedAs
+        private bool _importInProgress;
+        private int _importProgress;
+        private GlobalKeyboardHook _keyboardHook;
+        private bool _saveHookIsEnabled;
+        private bool _restoreHookIsEnabled;
+        private bool _overwriteHookIsEnabled;
+
+        public SettingsModel Settings { get; }
+        public bool HookIsEnabled => SaveHookIsEnabled || RestoreHookIsEnabled || OverwriteHookIsEnabled;
+        public bool SaveHookIsEnabled { get => _saveHookIsEnabled; set => SetProperty(ref _saveHookIsEnabled, value,
+            () => { if (value) { RestoreHookIsEnabled = false; OverwriteHookIsEnabled = false; } }); }
+        public bool RestoreHookIsEnabled { get => _restoreHookIsEnabled; set => SetProperty(ref _restoreHookIsEnabled, value,
+            () => { if (value) { SaveHookIsEnabled = false; OverwriteHookIsEnabled = false; } }); }
+        public bool OverwriteHookIsEnabled { get => _overwriteHookIsEnabled; set => SetProperty(ref _overwriteHookIsEnabled, value,
+            () => { if (value) { SaveHookIsEnabled = false; RestoreHookIsEnabled = false; } }); }
+        public string AuthorizedAs => GetUserEmail();
+        public int ImportProgress { get => _importProgress; private set => SetProperty(ref _importProgress, value); }
+        public bool ImportInProgress { get => _importInProgress; private set => SetProperty(ref _importInProgress, value); }
+        public string CurrentGameTitle => SqliteDataAccess.GetCurrentGame() is null ? "none" : SqliteDataAccess.GetCurrentGame().Title;
+        public ObservableCollection<GameModel> Games { get; private set; }
+
+        public SettingsViewModel()
         {
-            get
+            _keyboardHook = new GlobalKeyboardHook();
+            Settings = new SettingsModel();
+            Settings.PropertyChanged += (s, e) => Properties.Settings.Default.Save();
+            
+            AddGameCommand = new DelegateCommand(AddEmptyGame);
+            UploadCustomCommand = new DelegateCommand(async () => await UploadBackups());
+            RegisterHotkeyCommand = new DelegateCommand<bool?>(isEnabled => RegisterHotkey(isEnabled));
+            AuthorizeCommand = new DelegateCommand(async () => await AuthorizeAsync());
+            ReauthorizeCommand = new DelegateCommand(async () => await ReauthorizeAsync());
+
+            UpdateGameList();
+            if (Games.Count == 0) 
+                AddEmptyGame();
+
+            TryAuthorize();
+        }
+
+        private void TryAuthorize()
+        {
+            var mode = GoogleDrive.CurrentMode;
+            var tokenFolder = GoogleDrive.GetToken(mode);
+            var folderExists = Directory.Exists(tokenFolder);
+            if (folderExists)
             {
-                try
+                var tokenExists = Directory.GetFiles(tokenFolder).Any(x => x.Contains("Google.Apis.Auth.OAuth2.Responses.TokenResponse-user"));
+                if (tokenExists)
+                    AuthorizeCommand?.Execute();
+            }
+        }
+
+        private void RegisterHotkey(bool? isEnabled)
+        {
+            var enabled = isEnabled ?? HookIsEnabled;
+            
+            if (enabled)
+            {
+                _keyboardHook.Hook();
+                _keyboardHook.KeyDown += _keyboardHook_KeyDown;
+            }
+            else
+            {
+                _keyboardHook.Unhook();
+                _keyboardHook.KeyDown -= _keyboardHook_KeyDown;
+            }
+        }
+
+        private void _keyboardHook_KeyDown(object sender, KeyEventArgs e)
+        {
+            var mod = Keys.None;
+            if (e.Alt) mod = Keys.Alt;
+            if (e.Shift) mod = Keys.Shift;
+            if (e.Control) mod = Keys.Control;
+
+            var key = Keys.None;
+            if (e.KeyValue > 0) key = e.KeyCode;
+
+            if (key == Keys.LMenu || key == Keys.RMenu ||
+                key == Keys.LShiftKey || key == Keys.RShiftKey ||
+                key == Keys.LControlKey || key == Keys.RControlKey)
+                mod = Keys.None;
+
+            if (SaveHookIsEnabled)
+            {
+                Settings.SelectedQSKey = key;
+                Settings.SelectedQSMod = mod;
+            }
+            else if (RestoreHookIsEnabled)
+            {
+                Settings.SelectedQLKey = key;
+                Settings.SelectedQLMod = mod;
+            }
+            else if (OverwriteHookIsEnabled)
+            {
+                Settings.SelectedSOKey = key;
+                Settings.SelectedSOMod = mod;
+            }
+        }
+
+        private async Task UploadBackups() 
+        {
+            var game = SqliteDataAccess.GetCurrentGame();
+
+            if (game == null)
+            {
+                Util.PopUp("No game is set as current yet.");
+                return;
+            }
+
+            using (var dialog = new CommonOpenFileDialog())
+            {
+                dialog.Multiselect = true;
+                dialog.IsFolderPicker = true;
+                dialog.ShowHiddenItems = true;
+
+                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
-                    var service = GoogleDrive.Current.CreateDriveApiService();
-                    var request = service.About.Get();
-                    request.Fields = "*";
-                    return request.Execute().User.EmailAddress;
-                }
-                catch
-                {
-                    return "not authorized";
+                    var folders = dialog.FileNames;
+                    var savefileName = Path.GetFileName(game.SavefilePath);
+                    var dateTimeNow = DateTime.Now;
+                    var sec = 0d;
+                    var sb = new StringBuilder();
+
+                    var importQCount = folders.Count();
+                    var importedCount = 0;
+
+                    ImportInProgress = true;
+
+                    await Task.Run(() =>
+                    {
+                        foreach (string folder in folders)
+                        {
+                            // Report progress.
+                            ImportProgress = (++importedCount * 100) / importQCount;
+
+                            var folderItems = Directory.GetFiles(folder);
+                            if (folderItems.Length == 0)
+                            {
+                                sb.Append($"Error: {folder} is empty.\n");
+                                continue;
+                            }
+                            var filePath = folderItems.FirstOrDefault(s => s.EndsWith(savefileName));
+                            if (filePath is null)
+                            {
+                                sb.Append($"Error: {savefileName} expected.\n");
+                                continue;
+                            }
+                            var picture = folderItems.FirstOrDefault(s => s.EndsWith(".jpg"));
+                            var dateTimeTag = dateTimeNow + TimeSpan.FromSeconds(sec);
+                            sec++;
+
+                            try
+                            {
+                                SqliteDataAccess.SaveBackup(new Backup()
+                                {
+                                    IsAutobackup = 0,
+                                    GameId = game.Title,
+                                    Origin = game.SavefilePath,
+                                    DateTimeTag = dateTimeTag.ToString(DateTimeFormat.UserFriendly, CultureInfo.CreateSpecificCulture("en-US")),
+                                    Picture = picture ?? "",
+                                    FilePath = filePath
+                                });
+                            }
+                            catch
+                            {
+                                sb.Append($"Error: {filePath} is already in the list.\n");
+                                continue;
+                            }
+                        }
+                    });
+
+                    // Reset progress.
+                    ImportInProgress = false;
+                    ImportProgress = 0;
+
+                    if (sb.Length != 0)
+                    {
+                        sb.Append("\nTip: Savefiles must be located in separate folders. ");
+                        sb.Append("To attach an image put it in the folder next to the savefile.");
+
+                        Util.PopUp(sb.ToString());
+                    }
                 }
             }
         }
 
-        public int ImportProgress { get; set; } = 0;
-        public bool ImportInProgress { get; set; }
-        private BackupRepository _backupRepository;
-        private AutobackupManager _autobackupManager;
-
-        public SettingsViewModel(BackupRepository repo, AutobackupManager manager)
+        private async Task CreateAppRootFolderAsync()
         {
-            _backupRepository = repo;
-            _autobackupManager = manager;
+            var rootId = await GoogleDrive.Current.GetAppRootFolderIdAsync();
+            if (rootId is null)
+                rootId = await GoogleDrive.Current.CreateAppRootFolderAsync();
 
-            this.PropertyChanged += (s, e) =>
-            {
-                CheckHotkeysValidity(e.PropertyName);
-                Properties.Settings.Default.Save();
-            };
-
-            AddGameCommand = new DelegateCommand(() =>
-            {
-                AddGame();
-            });
-
-            UploadCustomCommand = new DelegateCommand(async() =>
-            {
-                var game = SqliteDataAccess.GetCurrentGame();
-
-                if (game == null)
-                {
-                    Util.PopUp("No game is set as current yet."); return;
-                }
-
-                using (var dialog = new CommonOpenFileDialog())
-                {
-                    dialog.Multiselect = true;
-                    dialog.IsFolderPicker = true;
-                    dialog.ShowHiddenItems = true;
-
-                    if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-                    {
-                        var folders = dialog.FileNames;
-                        var savefileName = Path.GetFileName(game.SavefilePath);
-                        var dateTimeNow = DateTime.Now;
-                        var sec = 0;
-                        var sb = new StringBuilder();
-                        var handled = false;
-
-                        var importQ = folders.Count();
-                        var itemsImported = 0;
-
-                        ImportInProgress = true;
-                        RaisePropertyChanged("ImportInProgress");
-
-                        await Task.Run(() => 
-                        {
-                            foreach (string folder in folders)
-                            {
-                                // Report progress.
-                                itemsImported++;
-                                ImportProgress = (itemsImported * 100) / importQ;
-                                RaisePropertyChanged("ImportProgress");
-
-                                var folderItems = Directory.GetFiles(folder);
-                                if (folderItems.Length == 0)
-                                {
-                                    sb.Append($"Error: {folder} is empty.\n");
-                                    continue;
-                                }
-                                var filePath = folderItems.FirstOrDefault(s => s.EndsWith(savefileName));
-                                if (filePath == null)
-                                {
-                                    sb.Append($"Error: {savefileName} expected.\n");
-                                    continue;
-                                }
-                                var picture = folderItems.FirstOrDefault(s => s.EndsWith(".jpg"));
-                                var dateTimeTag = dateTimeNow + TimeSpan.FromSeconds(sec);
-                                sec++;
-
-                                try
-                                {
-                                    SqliteDataAccess.SaveBackup(new Backup()
-                                    {
-                                        IsAutobackup = 0,
-                                        GameId = game.Title,
-                                        Origin = game.SavefilePath,
-                                        DateTimeTag = dateTimeTag.ToString(DateTimeFormat.UserFriendly, CultureInfo.CreateSpecificCulture("en-US")),
-                                        Picture = picture != null ? picture : "",
-                                        FilePath = filePath
-                                    });
-
-                                    handled = true;
-                                }
-                                catch
-                                {
-                                    sb.Append($"Error: {filePath} is already in the list.\n");
-                                    continue;
-                                }
-                            }
-                        });
-
-                        // Reset progress.
-                        ImportInProgress = false;
-                        ImportProgress = 0;
-                        RaisePropertyChanged("ImportInProgress");
-                        RaisePropertyChanged("ImportProgress");
-
-                        if (sb.Length != 0)
-                        {
-                            sb.Append("\nTip: Savefiles must be located in separate folders. " +
-                                "To attach an image put it in the folder next to the savefile.");
-
-                            Util.PopUp(sb.ToString());
-                        }
-
-                        if (handled)
-                        {
-                            _backupRepository.LoadBackupsFromPage("1");
-                        }
-                    }
-                }
-            });
-
-            AuthorizeCommand = new DelegateCommand(async() =>
-            {
-                try
-                {
-                    await GoogleDrive.Current.AuthorizeAsync();
-                }
-                catch (Exception ex)
-                {
-                    Util.PopUp($"Error from SettingsViewModel: { ex.Message }");
-                }
-
-                RaisePropertyChanged("AuthorizedAs");
-            });
-
-            if (Games.Count == 0) AddGame();
-
-            UpdateGameList();
+            Settings.CloudAppRootFolderId = rootId;
+            Settings.Save();
         }
 
-        public DelegateCommand AddGameCommand { get; }
-        public DelegateCommand UploadCustomCommand { get; }
-        public DelegateCommand AuthorizeCommand { get; }
+        private async Task AuthorizeAsync()
+        {
+            var mode = GoogleDrive.CurrentMode;
+            var credentials = GoogleDrive.GetCredentials(mode);
+            var token = GoogleDrive.GetToken(mode);
+            var userCredential = await GoogleDrive.Current.AuthorizeAsync(credentials, token);
+            if (userCredential is null)
+                return;
+            GoogleDrive.Current.UserCredential = userCredential;
+            await CreateAppRootFolderAsync();
 
-        #region Game MGMT
-        public string CurrentGameTitle => SqliteDataAccess.GetCurrentGame() != null ? SqliteDataAccess.GetCurrentGame().Title : "none";
+            RaisePropertyChanged(nameof(AuthorizedAs));
+        }
 
-        public ObservableCollection<Game> Games { get; private set; } = new ObservableCollection<Game>(SqliteDataAccess.LoadGames());
+        private async Task ReauthorizeAsync()
+        {
+            var userCredential = GoogleDrive.Current.UserCredential;
+            if (userCredential is object)
+            {
+                await GoogleDrive.Current.ReauthorizeAsync(userCredential);
+                await CreateAppRootFolderAsync();
+                RaisePropertyChanged(nameof(AuthorizedAs));
+            }
+            else 
+            {
+                await AuthorizeAsync();
+                RaisePropertyChanged(nameof(AuthorizedAs));
+            }
+        }
+
+        private string GetUserEmail()
+        {
+            try
+            {
+                var service = GoogleDrive.Current.GetDriveApiService();
+                var request = service.About.Get();
+                request.Fields = "user(emailAddress)";
+                var result = request.Execute();
+                return result.User.EmailAddress;
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
         public void UpdateGameList()
         {
-            Games = new ObservableCollection<Game>(SqliteDataAccess.LoadGames());
-            foreach (Game game in Games) game.SetListener(this);
-            RaisePropertyChanged("Games");
-            RaisePropertyChanged("CurrentGameTitle");
+            var games = SqliteDataAccess.LoadGames();
+            var gameModels = games.Select(x => new GameModel(x)).ToList();
+            gameModels.ForEach(x => x.StateChanged += () => UpdateGameList());
+            Games = new ObservableCollection<GameModel>(gameModels);
+            RaisePropertyChanged(nameof(Games));
+            RaisePropertyChanged(nameof(CurrentGameTitle));
         }
 
-        public void AddGame()
+        public void AddEmptyGame()
         {
-            Game game = new Game()
+            var game = new Game()
             {
                 SavefilePath = "",
                 BackupFolder = "",
@@ -203,263 +282,11 @@ namespace SavescumBuddy.ViewModels
             SqliteDataAccess.SaveGame(game);
             UpdateGameList();
         }
-        #endregion
 
-        #region Hotkeys
-        //Keys
-        public List<Keys> HotKeys => new List<Keys>
-        {
-            Keys.NumPad0,
-            Keys.NumPad1,
-            Keys.NumPad2,
-            Keys.NumPad3,
-            Keys.O,
-            Keys.J,
-            Keys.C,
-            Keys.S,
-            Keys.V,
-            Keys.F6,
-            Keys.F7,
-            Keys.F8
-        };
-
-        public Keys SelectedQLKey
-        {
-            get { return (Keys)Settings.Default.QLKey; }
-            set { Settings.Default.QLKey = (int)value; RaisePropertyChanged("SelectedQLKey"); }
-        }
-        public Keys SelectedQSKey
-        {
-            get { return (Keys)Settings.Default.QSKey; }
-            set { Settings.Default.QSKey = (int)value; RaisePropertyChanged("SelectedQSKey"); }
-        }
-        public Keys SelectedSOKey
-        {
-            get { return (Keys)Settings.Default.SOKey; }
-            set { Settings.Default.SOKey = (int)value; RaisePropertyChanged("SelectedSOKey"); }
-        }
-
-        //Modifiers 
-        public List<string> Modifiers => UserFriendlyModifiers.AsList;
-
-        public Keys SelectedQLMod
-        {
-            get { return (Keys)Settings.Default.QLMod; }
-            set { Settings.Default.QLMod = (int)value; RaisePropertyChanged("SelectedQLMod"); }
-        }
-        public Keys SelectedQSMod
-        {
-            get { return (Keys)Settings.Default.QSMod; }
-            set { Settings.Default.QSMod = (int)value; RaisePropertyChanged("SelectedQSMod"); }
-        }
-        public Keys SelectedSOMod
-        {
-            get { return (Keys)Settings.Default.SOMod; }
-            set { Settings.Default.SOMod = (int)value; RaisePropertyChanged("SelectedSOMod"); }
-        }
-
-        // On/off
-        public bool HotkeysOn
-        {
-            get { return Settings.Default.HotkeysOn; }
-            set { Settings.Default.HotkeysOn = value; RaisePropertyChanged("HotkeysOn"); }
-        }
-
-        // Selected keys validation method
-        private void CheckHotkeysValidity(string key)
-        {
-            // compare QL and QS
-            if (SelectedQLKey == SelectedQSKey && SelectedQLMod == SelectedQSMod)
-            {
-                if (key.Equals("SelectedQLKey") || key.Equals("SelectedQLMod"))
-                {
-                    var keyIndex = HotKeys.FindIndex(k => k.Equals(SelectedQLKey));
-
-                    if (keyIndex > -1 && keyIndex < HotKeys.Count - 1)
-                    {
-                        SelectedQSKey = HotKeys[keyIndex + 1];
-                    }
-                    else
-                    {
-                        SelectedQSKey = HotKeys[0];
-                    }
-                }
-
-                if (key.Equals("SelectedQSKey") || key.Equals("SelectedQSMod"))
-                {
-                    var keyIndex = HotKeys.FindIndex(k => k.Equals(SelectedQSKey));
-
-                    if (keyIndex > -1 && keyIndex < HotKeys.Count - 1)
-                    {
-                        SelectedQLKey = HotKeys[keyIndex + 1];
-                    }
-                    else
-                    {
-                        SelectedQLKey = HotKeys[0];
-                    }
-                }
-            }
-
-            // compare QL and SO
-            if (SelectedQLKey == SelectedSOKey && SelectedQLMod == SelectedSOMod)
-            {
-                if (key.Equals("SelectedQLKey") || key.Equals("SelectedQLMod"))
-                {
-                    var keyIndex = HotKeys.FindIndex(k => k.Equals(SelectedQLKey));
-
-                    if (keyIndex > -1 && keyIndex < HotKeys.Count - 1)
-                    {
-                        SelectedSOKey = HotKeys[keyIndex + 1];
-                    }
-                    else
-                    {
-                        SelectedSOKey = HotKeys[0];
-                    }
-                }
-
-                if (key.Equals("SelectedSOKey") || key.Equals("SelectedSOMod"))
-                {
-                    var keyIndex = HotKeys.FindIndex(k => k.Equals(SelectedSOKey));
-
-                    if (keyIndex > -1 && keyIndex < HotKeys.Count - 1)
-                    {
-                        SelectedQLKey = HotKeys[keyIndex + 1];
-                    }
-                    else
-                    {
-                        SelectedQLKey = HotKeys[0];
-                    }
-                }
-            }
-
-            // compare QS and SO
-            if (SelectedQSKey == SelectedSOKey && SelectedQSMod == SelectedSOMod)
-            {
-                if (key.Equals("SelectedQSKey") || key.Equals("SelectedQSMod"))
-                {
-                    var keyIndex = HotKeys.FindIndex(k => k.Equals(SelectedQSKey));
-
-                    if (keyIndex > -1 && keyIndex < HotKeys.Count - 1)
-                    {
-                        SelectedSOKey = HotKeys[keyIndex + 1];
-                    }
-                    else
-                    {
-                        SelectedSOKey = HotKeys[0];
-                    }
-                }
-
-                if (key.Equals("SelectedSOKey") || key.Equals("SelectedSOMod"))
-                {
-                    var keyIndex = HotKeys.FindIndex(k => k.Equals(SelectedSOKey));
-
-                    if (keyIndex > -1 && keyIndex < HotKeys.Count - 1)
-                    {
-                        SelectedQSKey = HotKeys[keyIndex + 1];
-                    }
-                    else
-                    {
-                        SelectedQSKey = HotKeys[0];
-                    }
-                }
-            }
-        }
-        #endregion
-
-        #region Autobackup options
-        public List<string> SkipOptions => SkipOptionsEnum.AsList();
-
-        public static class SkipOptionsEnum
-        {
-            public const string Never = "Never";
-            public const string FiveMin = "If any backup was created <5 min ago";
-            public const string TenMin = "If any backup was created <10 min ago";
-
-            public static List<string> AsList()
-            {
-                return new List<string>()
-                {
-                    Never, FiveMin, TenMin
-                };
-            }
-        }
-
-        public List<string> IntervalList => Intervals.AsList();
-
-        public class Intervals
-        {
-            private static int[] _intervals = new int[] { 5, 10, 15, 20, 30, 40, 50, 60 };
-
-            public static List<string> AsList()
-            {
-                var output = new List<string>();
-                foreach (int i in _intervals) output.Add(i + " min");
-                return output;
-            }
-        }
-
-        public List<string> OverwriteOptions => OverwriteOptionsEnum.AsList();
-
-        public static class OverwriteOptionsEnum
-        {
-            public const string Never = "Never";
-            public const string Always = "Always";
-            public const string KeepLiked = "Keep liked autobackups";
-
-            public static List<string> AsList()
-            {
-                return new List<string>()
-                {
-                    Never, Always, KeepLiked
-                };
-            }
-        }
-
-        public bool AutobackupsOn
-        {
-            get { return Settings.Default.AutobackupsOn; }
-            set
-            {
-                Settings.Default.AutobackupsOn = value;
-                _autobackupManager.OnEnabledChanged(value);
-                RaisePropertyChanged("AutobackupsOn");
-            }
-        }
-        public string SelectedSkipOption
-        {
-            get { return Settings.Default.Skip; }
-            set { Settings.Default.Skip = value; RaisePropertyChanged("SelectedSkipOption"); }
-        }
-
-        public string SelectedInterval
-        {
-            get { return Settings.Default.Interval + " min"; }
-            set
-            {
-                Settings.Default.Interval = int.Parse(Regex.Match(value, @"\d+").Value);
-                _autobackupManager.OnIntervalChanged();
-                RaisePropertyChanged("SelectedInterval");
-            }
-        }
-
-        public string SelectedOverwriteOption
-        {
-            get { return Settings.Default.Overwrite; }
-            set { Settings.Default.Overwrite = value; RaisePropertyChanged("SelectedOverwriteOption"); }
-        }
-        #endregion
-
-        #region Sound cues
-        public bool SoundCuesOn
-        {
-            get { return Settings.Default.SoundCuesOn; }
-            set { Settings.Default.SoundCuesOn = value; RaisePropertyChanged("SoundCuesOn"); }
-        }
-        #endregion
-
-        public void StateChanged()
-        {
-            UpdateGameList();
-        }
+        public DelegateCommand AddGameCommand { get; }
+        public DelegateCommand UploadCustomCommand { get; }
+        public DelegateCommand<bool?> RegisterHotkeyCommand { get; }
+        public DelegateCommand AuthorizeCommand { get; }
+        public DelegateCommand ReauthorizeCommand { get; }
     }
 }

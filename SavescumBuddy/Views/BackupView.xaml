@@ -48,13 +48,13 @@
         <Grid HorizontalAlignment="Center" Height="100" VerticalAlignment="Center" Width="179" Grid.Column="0" Grid.RowSpan="3" >
             <Border Background="White">
                 <TextBlock Text="NO IMAGE" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource Grayish}"
-                       FontWeight="Bold" Visibility="{Binding Picture, Converter={StaticResource ExistsToVisibilityConverter}}"/>
+                           FontWeight="Bold" Visibility="{Binding Backup.Picture, Converter={StaticResource ExistsToVisibilityConverter}}"/>
             </Border>
-            <Image Source="{Binding Path=Picture, Converter={StaticResource UriToImgConverter}}"/>
+            <Image Source="{Binding Backup.Picture, Converter={StaticResource UriToImgConverter}}"/>
         </Grid>
         <!--NoteBox-->
-        <TextBox x:Name="NoteBox" Text="{Binding Path=Note, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MaxLength="180" TextWrapping="Wrap"  
-                         Margin="5,3,5,5" Grid.Column="1" MaxLines="2" Padding="4,0,0,0" BorderBrush="#FFDCDCDC" Foreground="{StaticResource Dark}" Style="{StaticResource TextBoxStyleFlat}" Grid.Row="2">
+        <TextBox x:Name="NoteBox" Text="{Binding Backup.Note, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MaxLength="180" TextWrapping="Wrap"  
+                 Margin="5,3,5,5" Grid.Column="1" MaxLines="2" Padding="4,0,0,0" BorderBrush="#FFDCDCDC" Foreground="{StaticResource Dark}" Style="{StaticResource TextBoxStyleFlat}" Grid.Row="2">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="LostFocus">
                     <i:InvokeCommandAction Command="{Binding UpdateNoteCommand}"/>
@@ -83,7 +83,7 @@
                     <TextBlock Margin="3,2" Text="Double-click to show in windows explorer."/>
                 </ToolTip>
             </StackPanel.ToolTip>
-            <TextBlock Foreground="{StaticResource Dark}" Text="{Binding DateTimeTag, FallbackValue=1020304020304020}"/>
+            <TextBlock Foreground="{StaticResource Dark}" Text="{Binding Backup.DateTimeTag, FallbackValue=1020304020304020}"/>
             <!--Question mark-->
             <TextBlock Text="&#xF142;" FontFamily="Segoe MDL2 Assets">
                 <TextBlock.Style>
@@ -102,7 +102,7 @@
         <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" >
             <!--Heart button-->
             <ToggleButton FontFamily="Segoe MDL2 Assets" Command="{Binding UpdateIsLikedCommand}" 
-                        Width="22" FontSize="16" Height="20" IsChecked="{Binding Path=IsLiked, Mode=TwoWay, Converter={StaticResource IntToBoolConverter}}" >
+                        Width="22" FontSize="16" Height="20" IsChecked="{Binding Backup.IsLiked, Mode=TwoWay, Converter={StaticResource IntToBoolConverter}}" >
                 <ToggleButton.Style>
                     <Style TargetType="{x:Type ToggleButton}">
                         <Setter Property="Content" Value="&#x0000EB51;"/>
@@ -129,8 +129,8 @@
                 </ToggleButton.Style>
             </ToggleButton>
             <!--Cloud button-->
-            <ToggleButton FontFamily="Segoe MDL2 Assets" Command="{Binding UpdateInCloudCommand}" Margin="5,0,0,0"
-                        Width="22" FontSize="20" Height="20" IsChecked="{Binding Path=InCloud, Mode=TwoWay, Converter={StaticResource IntToBoolConverter}}" >
+            <ToggleButton FontFamily="Segoe MDL2 Assets" Command="{Binding UpdateInCloudCommand}" CommandParameter="{Binding Backup}" Margin="5,0,0,0"
+                          Width="22" FontSize="20" Height="20" IsChecked="{Binding Backup.InCloud, Mode=TwoWay, Converter={StaticResource IntToBoolConverter}}">
                 <ToggleButton.Style>
                     <Style TargetType="{x:Type ToggleButton}">
                         <Setter Property="Content" Value="&#xE753;"/>
@@ -158,7 +158,7 @@
         </StackPanel>
         <!--Caution icon-->
         <Border Grid.Column="0" Grid.RowSpan="3" VerticalAlignment="Center" HorizontalAlignment="Center" CornerRadius="3"
-                     Visibility="{Binding FilePath, Converter={StaticResource ExistsToVisibilityConverter}}" Background="White" >
+                Visibility="{Binding Backup.FilePath, Converter={StaticResource ExistsToVisibilityConverter}}" Background="White">
             <Border.RenderTransform>
                 <SkewTransform AngleX="-12"/>
             </Border.RenderTransform>
@@ -169,7 +169,7 @@
                             <SkewTransform AngleX="12"/>
                         </StackPanel.RenderTransform>
                         <TextBlock Text="&#xE7BA;" FontFamily="Segoe MDL2 Assets" FontSize="26" Margin="0,0,5,0" 
-                        Foreground="{StaticResource Ash}" Visibility="Visible" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                   Foreground="{StaticResource Ash}" Visibility="Visible" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                         <TextBlock Text="SAVEFILE &#xA;MISSING" FontFamily="Segoe UI" FontSize="12" 
                                    Foreground="{StaticResource Ash}" VerticalAlignment="Center" FontStyle="Italic"/>
                     </StackPanel>
@@ -178,7 +178,7 @@
         </Border>
         <!--Char counter-->
         <TextBlock Grid.Column="1" FontSize="10" Foreground="#FF969696" TextAlignment="Right" Grid.Row="1"
-                   VerticalAlignment="Bottom" Margin="0,0,10,0" >
+                   VerticalAlignment="Bottom" Margin="0,0,10,0">
             <Run Text="{Binding Text.Length, ElementName=NoteBox, Mode=OneWay}"/>
             <Run Text="/"/>
             <Run Text="{Binding MaxLength, ElementName=NoteBox, Mode=OneWay}"/>
@@ -201,14 +201,14 @@
                     <Setter Property="Background" Value="#FFF0F0F0"/>
                     <Setter Property="Opacity" Value="1"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsAutobackup, Converter={StaticResource IntToBoolConverter}}" Value="True">
+                        <DataTrigger Binding="{Binding Backup.IsAutobackup, Converter={StaticResource IntToBoolConverter}}" Value="True">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </Border.Style>
             <TextBlock x:Name="AutosaveLabel" IsHitTestVisible="False" Text=" Autosave " VerticalAlignment="Center" HorizontalAlignment="Left" 
-                            Foreground="#FF969696" Grid.Column="0" FontWeight="SemiBold"/>
+                       Foreground="#FF969696" Grid.Column="0" FontWeight="SemiBold"/>
         </Border>
     </Grid>
 </UserControl>

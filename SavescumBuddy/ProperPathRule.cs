@@ -10,12 +10,7 @@ namespace SavescumBuddy
 
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            var input = "";
-
-            if (((string)value).Length > 0)
-            {
-                input = (string)value;
-            }
+            var input = value is string val && val.Length > 0 ? val : "";
 
             if (IsFilePath)
             {
