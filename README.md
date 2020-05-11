@@ -62,3 +62,5 @@ by Johannes Nestler, 2009.
 * [*cat_icon_64px.ico*](https://github.com/bokuwazheng/SavescumBuddy/blob/master/SavescumBuddy/cat_icon_64px.ico)
 from Segoe UI Emoji.
 * Sound cues from [낙원](https://music.apple.com/ca/album/paradise/1384386163?i=1384386840) by BTS (cropped and denoised with Adobe Premiere Pro).
+* [*siegmeyer.jpg*](https://github.com/bokuwazheng/SavescumBuddy/blob/master/SavescumBuddy/siegmeyer.jpg)
+by jakeallenesq on [DeviantArt](https://www.deviantart.com/jakeallenesq/art/Siegmeyer-of-catarina-443799824).
