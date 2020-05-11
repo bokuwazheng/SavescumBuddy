@@ -1,41 +1,39 @@
-﻿using SavescumBuddy.ViewModels;
-using Prism.Mvvm;
+﻿using Prism.Mvvm;
 using System;
 using System.Windows.Threading;
 using Settings = SavescumBuddy.Properties.Settings;
+using SavescumBuddy.Models;
+using SavescumBuddy.MarkupExtensions;
+using SavescumBuddy.Sqlite;
 
 namespace SavescumBuddy
 {
     public class AutobackupManager : BindableBase
     {
-        private DispatcherTimer _backupTimer = new DispatcherTimer();
-        private DispatcherTimer _progressBarTimer = new DispatcherTimer();
-        private BackupRepository _backupRepository;
-        private BackupFactory _backupFactory;
-        public int Progress { get; private set; }
+        private int _progress;
+        private DispatcherTimer _backupTimer;
+        private DispatcherTimer _progressBarTimer;
+        public event Action<Backup> RemovalRequested;
+        public event Action<Backup> AdditionRequested;
 
-        public AutobackupManager(BackupRepository repo, BackupFactory factory)
+        public int Progress { get => _progress; private set => SetProperty(ref _progress, value); }
+
+        public AutobackupManager()
         {
-            _backupRepository = repo;
-            _backupFactory = factory;
+            // If false puts the timer on pause.
+            var isEnabled = Settings.Default.AutobackupsOn; 
 
+            _backupTimer = new DispatcherTimer();
             _backupTimer.Interval = TimeSpan.FromMinutes(Settings.Default.Interval);
-            _backupTimer.Tick += (s, ea) =>
-            {
-                SmartAutobackup();
-                Progress = 0;
-            };
+            _backupTimer.Tick += (s, ea) => { SmartAutobackup(); Progress = 0; };
             _backupTimer.Start();
-            _backupTimer.IsEnabled = Settings.Default.AutobackupsOn; // puts on pause if false
+            _backupTimer.IsEnabled = isEnabled;
 
-            _progressBarTimer.Interval = TimeSpan.FromMilliseconds(1000);
-            _progressBarTimer.Tick += (s, ea) =>
-            {
-                Progress++;
-                RaisePropertyChanged("Progress");
-            };
+            _progressBarTimer = new DispatcherTimer();
+            _progressBarTimer.Interval = TimeSpan.FromSeconds(1);
+            _progressBarTimer.Tick += (s, ea) => Progress++;
             _progressBarTimer.Start();
-            _progressBarTimer.IsEnabled = Settings.Default.AutobackupsOn;
+            _progressBarTimer.IsEnabled = isEnabled;
         }
 
         private void Start()
@@ -52,13 +50,28 @@ namespace SavescumBuddy
             Progress = 0;
         }
 
+        public void OnIsEnabledChanged(bool isEnabled)
+        {
+            if (isEnabled)
+                Start();
+            else
+                Stop();
+        }
+
+        public void OnIntervalChanged(bool isEnabled)
+        {
+            if (isEnabled)
+            {
+                Stop(); 
+                Start();
+            }
+        }
+
         #region SmartAutobackup implementation
         private void SmartAutobackup()
         {
-            if (SqliteDataAccess.GetCurrentGame() == null || ItIsTimeToSkip())
-            {
+            if (SqliteDataAccess.GetCurrentGame() == null || ItIsTimeToSkip()) 
                 return;
-            }
 
             var backup = SqliteDataAccess.GetLatestAutobackup();
 
@@ -66,11 +79,11 @@ namespace SavescumBuddy
             {
                 if (PreviousAutobackupShouldBeDeleted(backup))
                 {
-                    _backupRepository.Remove(backup);
+                    RemovalRequested?.Invoke(backup);
                 }
             }
 
-            _backupRepository.Add(_backupFactory.CreateAutobackup());
+            AdditionRequested?.Invoke(BackupFactory.CreateAutobackup());
         }
 
         private bool ItIsTimeToSkip()
@@ -79,15 +92,15 @@ namespace SavescumBuddy
 
             if (lastBackup != null)
             {
-                var timeSinceLastBackup = (DateTime.Now - DateTime.Parse(lastBackup.DateTimeTag)).Minutes;
+                var timeSinceLastBackup = DateTime.Now - DateTime.Parse(lastBackup.DateTimeTag);
 
-                if (Settings.Default.Skip.Equals(SettingsViewModel.SkipOptionsEnum.FiveMin))
+                if (Settings.Default.Skip.Equals(EnumToCollectionExtension.EnumToDescriptionOrString(SkipOption.FiveMin)))
                 {
-                    return timeSinceLastBackup > 5;
+                    return timeSinceLastBackup > TimeSpan.FromMinutes(5d);
                 }
-                else if (Settings.Default.Skip.Equals(SettingsViewModel.SkipOptionsEnum.TenMin))
+                else if (Settings.Default.Skip.Equals(EnumToCollectionExtension.EnumToDescriptionOrString(SkipOption.TenMin)))
                 {
-                    return timeSinceLastBackup > 10;
+                    return timeSinceLastBackup > TimeSpan.FromMinutes(10d);
                 }
             }
 
@@ -96,36 +109,16 @@ namespace SavescumBuddy
 
         private bool PreviousAutobackupShouldBeDeleted(Backup previous)
         {
-            if (Settings.Default.Overwrite.Equals(SettingsViewModel.OverwriteOptionsEnum.Always))
+            if (Settings.Default.Overwrite.Equals(EnumToCollectionExtension.EnumToDescriptionOrString(OverwriteOption.Always)))
             {
                 return true;
             }
-            else if (Settings.Default.Overwrite.Equals(SettingsViewModel.OverwriteOptionsEnum.KeepLiked))
+            else if (Settings.Default.Overwrite.Equals(EnumToCollectionExtension.EnumToDescriptionOrString(OverwriteOption.KeepLiked)))
             {
-                return previous.IsLiked.Equals(1);
+                return !previous.IsLiked.Equals(1);
             }
 
             return false;
-        }
-
-        internal void OnEnabledChanged(bool value)
-        {
-            if (value)
-            {
-                Start();
-            }
-            else
-            {
-                Stop();
-            }
-        }
-
-        internal void OnIntervalChanged()
-        {
-            if (Settings.Default.AutobackupsOn)
-            {
-                Stop(); Start();
-            }
         }
         #endregion
     }

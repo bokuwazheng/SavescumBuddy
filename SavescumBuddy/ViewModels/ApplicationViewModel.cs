@@ -1,58 +1,58 @@
 ﻿using Common;
 using Prism.Commands;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Settings = SavescumBuddy.Properties.Settings;
+using SavescumBuddy.Sqlite;
 
 namespace SavescumBuddy.ViewModels
 {
     public class ApplicationViewModel : BaseViewModel
     {
-        private BackupFactory _backupFactory;
+        private BaseViewModel _currentViewModel;
         private BackupRepository _backupRepository;
         private AutobackupManager _autobackupManager;
         private GlobalKeyboardHook _keyboardListener;
-
-        private List<BaseViewModel> _viewModels;
-        private BaseViewModel _currentViewModel;
-        public BaseViewModel CurrentViewModel
-        {
-            get { return _currentViewModel; }
-            set { if (_currentViewModel != value) _currentViewModel = value; RaisePropertyChanged("CurrentViewModel"); }
-        }
+        
+        public BaseViewModel CurrentViewModel { get => _currentViewModel; set => SetProperty(ref _currentViewModel, value); }
+        public readonly List<BaseViewModel> ViewModels;
 
         public ApplicationViewModel()
         {
-            _backupFactory = new BackupFactory();
             _backupRepository = new BackupRepository();
-            _autobackupManager = new AutobackupManager(_backupRepository, _backupFactory);
+            _backupRepository.BackupAdded += b => Util.BackupFiles(b);
+            _backupRepository.BackupDeleted += b => Util.MoveToTrash(b);
+
+            _autobackupManager = new AutobackupManager();
             _keyboardListener = new GlobalKeyboardHook();
 
-            _viewModels = new List<BaseViewModel>();
-            _viewModels.Add(new MainViewModel(_backupRepository, _backupFactory, _autobackupManager));
-            _viewModels.Add(new SettingsViewModel(_backupRepository, _autobackupManager));
-            _viewModels.Add(new AboutViewModel());
+            var mainVm = new MainViewModel(_backupRepository, _autobackupManager);
+            var settingsVm = new SettingsViewModel();
+            var aboutVm = new AboutViewModel();
 
-            CurrentViewModel = _viewModels[0];
-            MainViewLoaded();
+            settingsVm.Settings.AutobackupsIsEnabledChanged += isEnabled => _autobackupManager.OnIsEnabledChanged(isEnabled);
+            settingsVm.Settings.SelectedInvervalChanged += isEnabled => _autobackupManager.OnIntervalChanged(isEnabled);
+
+            ViewModels = new List<BaseViewModel>()
+            {
+                mainVm, settingsVm, aboutVm
+            };
+
+            NavigateToMainCommand = new DelegateCommand(() => CurrentViewModel = GetViewModel<MainViewModel>());
+            NavigateToSettingsCommand = new DelegateCommand(() => CurrentViewModel = GetViewModel<SettingsViewModel>());
+            NavigateToAboutCommand = new DelegateCommand(() => CurrentViewModel = GetViewModel<AboutViewModel>());
+
+            NavigateToMainCommand.Execute();
         }
 
-        public DelegateCommand<string> ChangeViewModelCommand => new DelegateCommand<string>(s =>
-        {
-            switch (s)
-            {
-                case (NavigateTo.Main):
-                    CurrentViewModel = _viewModels[0]; MainViewLoaded();
-                    break;
-                case (NavigateTo.Settings):
-                    CurrentViewModel = _viewModels[1]; MainViewUnloaded();
-                    break;
-                case (NavigateTo.About):
-                    CurrentViewModel = _viewModels[2];
-                    break;
-            }
-        });
+        public DelegateCommand NavigateToMainCommand { get; }
+        public DelegateCommand NavigateToSettingsCommand { get; }
+        public DelegateCommand NavigateToAboutCommand { get; }
 
-        private void MainViewLoaded()
+        public T GetViewModel<T>() => ViewModels.OfType<T>().First();
+
+        public void Hook()
         {
             if (Settings.Default.HotkeysOn)
             {
@@ -61,29 +61,32 @@ namespace SavescumBuddy.ViewModels
             }
         }
 
-        private void MainViewUnloaded()
+        public void Unhook()
         {
             _keyboardListener.Unhook();
             _keyboardListener.KeyDown -= _keyboardListener_KeyDown;
         }
 
         private void _keyboardListener_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
-        {
+        {            
             if (e.KeyValue == Settings.Default.QSKey)
             {
                 if ((int)e.Modifiers == Settings.Default.QSMod)
                 {
                     try
                     {
-                        _backupRepository.Add(_backupFactory.CreateBackup());
+                        var backup = BackupFactory.CreateBackup();
+                        var mainVm = ViewModels.OfType<MainViewModel>().First();
+                        mainVm.AddCommand.Execute(backup);
                         Util.PlaySound(WavLocator.backup_cue);
                     }
-                    catch
+                    catch (NullReferenceException ex)
                     {
-                        Util.PopUp("Failed to create a backup: no game is set as current yet.");
+                        Util.PopUp(ex.Message);
                     }
 
                     e.Handled = true;
+                    return;
                 }
             }
 
@@ -93,15 +96,19 @@ namespace SavescumBuddy.ViewModels
                 {
                     try
                     {
-                        _backupRepository.RestoreLatest();
+                        var latest = SqliteDataAccess.GetLatestBackup();
+                        if (latest is null)
+                            return;
+                        Util.Restore(latest);
                         Util.PlaySound(WavLocator.restore_cue);
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        Util.PopUp("There is no backup to restore yet.");
+                        Util.PopUp(ex.Message);
                     }
 
                     e.Handled = true;
+                    return;
                 }
             }
 
@@ -111,29 +118,27 @@ namespace SavescumBuddy.ViewModels
                 {
                     try
                     {
-                        _backupRepository.Remove(SqliteDataAccess.GetLatestBackup());
-                        _backupRepository.Add(_backupFactory.CreateBackup());
+                        var latest = SqliteDataAccess.GetLatestBackup();
+                        if (latest is object)
+                            _backupRepository.Remove(latest);
+                        var backup = BackupFactory.CreateBackup();
+                        var mainVm = ViewModels.OfType<MainViewModel>().First();
+                        mainVm.AddCommand.Execute(backup);
                         Util.PlaySound(WavLocator.backup_cue);
                     }
-                    catch
+                    catch (NullReferenceException ex)
                     {
-                        Util.PopUp("There is no backup to overwrite yet.");
+                        Util.PopUp(ex.Message);
+                    }
+                    catch (Exception ex)
+                    {
+                        Util.PopUp(ex.Message);
                     }
 
                     e.Handled = true;
+                    return;
                 }
             }
         }
-
-        public static class NavigateTo
-        {
-            public const string Main = "Main";
-            public const string Settings = "Settings";
-            public const string About = "About";
-        }
-
-        public string ToMain => NavigateTo.Main;
-        public string ToSettings => NavigateTo.Settings;
-        public string ToAbout => NavigateTo.About;
     }
 }

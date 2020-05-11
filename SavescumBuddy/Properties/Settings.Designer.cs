@@ -12,7 +12,7 @@ namespace SavescumBuddy.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.1.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.5.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -121,7 +121,7 @@ namespace SavescumBuddy.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\"Never\"")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Never")]
         public string Skip {
             get {
                 return ((string)(this["Skip"]));
@@ -133,7 +133,7 @@ namespace SavescumBuddy.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\"Never\"")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Never")]
         public string Overwrite {
             get {
                 return ((string)(this["Overwrite"]));
@@ -206,12 +206,12 @@ namespace SavescumBuddy.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string CloudRootId {
+        public string CloudAppRootFolderId {
             get {
-                return ((string)(this["CloudRootId"]));
+                return ((string)(this["CloudAppRootFolderId"]));
             }
             set {
-                this["CloudRootId"] = value;
+                this["CloudAppRootFolderId"] = value;
             }
         }
         

@@ -1,26 +1,45 @@
-﻿using System.Windows;
-using System.Windows.Forms;
-
+﻿using SavescumBuddy.ViewModels;
+using System.Windows;
+using System.Linq;
+using System.Windows.Controls;
+using Settings = SavescumBuddy.Properties.Settings;
 
 namespace SavescumBuddy.Views
 {
     /// <summary>
     /// Interaction logic for MainView.xaml
     /// </summary>
-    public partial class MainView : System.Windows.Controls.UserControl
+    public partial class MainView : UserControl
     {
         public MainView()
         {
             InitializeComponent();
         }
 
-        private void PageBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        private void MainViewLoaded(object sender, RoutedEventArgs e)
         {
-            if (System.Text.RegularExpressions.Regex.IsMatch(PageBox.Text, "[^0-9]"))
-            {
-                PageBox.Text = PageBox.Text.Remove(PageBox.Text.Length - 1);
-                PageBox.SelectionStart = PageBox.Text.Length;
-            }
+            var dc = Application.Current.MainWindow.DataContext;
+            var appVm = dc as ApplicationViewModel;
+            
+            // Enable keyboard listener.
+            appVm.Hook();
+
+            // Update backup list.
+            var mainVm = appVm.ViewModels.OfType<MainViewModel>().First();
+            mainVm.UpdateBackupList();
+            mainVm.NavigateToStartCommand?.Execute();
+        }
+
+        private void MainViewUnloaded(object sender, RoutedEventArgs e)
+        {
+            var dc = Application.Current.MainWindow.DataContext;
+            var appVm = dc as ApplicationViewModel;
+
+            // Disable keyboard listener.
+            appVm.Unhook();
+
+            // Save filtering settings.
+            Settings.Default.Save();
         }
     }
 }

@@ -3,7 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:SavescumBuddy.Views"
+             xmlns:local="clr-namespace:SavescumBuddy"
+             xmlns:models="clr-namespace:SavescumBuddy.Models"
+             xmlns:views="clr-namespace:SavescumBuddy.Views"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:ext="clr-namespace:SavescumBuddy.MarkupExtensions"
              mc:Ignorable="d" 
              d:DesignHeight="660" d:DesignWidth="1160" 
              Unloaded="UserControl_Unloaded">
@@ -84,7 +89,7 @@
     </UserControl.Resources>
 
     <!--MAIN GRID-->
-    <Grid Background="White">
+    <Grid Background="White" SnapsToDevicePixels="True">
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -95,14 +100,12 @@
         <!--Escape button-->
         <Button Content="&#xE72B;" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Grid.Column="0"
                 Background="{x:Null}" BorderBrush="{x:Null}" FontSize="24" Grid.Row="0" Height="34"
-                Command="{Binding DataContext.ChangeViewModelCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Margin="20,23"
-                CommandParameter="{Binding DataContext.ToMain, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
+                Command="{Binding DataContext.NavigateToMainCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Margin="20,23"/>
 
         <!--About button-->
         <Button Content="About me" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Column="0" Cursor="Hand"
                 Background="{x:Null}" BorderBrush="{x:Null}" FontSize="{StaticResource CaptionFontSize}" Grid.Row="0" 
-                Command="{Binding DataContext.ChangeViewModelCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Margin="20,23"
-                CommandParameter="{Binding DataContext.ToAbout, RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
+                Command="{Binding DataContext.NavigateToAboutCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Margin="20,23">
             <Button.Style>
                 <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
                     <Setter Property="Foreground" Value="{StaticResource Grayish}"/>
@@ -119,7 +122,7 @@
                     <RowDefinition Height="50"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="64"/>
-                    <RowDefinition Height="84"/>
+                    <RowDefinition Height="64"/>
                     <RowDefinition Height="Auto" MinHeight="50"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="50"/>
@@ -134,12 +137,13 @@
                 <!--Title (header + caption)-->
                 <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="0">
                     <!--Header-->
-                    <TextBlock Text="Auto backups" TextAlignment="Left" Style="{StaticResource Header}" />
+                    <TextBlock Text="Auto Backups" TextAlignment="Left" Style="{StaticResource Header}" />
                     <!--Caption-->
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock TextAlignment="Left" Style="{StaticResource Caption}">
-                            <Run Text="A backup will be automatically created every"/>
-                            <Run Text="{Binding SelectedInterval, UpdateSourceTrigger=PropertyChanged, FallbackValue='10 mins'}"/>
+                        <TextBlock Style="{StaticResource Caption}">
+                            <TextBlock.Text>
+                                <Binding StringFormat="A backup will be automatically created every {0}" Path="Settings.SelectedInterval"/>
+                            </TextBlock.Text>
                         </TextBlock>
                         <TextBlock Text=", unless..." TextAlignment="Left">
                             <TextBlock.Style>
@@ -156,30 +160,8 @@
                     </StackPanel>
                 </StackPanel>
                 <!--Autobackup ToggleButton-->
-                <Canvas Grid.Column="1" Grid.Row="0" Width="40" Margin="5" HorizontalAlignment="Right">
-                    <ToggleButton x:Name="AutobackupButton" Content="&#xEC11;" FontSize="34" FontFamily="Segoe MDL2 Assets" 
-                                  Height="34" Width="34" Canvas.Left="5" Canvas.Top="0" Style="{StaticResource SlidingToggleButton}"
-                                  IsChecked="{Binding AutobackupsOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <Ellipse Fill="White" Height="22" Width="22" StrokeThickness="2" Canvas.Left="3" Canvas.Top="6"
-                             IsHitTestVisible="False">
-                        <Ellipse.Style>
-                            <Style TargetType="{x:Type Ellipse}">
-                                <Setter Property="Stroke" Value="{Binding Foreground, ElementName=AutobackupButton}"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsChecked, ElementName=AutobackupButton}" Value="True">
-                                        <Setter Property="Stroke" Value="{StaticResource SkyBlue}"/>
-                                        <DataTrigger.EnterActions>
-                                            <BeginStoryboard Storyboard="{StaticResource ToggleOn}"/>
-                                        </DataTrigger.EnterActions>
-                                        <DataTrigger.ExitActions>
-                                            <BeginStoryboard Storyboard="{StaticResource ToggleOff}"/>
-                                        </DataTrigger.ExitActions>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Ellipse.Style>
-                    </Ellipse>
-                </Canvas>
+                <ToggleButton Style="{StaticResource slidingToggleButton}" Grid.Column="1" Grid.Row="0" Margin="10,0,0,0"
+                              IsChecked="{Binding Settings.AutobackupsOn}"/>
 
                 <!--Auto backups Expander-->
                 <Expander Header="Advanced..." ExpandDirection="Down" Grid.ColumnSpan="2" Margin="0,0,0,15" FontSize="{StaticResource CaptionFontSize}" Grid.Row="1" Foreground="{StaticResource Ash}">
@@ -193,16 +175,26 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Interval:" VerticalAlignment="Center" HorizontalAlignment="Right"  Grid.Column="0" Margin="0,0,10,0" Grid.Row="0"/>
-                        <ComboBox IsSynchronizedWithCurrentItem="True" Grid.Column="1" Grid.Row="0" Height="28" Foreground="{StaticResource Ash}"
-                                          ItemsSource="{Binding IntervalList}" SelectedItem="{Binding SelectedInterval, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBlock Text="Skip:" Margin="0,0,10,0" FontSize="{StaticResource CaptionFontSize}" VerticalAlignment="Center" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="1"/>
-                        <ComboBox x:Name="SkipBox" IsSynchronizedWithCurrentItem="True" Grid.Column="1" Grid.Row="1" Height="28" Foreground="{StaticResource Ash}"
-                                          ItemsSource="{Binding SkipOptions}" SelectedItem="{Binding SelectedSkipOption, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-
-                        <TextBlock Text="Overwrite:" Grid.Column="0" Margin="0,0,10,0" VerticalAlignment="Center" Grid.Row="2"/>
-                        <ComboBox IsSynchronizedWithCurrentItem="True" Grid.Column="1" Height="28" Foreground="{StaticResource Ash}"
-                                          ItemsSource="{Binding OverwriteOptions}" SelectedItem="{Binding SelectedOverwriteOption, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="2" />
+                        <TextBlock Text="Interval:" Grid.Column="0" Margin="0,0,10,0" VerticalAlignment="Center" HorizontalAlignment="Right" Grid.Row="0"/>
+                        <TextBlock Text="Skip:" Grid.Column="0" Margin="0,0,10,0" VerticalAlignment="Center" HorizontalAlignment="Right" Grid.Row="1"/>
+                        <TextBlock Text="Overwrite:" Grid.Column="0"  Margin="0,0,10,0" VerticalAlignment="Center" Grid.Row="2"/>
+                        <ComboBox Grid.Column="1" Grid.Row="0" Height="28" Foreground="{StaticResource Ash}"
+                                  SelectedItem="{Binding Settings.SelectedInterval}">
+                            <sys:String>5 min</sys:String>
+                            <sys:String>10 min</sys:String>
+                            <sys:String>15 min</sys:String>
+                            <sys:String>20 min</sys:String>
+                            <sys:String>30 min</sys:String>
+                            <sys:String>40 min</sys:String>
+                            <sys:String>50 min</sys:String>
+                            <sys:String>60 min</sys:String>
+                        </ComboBox>
+                        <ComboBox Grid.Column="1" Grid.Row="1" Height="28" Foreground="{StaticResource Ash}"
+                                  ItemsSource="{ext:EnumToCollection EnumType={x:Type models:SkipOption}}" 
+                                  SelectedItem="{Binding Settings.SelectedSkipOption}"/>
+                        <ComboBox Grid.Column="1" Grid.Row="2" Height="28" Foreground="{StaticResource Ash}" 
+                                  ItemsSource="{ext:EnumToCollection EnumType={x:Type models:OverwriteOption}}"
+                                  SelectedItem="{Binding Settings.SelectedOverwriteOption}"/>
                     </Grid>
                 </Expander>
                 <!--Auto backups region ends here-->
@@ -215,140 +207,165 @@
                     <!--Caption-->
                     <StackPanel Orientation="Horizontal" Width="435">
                         <!--QS caption-->
-                        <TextBlock Text="Save: " Style="{StaticResource Caption}"/>
-                        <TextBlock>
-                                <Run Text="{Binding SelectedQSMod, FallbackValue=Ctrl, Converter={StaticResource StringToModifierConverter}}"/>
-                                <Run Text="+ "/>
-                            <TextBlock.Style>
-                                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource Caption}">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Text, ElementName=QSMod}" Value="None">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                        <TextBlock Text="{Binding SelectedQSKey, FallbackValue=J}" Style="{StaticResource Caption}"/>
-                        <!--QL caption-->
-                        <TextBlock Text=". Load: " Style="{StaticResource Caption}"/>
-                        <TextBlock>
-                                <Run Text="{Binding SelectedQLMod, FallbackValue=Shift, Converter={StaticResource StringToModifierConverter}}"/>
-                                <Run Text="+ "/>
-                            <TextBlock.Style>
-                                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource Caption}">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Text, ElementName=QLMod}" Value="None">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
                         <TextBlock Style="{StaticResource Caption}">
-                            <Run Text="{Binding SelectedQLKey, FallbackValue=O}"/>
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="Save: {0}. " Converter="{StaticResource KeysToStringConverter}">
+                                    <Binding Path="Settings.SelectedQSKey"/>
+                                    <Binding Path="Settings.SelectedQSMod"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                        <!--QL caption-->
+                        <TextBlock Style="{StaticResource Caption}">
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="Load: {0}. " Converter="{StaticResource KeysToStringConverter}">
+                                    <Binding Path="Settings.SelectedQLKey"/>
+                                    <Binding Path="Settings.SelectedQLMod"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
                         </TextBlock>
                         <!--SO caption-->
-                        <TextBlock Text=". Overwrite prev.: " Style="{StaticResource Caption}"/>
-                        <TextBlock>
-                                <Run Text="{Binding SelectedSOMod, FallbackValue=Alt, Converter={StaticResource StringToModifierConverter}}"/>
-                                <Run Text="+ "/>
-                            <TextBlock.Style>
-                                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource Caption}">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Text, ElementName=QLMod}" Value="None">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
                         <TextBlock Style="{StaticResource Caption}">
-                            <Run Text="{Binding SelectedSOKey, FallbackValue=U}"/>.
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="Overwrite: {0}. " Converter="{StaticResource KeysToStringConverter}">
+                                    <Binding Path="Settings.SelectedSOKey"/>
+                                    <Binding Path="Settings.SelectedSOMod"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
                         </TextBlock>
                     </StackPanel>
                 </StackPanel>
                 <!--Toggle Hotkeys Buttons-->
-                <Canvas Grid.Column="1" Grid.Row="2" Margin="5" Width="40" HorizontalAlignment="Right" >
-                    <ToggleButton x:Name="HotkeysButton" Content="&#xEC11;" FontSize="34" FontFamily="Segoe MDL2 Assets" Grid.Column="1"
-                              IsChecked="{Binding HotkeysOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SlidingToggleButton}"
-                                  Height="34" Width="34" Canvas.Left="5" Canvas.Top="0" />
-                    <Ellipse Fill="White" Height="22" Width="22" StrokeThickness="2" Canvas.Left="3" Canvas.Top="6"
-                             IsHitTestVisible="False">
-                        <Ellipse.Style>
-                            <Style TargetType="{x:Type Ellipse}">
-                                <Setter Property="Stroke" Value="{Binding Foreground, ElementName=HotkeysButton}"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsChecked, ElementName=HotkeysButton}" Value="True">
-                                        <Setter Property="Stroke" Value="{StaticResource SkyBlue}"/>
-                                        <DataTrigger.EnterActions>
-                                            <BeginStoryboard Storyboard="{StaticResource ToggleOn}"/>
-                                        </DataTrigger.EnterActions>
-                                        <DataTrigger.ExitActions>
-                                            <BeginStoryboard Storyboard="{StaticResource ToggleOff}"/>
-                                        </DataTrigger.ExitActions>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Ellipse.Style>
-                    </Ellipse>
-                </Canvas>
+                <ToggleButton Style="{StaticResource slidingToggleButton}" Grid.Column="1" Grid.Row="2" Margin="10,0,0,0"
+                              IsChecked="{Binding Settings.HotkeysOn}"/>
                 <!--Shortcuts Expander-->
                 <Expander Header="Show more..." ExpandDirection="Down" Grid.ColumnSpan="2" Grid.Row="3" Margin="0,0,0,15" Foreground="{StaticResource Ash}"
                           FontSize="{StaticResource CaptionFontSize}" >
                     <StackPanel Orientation="Vertical" Margin="5">
                         <!--Quick save-->
                         <GroupBox Header="Backup" Padding="3" BorderBrush="{StaticResource Ash}" FontSize="{StaticResource СommonFontSize}" >
-                            <Grid Margin="0,0,0,2" >
+                            <Grid Margin="-2">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="120"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Modifier" Margin="0,0,10,0" Style="{StaticResource Caption}" VerticalAlignment="Center" Grid.Column="0"/>
-                                <ComboBox x:Name="QSMod" IsSynchronizedWithCurrentItem="True" HorizontalAlignment="Stretch" Grid.Column="1" Foreground="{StaticResource Ash}"
-                                              ItemsSource="{Binding Modifiers}" SelectedValue="{Binding SelectedQSMod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToModifierConverter}}" />
-                                <TextBlock Text="Key*" Margin="20,0,10,0" Style="{StaticResource Caption}" FontSize="{StaticResource CaptionFontSize}" VerticalAlignment="Center" Grid.Column="2"/>
-                                <ComboBox IsSynchronizedWithCurrentItem="True" Grid.Column="3" Foreground="{StaticResource Ash}"
-                                              ItemsSource="{Binding HotKeys}" SelectedValue="{Binding SelectedQSKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <Border CornerRadius="3" BorderThickness="1" Height="30">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="BorderBrush" Value="Transparent"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SaveHookIsEnabled}" Value="True">
+                                                    <Setter Property="BorderBrush" Value="White"/>
+                                                    <DataTrigger.EnterActions>
+                                                        <BeginStoryboard Storyboard="{StaticResource Pulse}"/>
+                                                    </DataTrigger.EnterActions>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <TextBlock VerticalAlignment="Center" Margin="10,0" FontWeight="Medium">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource KeysToStringConverter}">
+                                                <Binding Path="Settings.SelectedQSKey"/>
+                                                <Binding Path="Settings.SelectedQSMod"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </Border>
+                                <ToggleButton Grid.Column="1" IsChecked="{Binding SaveHookIsEnabled}" Style="{StaticResource RecordHotkeyToggleButton}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Checked">
+                                            <i:InvokeCommandAction Command="{Binding RegisterHotkeyCommand}"/>
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="Unchecked">
+                                            <i:InvokeCommandAction Command="{Binding RegisterHotkeyCommand}"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </ToggleButton>
                             </Grid>
                         </GroupBox>
                         <!--Quick load-->
                         <GroupBox Header="Restore previous" Padding="3" BorderBrush="{StaticResource Ash}" FontSize="{StaticResource СommonFontSize}">
-                            <Grid Margin="0,0,0,2" >
+                            <Grid Margin="-2">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="120"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Modifier" Margin="0,0,10,0" Style="{StaticResource Caption}" VerticalAlignment="Center" Grid.Column="0"/>
-                                <ComboBox x:Name="QLMod" IsSynchronizedWithCurrentItem="True" Grid.Column="1" Foreground="{StaticResource Ash}"
-                                              ItemsSource="{Binding Modifiers}" SelectedValue="{Binding SelectedQLMod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToModifierConverter}}" />
-                                <TextBlock Text="Key*" Margin="20,0,10,0" Style="{StaticResource Caption}" VerticalAlignment="Center" Grid.Column="2"/>
-                                <ComboBox IsSynchronizedWithCurrentItem="True" Grid.Column="3" Foreground="{StaticResource Ash}"
-                                              ItemsSource="{Binding HotKeys}" SelectedValue="{Binding SelectedQLKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <Border CornerRadius="3" BorderThickness="1" Height="30">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="BorderBrush" Value="Transparent"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding RestoreHookIsEnabled}" Value="True">
+                                                    <Setter Property="BorderBrush" Value="White"/>
+                                                    <DataTrigger.EnterActions>
+                                                        <BeginStoryboard Storyboard="{StaticResource Pulse}"/>
+                                                    </DataTrigger.EnterActions>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <TextBlock VerticalAlignment="Center" Margin="10,0" FontWeight="Medium">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource KeysToStringConverter}">
+                                                <Binding Path="Settings.SelectedQLKey"/>
+                                                <Binding Path="Settings.SelectedQLMod"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </Border>
+                                <ToggleButton Grid.Column="1" IsChecked="{Binding RestoreHookIsEnabled}" Style="{StaticResource RecordHotkeyToggleButton}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Checked">
+                                            <i:InvokeCommandAction Command="{Binding RegisterHotkeyCommand}"/>
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="Unchecked">
+                                            <i:InvokeCommandAction Command="{Binding RegisterHotkeyCommand}"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </ToggleButton>
                             </Grid>
                         </GroupBox>
                         <!--Save and overwrite-->
-                        <GroupBox Header="Backup and overwrite previous" Padding="3" BorderBrush="{StaticResource Ash}" FontSize="{StaticResource СommonFontSize}" >
-                            <Grid Margin="0,0,0,2" >
+                        <GroupBox Header="Backup and overwrite previous" Padding="3" BorderBrush="{StaticResource Ash}" FontSize="{StaticResource СommonFontSize}">
+                            <Grid Margin="-2">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="120"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Modifier" Margin="0,0,10,0" Style="{StaticResource Caption}" VerticalAlignment="Center" Grid.Column="0"/>
-                                <ComboBox x:Name="QSRMod" IsSynchronizedWithCurrentItem="True" HorizontalAlignment="Stretch" Grid.Column="1" Foreground="{StaticResource Ash}"
-                                              ItemsSource="{Binding Modifiers}" SelectedValue="{Binding SelectedSOMod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToModifierConverter}}" />
-                                <TextBlock Text="Key*" Margin="20,0,10,0" Style="{StaticResource Caption}" FontSize="{StaticResource CaptionFontSize}" VerticalAlignment="Center" Grid.Column="2"/>
-                                <ComboBox IsSynchronizedWithCurrentItem="True" Grid.Column="3" Foreground="{StaticResource Ash}"
-                                              ItemsSource="{Binding HotKeys}" SelectedValue="{Binding SelectedSOKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <Border CornerRadius="3" BorderThickness="1" Height="30">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="BorderBrush" Value="Transparent"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding OverwriteHookIsEnabled}" Value="True">
+                                                    <Setter Property="BorderBrush" Value="White"/>
+                                                    <DataTrigger.EnterActions>
+                                                        <BeginStoryboard Storyboard="{StaticResource Pulse}"/>
+                                                    </DataTrigger.EnterActions>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <TextBlock VerticalAlignment="Center" Margin="10,0" FontWeight="Medium">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource KeysToStringConverter}">
+                                                <Binding Path="Settings.SelectedSOKey"/>
+                                                <Binding Path="Settings.SelectedSOMod"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </Border>
+                                <ToggleButton Grid.Column="1" IsChecked="{Binding OverwriteHookIsEnabled}" Style="{StaticResource RecordHotkeyToggleButton}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Checked">
+                                            <i:InvokeCommandAction Command="{Binding RegisterHotkeyCommand}"/>
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="Unchecked">
+                                            <i:InvokeCommandAction Command="{Binding RegisterHotkeyCommand}"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </ToggleButton>
                             </Grid>
                         </GroupBox>
                     </StackPanel>
@@ -357,17 +374,35 @@
                 <!--Title (header + caption)-->
                 <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="4" >
                     <!--Header-->
-                    <TextBlock Text="Sound cues" TextAlignment="Left" Style="{StaticResource Header}" />
+                    <TextBlock Text="Sound Cues" TextAlignment="Left" Style="{StaticResource Header}" />
                     <!--Caption-->
                     <TextBlock Text="Play a sound cue when a hotkey is pressed." TextAlignment="Left" Style="{StaticResource Caption}"/>
                 </StackPanel>
-
+                
+                
                 <!--Title (header + caption)-->
                 <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="5" >
                     <!--Header-->
-                    <TextBlock Text="Google drive" TextAlignment="Left" Style="{StaticResource Header}" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Google Drive" TextAlignment="Left" Style="{StaticResource Header}" />
+                        <!--Sign out button-->
+                        <Button FontFamily="Segoe MDL2 Assets" FontSize="22" Content="&#xE748;" ToolTip="Reauthorize"
+                                HorizontalAlignment="Center" VerticalAlignment="Center" Margin="12,6,0,0"
+                                Command="{Binding ReauthorizeCommand}" BorderThickness="0" FontWeight="Normal"/>
+                    </StackPanel>
+                    
                     <!--Caption-->
-                    <TextBlock TextAlignment="Left" Style="{StaticResource Caption}"> 
+                    <TextBlock TextAlignment="Left">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource Caption}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding AuthorizedAs}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
                         <Hyperlink Command="{Binding AuthorizeCommand}">
                                 <Hyperlink.Style>
                                     <Style TargetType="{x:Type Hyperlink}">
@@ -381,37 +416,26 @@
                                 </Hyperlink.Style>
                        Authorize</Hyperlink> to store your backups in Google drive.
                     </TextBlock>
-                    <TextBlock Style="{StaticResource Caption}" Width="435">
-                        <Run Text="Currently authorized as:"/>
-                        <Run Text="{Binding AuthorizedAs, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>.
+                    <TextBlock Width="435">
+                        <TextBlock.Text>
+                            <Binding Path="AuthorizedAs" StringFormat="Currently authorized as: {0}."/>
+                        </TextBlock.Text>
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource Caption}">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding AuthorizedAs}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
                     </TextBlock>
                 </StackPanel>
 
                 <!--Toggle Hotkeys Buttons-->
-                <Canvas Grid.Column="1" Grid.Row="4" Margin="5" Width="40" HorizontalAlignment="Right">
-                    <ToggleButton x:Name="SoundCuesButton" Content="&#xEC11;" FontSize="34" FontFamily="Segoe MDL2 Assets" Grid.Column="1"
-                              IsChecked="{Binding SoundCuesOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SlidingToggleButton}"
-                                  Height="34" Width="34" Canvas.Left="5" Canvas.Top="0" />
-                    <Ellipse Fill="White" Height="22" Width="22" StrokeThickness="2" Canvas.Left="3" Canvas.Top="6"
-                             IsHitTestVisible="False">
-                        <Ellipse.Style>
-                            <Style TargetType="{x:Type Ellipse}">
-                                <Setter Property="Stroke" Value="{Binding Foreground, ElementName=SoundCuesButton}"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsChecked, ElementName=SoundCuesButton}" Value="True">
-                                        <Setter Property="Stroke" Value="#FF80C8FA"/>
-                                        <DataTrigger.EnterActions>
-                                            <BeginStoryboard Storyboard="{StaticResource ToggleOn}"/>
-                                        </DataTrigger.EnterActions>
-                                        <DataTrigger.ExitActions>
-                                            <BeginStoryboard Storyboard="{StaticResource ToggleOff}"/>
-                                        </DataTrigger.ExitActions>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Ellipse.Style>
-                    </Ellipse>
-                </Canvas>
+                <ToggleButton Style="{StaticResource slidingToggleButton}" Grid.Column="1" Grid.Row="4" Margin="10,0,0,0"
+                              IsChecked="{Binding Settings.SoundCuesOn}"/>
                 <!--Shortcuts region ends here-->
 
                 <!--Game mgmt-->
@@ -419,37 +443,36 @@
                 <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="6">
                     <TextBlock Text="Games" Style="{StaticResource Header}" />
                     <TextBlock Style="{StaticResource Caption}" TextWrapping="Wrap" MaxWidth="475" HorizontalAlignment="Left" >
-            Current game: <Run Text="{Binding CurrentGameTitle, Mode=OneWay, 
-                                UpdateSourceTrigger=PropertyChanged, FallbackValue=none}"/>.
-                    You can <Hyperlink Command="{Binding UploadCustomCommand}" ToolTipService.ShowDuration="30000" >
-                                <Hyperlink.Style>
-                                    <Style TargetType="{x:Type Hyperlink}">
-                                        <Setter Property="Foreground" Value="{StaticResource SkyBlue}"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding CurrentGameTitle}" Value="none">
-                                                <Setter Property="IsEnabled" Value="False"/>
-                                            </DataTrigger>
-                                            <Trigger Property="IsEnabled" Value="False">
-                                                <Setter Property="Foreground" Value="{StaticResource Ash}"/>
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Hyperlink.Style>
-                                <Hyperlink.ToolTip>
-                                    <ToolTip >
-                                        <TextBlock Margin="3,2" Text="Savefiles must be located in separate folders.&#xA;To attach an image put it in the folder next to the savefile."/>
-                                    </ToolTip>
-                                </Hyperlink.ToolTip>
-                       import</Hyperlink> backups of current game.
+          Current game: <Run Text="{Binding CurrentGameTitle, Mode=OneWay, FallbackValue=none}"/>.
+                You can <Hyperlink Command="{Binding UploadCustomCommand}" ToolTipService.ShowDuration="30000" >
+                            <Hyperlink.Style>
+                                <Style TargetType="{x:Type Hyperlink}">
+                                    <Setter Property="Foreground" Value="{StaticResource SkyBlue}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding CurrentGameTitle}" Value="none">
+                                            <Setter Property="IsEnabled" Value="False"/>
+                                        </DataTrigger>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Foreground" Value="{StaticResource Ash}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Hyperlink.Style>
+                            <Hyperlink.ToolTip>
+                                <ToolTip >
+                                    <TextBlock Margin="3,2" Text="Savefiles must be located in separate folders.&#xA;To attach an image put it in the folder next to the savefile."/>
+                                </ToolTip>
+                            </Hyperlink.ToolTip>
+                  import</Hyperlink> backups of current game.
                     </TextBlock>
                     <!--Import progress bar-->
-                    <ProgressBar Value="{Binding ImportProgress, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="100" BorderThickness="0"
+                    <ProgressBar Value="{Binding ImportProgress, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="100" BorderThickness="0"
                                  Height="2" Foreground="{StaticResource SkyBlue}" Margin="5" >
                         <ProgressBar.Style>
                             <Style TargetType="{x:Type ProgressBar}">
                                 <Setter Property="Visibility" Value="Collapsed"/>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ImportInProgress}" Value="true">
+                                    <DataTrigger Binding="{Binding ImportInProgress, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="true">
                                         <Setter Property="Visibility" Value="Visible"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -459,25 +482,26 @@
                 </StackPanel>
                 <!--Expander-->
                 <ListView x:Name="GamesListView" ItemsSource="{Binding Games}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" SelectionMode="Single"
-                  Margin="0,5" IsSynchronizedWithCurrentItem="True" Grid.ColumnSpan="2" Grid.Row="7" BorderBrush="{x:Null}" Background="{x:Null}" 
+                          Margin="0,5" IsSynchronizedWithCurrentItem="True" Grid.ColumnSpan="2" Grid.Row="7" BorderBrush="{x:Null}" Background="{x:Null}" 
                           ScrollViewer.CanContentScroll="True" Style="{DynamicResource ListViewNoScrollView}" MinWidth="485">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <local:GameView/>
+                            <views:GameView/>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
 
-                <Grid Grid.ColumnSpan="2" Grid.Row="8" Margin="5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="120"/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Right" 
-                               VerticalAlignment="Center" Margin="5" FontSize="14" Foreground="#FF80C8FA"/>
-                    <Button Content="Add another game" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Left" Foreground="{StaticResource SkyBlue}"
-                            VerticalAlignment="Center" Margin="5" Command="{Binding AddGameCommand}" FontSize="14" Cursor="Hand" />
-                </Grid>
+                <Button Grid.ColumnSpan="2" Grid.Row="8" HorizontalAlignment="Left" Foreground="{StaticResource SkyBlue}"
+                        VerticalAlignment="Center" Margin="120,5,5,5" Command="{Binding AddGameCommand}" FontSize="14" Cursor="Hand"
+                        Style="{StaticResource TextButton}" Height="28" Width="160">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Right" 
+                                       VerticalAlignment="Center" FontSize="14" Margin="0,0,5,0"/>
+                            <TextBlock Text="Add another game"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
             </Grid>
         </ScrollViewer>
     </Grid>

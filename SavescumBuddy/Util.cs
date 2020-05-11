@@ -13,6 +13,11 @@ namespace SavescumBuddy
         public const string WindowsFriendly = "dd.MM.yyyy--HH.mm.ss";
         public const string UserFriendly = "MMM dd, yyyy h:mm:ss tt";
     }
+    public class WavLocator
+    {
+        public const string restore_cue = @"Resources\restore_cue.wav";
+        public const string backup_cue = @"Resources\backup_cue.wav";
+    }
 
     class Util
     {
@@ -25,7 +30,7 @@ namespace SavescumBuddy
 
         public static void SaveImage(string filePath)
         {
-            Rectangle bounds = System.Windows.Forms.Screen.GetBounds(Point.Empty);
+            Rectangle bounds = Screen.GetBounds(Point.Empty);
             using (Bitmap bitmap = new Bitmap(bounds.Width, bounds.Height))
             {
                 using (Graphics g = Graphics.FromImage(bitmap))
@@ -47,11 +52,25 @@ namespace SavescumBuddy
             File.Copy(backup.FilePath, backup.Origin, true);
         }
 
-        public static void MoveToTrash(string path)
+        public static void MoveToTrash(Backup backup)
         {
-            if (Directory.Exists(Path.GetDirectoryName(path)))
+            var dirName = Path.GetDirectoryName(backup.FilePath);
+
+            if (Directory.Exists(dirName))
+                FileSystem.DeleteDirectory(dirName, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+        }
+
+        public static void ShowInExplorer(string filePath)
+        {
+            var folder = Path.GetDirectoryName(filePath);
+
+            try
             {
-                FileSystem.DeleteDirectory(Path.GetDirectoryName(path), UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+                System.Diagnostics.Process.Start(folder);
+            }
+            catch
+            {
+                PopUp($"Folder ({folder}) doesn't exist.");
             }
         }
         #endregion
@@ -60,9 +79,7 @@ namespace SavescumBuddy
         public static void PlaySound(string path)
         {
             if (!Properties.Settings.Default.SoundCuesOn)
-            {
                 return;
-            }
 
             try
             {
@@ -81,10 +98,12 @@ namespace SavescumBuddy
         {
             try
             {
-                using (FileStream fs = File.Create(Path.Combine(directory, Path.GetRandomFileName()),
-                    1, FileOptions.DeleteOnClose))
+                using (FileStream fs = File.Create(
+                    Path.Combine(directory, Path.GetRandomFileName()),
+                    1, 
+                    FileOptions.DeleteOnClose))
 
-                    return true;
+                return true;
             }
             catch
             {
@@ -102,11 +121,5 @@ namespace SavescumBuddy
                 MessageBoxButtons.OK);
         }
         #endregion
-    }
-
-    public class WavLocator
-    {
-        public const string restore_cue = @"Resources\restore_cue.wav";
-        public const string backup_cue = @"Resources\backup_cue.wav";
     }
 }

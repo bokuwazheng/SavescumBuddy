@@ -1,33 +1,13 @@
 ﻿using System;
+using System.Globalization;
+using System.Windows.Data;
 
 namespace SavescumBuddy.ValueConverters
 {
-    class IntToBoolConverter : System.Windows.Data.IValueConverter
+    class IntToBoolConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            if (value != null && value is int)
-            {
-                var val = (int)value;
-                return (val == 0) ? false : true;
-            }
-            else
-            {
-                return null;
-            }
-        }
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) => value is int val ? val != 0 : (bool?)null;
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            if (value != null && value is bool)
-            {
-                var val = (bool)value;
-                return val ? 1 : 0;
-            }
-            else
-            {
-                return null;
-            }
-        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => value is bool val ? val ? 1 : 0 : (int?)null;
     }
 }

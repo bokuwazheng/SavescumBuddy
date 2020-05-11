@@ -27,10 +27,10 @@
       <Value Profile="(Default)">15</Value>
     </Setting>
     <Setting Name="Skip" Type="System.String" Scope="User">
-      <Value Profile="(Default)">"Never"</Value>
+      <Value Profile="(Default)">Never</Value>
     </Setting>
     <Setting Name="Overwrite" Type="System.String" Scope="User">
-      <Value Profile="(Default)">"Never"</Value>
+      <Value Profile="(Default)">Never</Value>
     </Setting>
     <Setting Name="LikedOnly" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -47,7 +47,7 @@
     <Setting Name="OrderByDesc" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="CloudRootId" Type="System.String" Scope="User">
+    <Setting Name="CloudAppRootFolderId" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="BackupsPerPage" Type="System.Int32" Scope="Application">

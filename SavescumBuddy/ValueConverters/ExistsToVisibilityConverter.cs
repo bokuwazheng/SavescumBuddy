@@ -1,15 +1,18 @@
 ﻿using System;
+using System.Globalization;
+using System.IO;
+using System.Windows.Data;
 
 namespace SavescumBuddy.ValueConverters
 {
-    class ExistsToVisibilityConverter : System.Windows.Data.IValueConverter
+    class ExistsToVisibilityConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return System.IO.File.Exists((string)value) ? "Collapsed" : "Visible";
+            return File.Exists((string)value) ? "Collapsed" : "Visible";
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

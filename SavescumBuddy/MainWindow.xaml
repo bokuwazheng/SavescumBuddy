@@ -3,12 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SavescumBuddy"
         xmlns:views="clr-namespace:SavescumBuddy.Views"
         xmlns:viewmodels="clr-namespace:SavescumBuddy.ViewModels"
         mc:Ignorable="d"
         Height="700" Width="1160" ResizeMode="CanMinimize" Title="Savescum Buddy" 
-        WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
+        WindowStartupLocation="CenterScreen">
     
     <Window.DataContext>
         <viewmodels:ApplicationViewModel/>
