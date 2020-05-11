@@ -121,7 +121,7 @@ namespace SavescumBuddy.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Never")]
         public string Skip {
             get {
                 return ((string)(this["Skip"]));
@@ -133,7 +133,7 @@ namespace SavescumBuddy.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Never")]
         public string Overwrite {
             get {
                 return ((string)(this["Overwrite"]));
