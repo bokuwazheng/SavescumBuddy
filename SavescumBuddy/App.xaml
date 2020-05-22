@@ -50,6 +50,7 @@
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
         <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
         <converters:KeysToStringConverter x:Key="KeysToStringConverter"/>
+        <converters:InverseExistsToVisibilityConverter x:Key="InverseExistsToVisibilityConverter"/>
 
         <!--Expander style-->
         <SolidColorBrush x:Key="Expander.MouseOver.Circle.Stroke" Color="#FF5593FF"/>
@@ -442,6 +443,28 @@
                 </EasingDoubleKeyFrame>
             </DoubleAnimationUsingKeyFrames>
         </Storyboard>
+
+        <Storyboard x:Key="Disappear">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity" RepeatBehavior="1x">
+                <EasingDoubleKeyFrame KeyTime="0" Value="100"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:1.2" Value="0">
+                    <EasingDoubleKeyFrame.EasingFunction>
+                        <QuinticEase EasingMode="EaseInOut"/>
+                    </EasingDoubleKeyFrame.EasingFunction>
+                </EasingDoubleKeyFrame>
+            </DoubleAnimationUsingKeyFrames>
+            <ColorAnimation To="White" BeginTime="0" Duration="0" Storyboard.TargetProperty="(Grid.Background).(SolidColorBrush.Color)"/>
+        </Storyboard>
+
+        <Style x:Key="Curtain" TargetType="Grid">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="IsHitTestVisible" Value="False"/>
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="Loaded">
+                    <BeginStoryboard Storyboard="{StaticResource Disappear}"/>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
 
         <!--Sliding toggle button-->
         <Style TargetType="ToggleButton" x:Key="slidingToggleButton">

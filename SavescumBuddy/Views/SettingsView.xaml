@@ -12,15 +12,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="660" d:DesignWidth="1160" 
              Unloaded="UserControl_Unloaded">
-    <UserControl.Style>
-        <Style TargetType="{x:Type UserControl}">
-            <Style.Triggers>
-                <EventTrigger RoutedEvent="Loaded">
-                    <BeginStoryboard Storyboard="{StaticResource Appear}"/>
-                </EventTrigger>
-            </Style.Triggers>
-        </Style>
-    </UserControl.Style>
 
     <UserControl.Resources>
         <!--ListView default (no ScrollView)-->
@@ -90,12 +81,14 @@
 
     <!--MAIN GRID-->
     <Grid Background="White" SnapsToDevicePixels="True">
-
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
+
+        <!--Loading animation-->
+        <Grid Style="{StaticResource Curtain}" Grid.ColumnSpan="3" Panel.ZIndex="100"/>
 
         <!--Escape button-->
         <Button Content="&#xE72B;" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Grid.Column="0"
@@ -460,7 +453,7 @@
                             </Hyperlink.Style>
                             <Hyperlink.ToolTip>
                                 <ToolTip >
-                                    <TextBlock Margin="3,2" Text="Savefiles must be located in separate folders.&#xA;To attach an image put it in the folder next to the savefile."/>
+                                    <TextBlock Margin="3,2" Text="Savefiles must be located in separate folders.&#xA;To attach image put it in the folder next to the savefile."/>
                                 </ToolTip>
                             </Hyperlink.ToolTip>
                   import</Hyperlink> backups of current game.

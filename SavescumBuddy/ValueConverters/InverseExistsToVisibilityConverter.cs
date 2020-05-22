@@ -6,11 +6,11 @@ using System.Windows.Data;
 
 namespace SavescumBuddy.ValueConverters
 {
-    class ExistsToVisibilityConverter : IValueConverter
+    class InverseExistsToVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return File.Exists((string)value) ? Visibility.Visible : Visibility.Collapsed;
+            return File.Exists((string)value) ? Visibility.Collapsed : Visibility.Visible;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

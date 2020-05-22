@@ -140,6 +140,7 @@
     <Compile Include="ValueConverters\IntToBoolConverter.cs" />
     <Compile Include="ValueConverters\InverseBooleanConverter.cs" />
     <Compile Include="ValueConverters\InverseBooleanToVisibilityConverter.cs" />
+    <Compile Include="ValueConverters\InverseExistsToVisibilityConverter.cs" />
     <Compile Include="ValueConverters\KeysToStringConverter.cs" />
     <Compile Include="ValueConverters\ObjectToBoolConverter.cs" />
     <Compile Include="ValueConverters\UriToCachedImageConverter.cs" />
@@ -172,7 +173,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Backup.cs" />
-    <Compile Include="BackupRepository.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GlobalKeyboardHook.cs" />
     <Compile Include="MainWindow.xaml.cs">

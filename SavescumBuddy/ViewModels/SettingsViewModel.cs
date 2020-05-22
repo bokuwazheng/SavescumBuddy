@@ -11,6 +11,7 @@ using SavescumBuddy.Models;
 using Common;
 using System.Windows.Forms;
 using SavescumBuddy.Sqlite;
+using System.Collections.Generic;
 
 namespace SavescumBuddy.ViewModels
 {
@@ -25,16 +26,25 @@ namespace SavescumBuddy.ViewModels
 
         public SettingsModel Settings { get; }
         public bool HookIsEnabled => SaveHookIsEnabled || RestoreHookIsEnabled || OverwriteHookIsEnabled;
-        public bool SaveHookIsEnabled { get => _saveHookIsEnabled; set => SetProperty(ref _saveHookIsEnabled, value,
-            () => { if (value) { RestoreHookIsEnabled = false; OverwriteHookIsEnabled = false; } }); }
-        public bool RestoreHookIsEnabled { get => _restoreHookIsEnabled; set => SetProperty(ref _restoreHookIsEnabled, value,
-            () => { if (value) { SaveHookIsEnabled = false; OverwriteHookIsEnabled = false; } }); }
-        public bool OverwriteHookIsEnabled { get => _overwriteHookIsEnabled; set => SetProperty(ref _overwriteHookIsEnabled, value,
-            () => { if (value) { SaveHookIsEnabled = false; RestoreHookIsEnabled = false; } }); }
+        public bool SaveHookIsEnabled
+        {
+            get => _saveHookIsEnabled; set => SetProperty(ref _saveHookIsEnabled, value,
+                () => { if (value) { RestoreHookIsEnabled = false; OverwriteHookIsEnabled = false; } });
+        }
+        public bool RestoreHookIsEnabled
+        {
+            get => _restoreHookIsEnabled; set => SetProperty(ref _restoreHookIsEnabled, value,
+                () => { if (value) { SaveHookIsEnabled = false; OverwriteHookIsEnabled = false; } });
+        }
+        public bool OverwriteHookIsEnabled
+        {
+            get => _overwriteHookIsEnabled; set => SetProperty(ref _overwriteHookIsEnabled, value,
+                () => { if (value) { SaveHookIsEnabled = false; RestoreHookIsEnabled = false; } });
+        }
         public string AuthorizedAs => GetUserEmail();
         public int ImportProgress { get => _importProgress; private set => SetProperty(ref _importProgress, value); }
         public bool ImportInProgress { get => _importInProgress; private set => SetProperty(ref _importInProgress, value); }
-        public string CurrentGameTitle => SqliteDataAccess.GetCurrentGame() is null ? "none" : SqliteDataAccess.GetCurrentGame().Title;
+        public string CurrentGameTitle => SqliteDataAccess.GetCurrentGame()?.Title ?? "none";
         public ObservableCollection<GameModel> Games { get; private set; }
 
         public SettingsViewModel()
@@ -42,7 +52,7 @@ namespace SavescumBuddy.ViewModels
             _keyboardHook = new GlobalKeyboardHook();
             Settings = new SettingsModel();
             Settings.PropertyChanged += (s, e) => Properties.Settings.Default.Save();
-            
+
             AddGameCommand = new DelegateCommand(AddEmptyGame);
             UploadCustomCommand = new DelegateCommand(async () => await UploadBackups());
             RegisterHotkeyCommand = new DelegateCommand<bool?>(isEnabled => RegisterHotkey(isEnabled));
@@ -50,7 +60,7 @@ namespace SavescumBuddy.ViewModels
             ReauthorizeCommand = new DelegateCommand(async () => await ReauthorizeAsync());
 
             UpdateGameList();
-            if (Games.Count == 0) 
+            if (Games.Count == 0)
                 AddEmptyGame();
 
             TryAuthorize();
@@ -72,7 +82,7 @@ namespace SavescumBuddy.ViewModels
         private void RegisterHotkey(bool? isEnabled)
         {
             var enabled = isEnabled ?? HookIsEnabled;
-            
+
             if (enabled)
             {
                 _keyboardHook.Hook();
@@ -117,11 +127,11 @@ namespace SavescumBuddy.ViewModels
             }
         }
 
-        private async Task UploadBackups() 
+        private async Task UploadBackups()
         {
             var game = SqliteDataAccess.GetCurrentGame();
 
-            if (game == null)
+            if (game is null)
             {
                 Util.PopUp("No game is set as current yet.");
                 return;
@@ -137,37 +147,31 @@ namespace SavescumBuddy.ViewModels
                 {
                     var folders = dialog.FileNames;
                     var savefileName = Path.GetFileName(game.SavefilePath);
-                    var dateTimeNow = DateTime.Now;
-                    var sec = 0d;
+                    //var ext = Path.GetExtension(savefileName);
+                    var fileList = new List<string>();
+                    foreach(var folder in folders)
+                    {
+                        var files = Directory.GetFiles(folder, savefileName, SearchOption.AllDirectories);
+                        fileList.AddRange(files);
+                    }
+
                     var sb = new StringBuilder();
 
-                    var importQCount = folders.Count();
+                    var importQCount = fileList.Count();
                     var importedCount = 0;
 
                     ImportInProgress = true;
 
                     await Task.Run(() =>
                     {
-                        foreach (string folder in folders)
+                        foreach (string file in fileList)
                         {
                             // Report progress.
                             ImportProgress = (++importedCount * 100) / importQCount;
 
-                            var folderItems = Directory.GetFiles(folder);
-                            if (folderItems.Length == 0)
-                            {
-                                sb.Append($"Error: {folder} is empty.\n");
-                                continue;
-                            }
-                            var filePath = folderItems.FirstOrDefault(s => s.EndsWith(savefileName));
-                            if (filePath is null)
-                            {
-                                sb.Append($"Error: {savefileName} expected.\n");
-                                continue;
-                            }
+                            var parentFolder = Path.GetDirectoryName(file);
+                            var folderItems = Directory.GetFiles(parentFolder);
                             var picture = folderItems.FirstOrDefault(s => s.EndsWith(".jpg"));
-                            var dateTimeTag = dateTimeNow + TimeSpan.FromSeconds(sec);
-                            sec++;
 
                             try
                             {
@@ -176,14 +180,14 @@ namespace SavescumBuddy.ViewModels
                                     IsAutobackup = 0,
                                     GameId = game.Title,
                                     Origin = game.SavefilePath,
-                                    DateTimeTag = dateTimeTag.ToString(DateTimeFormat.UserFriendly, CultureInfo.CreateSpecificCulture("en-US")),
+                                    DateTimeTag = "N/A",
                                     Picture = picture ?? "",
-                                    FilePath = filePath
+                                    FilePath = file
                                 });
                             }
                             catch
                             {
-                                sb.Append($"Error: {filePath} is already in the list.\n");
+                                sb.Append($"Error: {file} is already in the list.\n");
                                 continue;
                             }
                         }
@@ -194,12 +198,7 @@ namespace SavescumBuddy.ViewModels
                     ImportProgress = 0;
 
                     if (sb.Length != 0)
-                    {
-                        sb.Append("\nTip: Savefiles must be located in separate folders. ");
-                        sb.Append("To attach an image put it in the folder next to the savefile.");
-
                         Util.PopUp(sb.ToString());
-                    }
                 }
             }
         }
@@ -237,7 +236,7 @@ namespace SavescumBuddy.ViewModels
                 await CreateAppRootFolderAsync();
                 RaisePropertyChanged(nameof(AuthorizedAs));
             }
-            else 
+            else
             {
                 await AuthorizeAsync();
                 RaisePropertyChanged(nameof(AuthorizedAs));

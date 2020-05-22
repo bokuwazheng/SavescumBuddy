@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-using System.Windows;
-using System.IO;
+﻿using System.Windows;
 
 namespace SavescumBuddy
 {
@@ -12,6 +10,11 @@ namespace SavescumBuddy
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Properties.Settings.Default.Save();
         }
     }
 }

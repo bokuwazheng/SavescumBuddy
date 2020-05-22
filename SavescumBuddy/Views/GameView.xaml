@@ -38,7 +38,7 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Background="White" Width="475">
+    <Grid Background="White" Width="475" SnapsToDevicePixels="True">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition />

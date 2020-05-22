@@ -7,30 +7,25 @@
              mc:Ignorable="d" 
              d:DesignHeight="660" d:DesignWidth="1160"
              Loaded="MainViewLoaded" Unloaded="MainViewUnloaded">
-    <UserControl.Style>
-        <Style TargetType="{x:Type UserControl}">
-            <Style.Triggers>
-                <EventTrigger RoutedEvent="Loaded">
-                    <BeginStoryboard Storyboard="{StaticResource Appear}"/>
-                </EventTrigger>
-            </Style.Triggers>
-        </Style>
-    </UserControl.Style>
 
-    <Grid Background="White">
+    <Grid Background="White" SnapsToDevicePixels="True">
+
+        <!--Loading animation-->
+        <Grid Style="{StaticResource Curtain}" Grid.ColumnSpan="2" Grid.RowSpan="3" Panel.ZIndex="100"/>
+
         <!--No current game-->
-        <Grid Panel.ZIndex="99" Visibility="{Binding CurrentGameIsSet, Converter={StaticResource InverseBooleanToVisibilityConverter}, FallbackValue=Collapsed}">
+        <Grid Panel.ZIndex="3" Visibility="{Binding CurrentGameIsSet, Converter={StaticResource InverseBooleanToVisibilityConverter}, FallbackValue=Collapsed}">
             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center" 
                        FontSize="14" Foreground="{StaticResource Ash}" Margin="0,0,0,180">
                 <Run Text="Siegmeyer is still waiting for you to go to Settings and set up a game..."/>
             </TextBlock>
-            <Image Height="380" Opacity=".55" Margin="0,-150,0,0" ToolTip="Artwork by jakeallenesq on DeviantArt">
+            <Image Height="380" Margin="0,-150,0,0" ToolTip="Artwork by jakeallenesq on DeviantArt">
                 <Image.Source>
                     <BitmapImage UriSource="/siegmeyer.jpg" />
                 </Image.Source>
             </Image>
             <Ellipse Height="100" Width="100" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-28,-31" 
-                     RenderTransformOrigin="0.5,0.5" Panel.ZIndex="100" IsHitTestVisible="False" Opacity=".4">
+                     RenderTransformOrigin="0.5,0.5" Panel.ZIndex="4" IsHitTestVisible="False" Opacity=".4">
                 <Ellipse.Fill>
                     <SolidColorBrush Color="#c9e6f0"/>
                 </Ellipse.Fill>
@@ -65,7 +60,7 @@
                 </Ellipse.Triggers>
             </Ellipse>
             <Ellipse Height="100" Width="100" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-28,-31" 
-                     RenderTransformOrigin="0.5,0.5" Panel.ZIndex="100" IsHitTestVisible="False" Opacity=".2">
+                     RenderTransformOrigin="0.5,0.5" Panel.ZIndex="4" IsHitTestVisible="False" Opacity=".2">
                 <Ellipse.Fill>
                     <SolidColorBrush Color="#c9e6f0"/>
                 </Ellipse.Fill>
@@ -104,13 +99,13 @@
         <!--MAIN GRID-->
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="405"/>
-                <RowDefinition Height="215"/>
+                <RowDefinition Height="Auto" MinHeight="390"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="720"/>
-                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <!--Hit test block-->
@@ -287,8 +282,19 @@
             <!--Viewer-->
             <StackPanel Grid.Column="0" Grid.Row="1" >
                 <!--Date and time label-->
-                <TextBlock x:Name="DateTimeLabel" Foreground="{StaticResource Dark}" Text="{Binding SelectedBackup.Backup.DateTimeTag}"
-                           FontSize="24" Margin="22,8" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="0" Grid.Row="1"/>
+                <TextBlock x:Name="DateTimeLabel" Text="{Binding SelectedBackup.Backup.DateTimeTag}" FontSize="24" Margin="22,8" 
+                           HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="0" Grid.Row="1">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="{StaticResource Dark}"/>
+                            <Style.Triggers>
+                                <Trigger Property="Text" Value="N/A">
+                                    <Setter Property="Foreground" Value="{StaticResource Grayish}"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
                 <!--ProgressBar-->
                 <Grid Width="700" Margin="15,0,10,0" >
                     <Border Height="1" Background="{StaticResource Grayish}" VerticalAlignment="Bottom"/>
@@ -350,8 +356,9 @@
                 </Grid>
             </StackPanel>
             <!--Picture-->
-            <Image Source="{Binding SelectedBackup.Backup.Picture, Converter={StaticResource UriToImgConverter}}" HorizontalAlignment="Stretch"  
-                   VerticalAlignment="Stretch" Margin="15,0,10,0" Grid.Column="0" Grid.Row="0"/>
+            <Image Source="{Binding SelectedBackup.Backup.Picture, Converter={StaticResource UriToImgConverter}}" HorizontalAlignment="Stretch" 
+                   VerticalAlignment="Stretch" Margin="15,0,10,0" Grid.Column="0" Grid.Row="0" Stretch="UniformToFill"
+                   RenderOptions.BitmapScalingMode="Fant"/>
         </Grid>
     </Grid>
 </UserControl>

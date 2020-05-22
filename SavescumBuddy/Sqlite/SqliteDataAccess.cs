@@ -162,6 +162,11 @@ namespace SavescumBuddy.Sqlite
             Execute("delete from Backup where Id = @Id;", new { Id = backup.Id });
         }
 
+        public static Backup GetBackup(Backup backup)
+        {
+            return QueryFirstOrDefault<Backup>($"select * from Backup where Id = @Id;", new { Id = backup.Id });
+        }
+
         public static Backup GetLatestBackup()
         {
             return QueryFirstOrDefault<Backup>("select * from [Backup] b where b.GameId = (select g.Title from [Game] g where g.IsCurrent = 1) and b.IsAutobackup = 0 order by b.Id desc");
@@ -182,19 +187,14 @@ namespace SavescumBuddy.Sqlite
             Execute("update Backup set IsLiked = @IsLiked where Id = @Id;", new { Id = backup.Id, IsLiked = backup.IsLiked });
         }
 
-        public static void UpdateInCloud(Backup backup)
+        public static void UpdateDriveId(Backup backup)
         {
-            Execute("update Backup set InCloud = @InCloud where Id = @Id;", new { Id = backup.Id, InCloud = backup.InCloud });
+            Execute("update Backup set DriveId = @DriveId where Id = @Id;", new { Id = backup.Id, DriveId = backup.DriveId });
         }
 
-        public static List<Backup> LoadBackupList()
+        public static void UpdateFilePaths(Backup backup)
         {
-            return Query<Backup>("select * from Backup order by Id desc");
-        }
-
-        public static List<string> LoadBackupDateTimeTagList()
-        {
-            return Query<string>("select DateTimeTag from Backup");
+            Execute("update Backup set FilePath = @FilePath, Picture = @Picture where Id = @Id;", new { FilePath = backup.FilePath, Picture = backup.Picture, Id = backup.Id });
         }
         #endregion
 
