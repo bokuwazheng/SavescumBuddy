@@ -5,6 +5,7 @@ using System.Drawing.Imaging;
 using Microsoft.VisualBasic.FileIO;
 using System.Media;
 using System.Windows.Forms;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace SavescumBuddy
 {
@@ -52,6 +53,41 @@ namespace SavescumBuddy
             File.Copy(backup.FilePath, backup.Origin, true);
         }
 
+        public static Backup FindNewFilePaths(Backup backup)
+        {
+            using (var dialog = new CommonOpenFileDialog())
+            {
+                dialog.Multiselect = false;
+                dialog.IsFolderPicker = true;
+                dialog.ShowHiddenItems = true;
+
+                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+                {
+                    var newFolder = dialog.FileName;
+                    var folderName = Path.GetFileNameWithoutExtension(backup.Picture);
+                    var isRightFolder = newFolder.Contains(folderName);
+                    if (!isRightFolder)
+                        return null;
+
+                    var backupFile = Path.GetFileName(backup.FilePath);
+                    var newFilePath = Path.Combine(newFolder, backupFile);
+                    var fileExists = File.Exists(newFilePath);
+                    if (fileExists)
+                        backup.FilePath = newFilePath;
+
+                    var imageFile = Path.GetFileName(backup.Picture);
+                    var newPicture = Path.Combine(newFolder, imageFile);
+                    var imageExists = File.Exists(newPicture);
+                    if (imageExists)
+                        backup.Picture = newPicture;
+
+                    return backup;
+                }
+            }
+
+            return null;
+        }
+
         public static void MoveToTrash(Backup backup)
         {
             var dirName = Path.GetDirectoryName(backup.FilePath);
@@ -60,17 +96,19 @@ namespace SavescumBuddy
                 FileSystem.DeleteDirectory(dirName, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
         }
 
-        public static void ShowInExplorer(string filePath)
+        public static void ShowFolderInExplorer(string path)
         {
-            var folder = Path.GetDirectoryName(filePath);
-
             try
             {
-                System.Diagnostics.Process.Start(folder);
+                var extension = Path.GetExtension(path);
+                if (!string.IsNullOrEmpty(extension))
+                    path = Path.GetDirectoryName(path);
+
+                System.Diagnostics.Process.Start(path);
             }
             catch
             {
-                PopUp($"Folder ({folder}) doesn't exist.");
+                PopUp("The folder could not be found.");
             }
         }
         #endregion
@@ -100,10 +138,10 @@ namespace SavescumBuddy
             {
                 using (FileStream fs = File.Create(
                     Path.Combine(directory, Path.GetRandomFileName()),
-                    1, 
+                    1,
                     FileOptions.DeleteOnClose))
 
-                return true;
+                    return true;
             }
             catch
             {
@@ -114,9 +152,9 @@ namespace SavescumBuddy
             }
         }
 
-        public static void PopUp(string message)
+        public static DialogResult PopUp(string message)
         {
-            MessageBox.Show(message,
+            return MessageBox.Show(message,
                 "Savescum Buddy",
                 MessageBoxButtons.OK);
         }

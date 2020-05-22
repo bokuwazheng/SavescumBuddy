@@ -146,90 +146,172 @@ namespace SavescumBuddy
             }
         }
 
-        public async Task<string> GetAppRootFolderIdAsync() => 
-            await GetIdByNameAsync(_applicationName, "root", MimeType.Folder);
+        public async Task<string> GetAppRootFolderIdAsync(CancellationToken ct = default) =>
+            await GetIdByNameAsync(_applicationName, "root", MimeType.Folder, ct);
 
-        public async Task<string> CreateAppRootFolderAsync()
+        public async Task<string> CreateAppRootFolderAsync(CancellationToken ct = default)
         {
-            var fileMetadata = new DriveFile()
+            try
             {
-                Name = _applicationName,
-                MimeType = "application/vnd.google-apps.folder",
-            };
-            var request = GetDriveApiService().Files.Create(fileMetadata);
-            request.Fields = "id";
-            var folder = await request.ExecuteAsync();
-            var rootId = folder.Id;
-            return rootId;
-        }
-
-        public async Task<string> CreateFolderAsync(string folderName, string parentId)
-        {
-            var fileMetadata = new DriveFile()
-            {
-                Name = folderName,
-                MimeType = "application/vnd.google-apps.folder",
-                Parents = new List<string> { parentId }
-            };
-            var request = GetDriveApiService().Files.Create(fileMetadata);
-            request.Fields = "id";
-            var folder = await request.ExecuteAsync();
-            return folder.Id;
-        }
-
-        public async Task UploadFileAsync(string path, string parentId)
-        {
-            var name = Path.GetFileName(path);
-
-            var fileMetadata = new DriveFile()
-            {
-                Name = name,
-                Parents = new List<string> { parentId }
-            };
-            using (var stream = new FileStream(path, FileMode.Open))
-            {
-                var request = GetDriveApiService().Files.Create(fileMetadata, stream, GetMimeType(name));
+                var fileMetadata = new DriveFile()
+                {
+                    Name = _applicationName,
+                    MimeType = "application/vnd.google-apps.folder",
+                };
+                var request = GetDriveApiService().Files.Create(fileMetadata);
                 request.Fields = "id";
-                await request.UploadAsync();
+                var folder = await request.ExecuteAsync(ct);
+                var rootId = folder.Id;
+                return rootId;
+            }
+            catch (OperationCanceledException)
+            {
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Util.PopUp(ex.Message);
+                return null;
             }
         }
 
-        public async Task DeleteFromCloudAsync(string name, string mimeType)
+        public async Task<string> CreateFolderAsync(string folderName, string parentId, CancellationToken ct = default)
         {
-            var folderId = await GetIdByNameAsync(name, mimeType);
-            var service = GetDriveApiService();
-            await service.Files.Delete(folderId).ExecuteAsync();
+            try
+            {
+                var fileMetadata = new DriveFile()
+                {
+                    Name = folderName,
+                    MimeType = "application/vnd.google-apps.folder",
+                    Parents = new List<string> { parentId }
+                };
+                var request = GetDriveApiService().Files.Create(fileMetadata);
+                request.Fields = "id";
+                var folder = await request.ExecuteAsync(ct);
+                return folder.Id;
+            }
+            catch (OperationCanceledException)
+            {
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Util.PopUp(ex.Message);
+                return null;
+            }
         }
 
-        public async Task<string> GetUserEmailAsync()
+        public async Task UploadFileAsync(string path, string parentId, CancellationToken ct = default)
         {
-            var service = GetDriveApiService();
-            var request = service.About.Get();
-            request.Fields = "user(emailAddress)";
-            var result = await request.ExecuteAsync();
-            return result?.User.EmailAddress;
+            try
+            {
+                var name = Path.GetFileName(path);
+
+                var fileMetadata = new DriveFile()
+                {
+                    Name = name,
+                    Parents = new List<string> { parentId }
+                };
+                using (var stream = new FileStream(path, FileMode.Open))
+                {
+                    var request = GetDriveApiService().Files.Create(fileMetadata, stream, GetMimeType(name));
+                    request.Fields = "id";
+                    await request.UploadAsync(ct);
+                }
+            }
+            catch (OperationCanceledException) { }
+            catch (Exception ex)
+            {
+                Util.PopUp(ex.Message);
+            }
         }
 
-        public async Task<string> GetIdByNameAsync(string name, string mimeType)
+        public async Task DeleteFromCloudAsync(string id, CancellationToken ct = default)
+        {
+            try
+            {
+                var service = GetDriveApiService();
+                await service.Files.Delete(id).ExecuteAsync(ct);
+            }
+            catch (OperationCanceledException) { }
+            catch (Exception ex)
+            {
+                Util.PopUp(ex.Message);
+            }
+        }
+
+        public async Task<string> GetUserEmailAsync(CancellationToken ct = default)
+        {
+            try
+            {
+                var service = GetDriveApiService();
+                var request = service.About.Get();
+                request.Fields = "user(emailAddress)";
+                var result = await request.ExecuteAsync(ct);
+                return result?.User.EmailAddress;
+            }
+            catch (OperationCanceledException)
+            {
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Util.PopUp(ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<DriveFile> GetById(string id, bool throwIfFails, CancellationToken ct = default)
+        {
+            try
+            {
+                var service = GetDriveApiService();
+                var request = service.Files.Get(id);
+                request.Fields = "*";
+                var result = await request.ExecuteAsync();
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                return null;
+            }
+            catch (Exception ex)
+            {
+                if (throwIfFails)
+                    throw ex;
+                else
+                    return null;
+            }
+        }
+
+        public async Task<List<DriveFile>> GetFileListAsync(string parentId, string mimeType, CancellationToken ct = default)
         {
             var listRequest = GetDriveApiService().Files.List();
+            listRequest.PageSize = 100;
             listRequest.Fields = "nextPageToken, files(id, name)";
             listRequest.Spaces = "drive";
-            listRequest.Q = mimeType + " and trashed = false";
+            listRequest.Q = mimeType + $" and '{ parentId }' in parents and trashed = false";
 
-            var list = await listRequest.ExecuteAsync();
-            var result = list.Files.FirstOrDefault(x => x.Name == name);
-            return result?.Id;
+            var result = await listRequest.ExecuteAsync(ct);
+            var files = result.Files.ToList();
+            if (result.NextPageToken is object)
+            {
+                listRequest.PageToken = result.NextPageToken;
+                result = await listRequest.ExecuteAsync(ct);
+                files.AddRange(result.Files);
+            }
+
+            return files;
         }
 
-        public async Task<string> GetIdByNameAsync(string name, string parentId, string mimeType)
+        public async Task<string> GetIdByNameAsync(string name, string parentId, string mimeType, CancellationToken ct = default)
         {
             var listRequest = GetDriveApiService().Files.List();
             listRequest.Fields = "nextPageToken, files(id, name)";
             listRequest.Spaces = "drive";
             listRequest.Q = mimeType + $" and '{ parentId }' in parents and trashed = false";
 
-            var list = await listRequest.ExecuteAsync();
+            var list = await listRequest.ExecuteAsync(ct);
             var result = list.Files.FirstOrDefault(x => x.Name == name);
             return result?.Id;
         }
@@ -239,8 +321,8 @@ namespace SavescumBuddy
             string mimeType = "application/unknown";
             string ext = Path.GetExtension(fileName).ToLower();
             var regKey = Registry.ClassesRoot.OpenSubKey(ext);
-            return (regKey != null && regKey.GetValue("Content Type") != null) 
-                ? regKey.GetValue("Content Type").ToString() 
+            return (regKey != null && regKey.GetValue("Content Type") != null)
+                ? regKey.GetValue("Content Type").ToString()
                 : mimeType;
         }
 

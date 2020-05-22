@@ -5,18 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    
-    <UserControl.Style>
-        <Style TargetType="{x:Type UserControl}">
-            <Style.Triggers>
-                <EventTrigger RoutedEvent="Loaded">
-                    <BeginStoryboard Storyboard="{StaticResource Appear}"/>
-                </EventTrigger>
-            </Style.Triggers>
-        </Style>
-    </UserControl.Style>
 
-    <Grid Background="White">
+    <Grid Background="White" SnapsToDevicePixels="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="5*"/>
             <RowDefinition/>
@@ -26,6 +16,9 @@
             <ColumnDefinition Width="Auto" MaxWidth="350"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
+
+        <!--Loading animation-->
+        <Grid Style="{StaticResource Curtain}" Grid.ColumnSpan="3" Grid.RowSpan="2" Panel.ZIndex="100"/>
 
         <!--Return button-->
         <Button Content="&#xE72B;" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Grid.Column="0"

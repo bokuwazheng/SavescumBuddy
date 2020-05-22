@@ -11,23 +11,18 @@ namespace SavescumBuddy.ViewModels
     public class ApplicationViewModel : BaseViewModel
     {
         private BaseViewModel _currentViewModel;
-        private BackupRepository _backupRepository;
         private AutobackupManager _autobackupManager;
         private GlobalKeyboardHook _keyboardListener;
-        
+
         public BaseViewModel CurrentViewModel { get => _currentViewModel; set => SetProperty(ref _currentViewModel, value); }
         public readonly List<BaseViewModel> ViewModels;
 
         public ApplicationViewModel()
         {
-            _backupRepository = new BackupRepository();
-            _backupRepository.BackupAdded += b => Util.BackupFiles(b);
-            _backupRepository.BackupDeleted += b => Util.MoveToTrash(b);
-
             _autobackupManager = new AutobackupManager();
             _keyboardListener = new GlobalKeyboardHook();
 
-            var mainVm = new MainViewModel(_backupRepository, _autobackupManager);
+            var mainVm = new MainViewModel(_autobackupManager);
             var settingsVm = new SettingsViewModel();
             var aboutVm = new AboutViewModel();
 
@@ -68,19 +63,23 @@ namespace SavescumBuddy.ViewModels
         }
 
         private void _keyboardListener_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
-        {            
+        {
             if (e.KeyValue == Settings.Default.QSKey)
             {
                 if ((int)e.Modifiers == Settings.Default.QSMod)
                 {
                     try
                     {
-                        var backup = BackupFactory.CreateBackup();
                         var mainVm = ViewModels.OfType<MainViewModel>().First();
-                        mainVm.AddCommand.Execute(backup);
-                        Util.PlaySound(WavLocator.backup_cue);
+                        mainVm.AddCommand.Execute();
+                        if (Settings.Default.SoundCuesOn)
+                            Util.PlaySound(WavLocator.backup_cue);
                     }
-                    catch (NullReferenceException ex)
+                    catch (BackupFactoryException)
+                    {
+                        return;
+                    }
+                    catch (Exception ex)
                     {
                         Util.PopUp(ex.Message);
                     }
@@ -100,7 +99,8 @@ namespace SavescumBuddy.ViewModels
                         if (latest is null)
                             return;
                         Util.Restore(latest);
-                        Util.PlaySound(WavLocator.restore_cue);
+                        if (Settings.Default.SoundCuesOn)
+                            Util.PlaySound(WavLocator.restore_cue);
                     }
                     catch (Exception ex)
                     {
@@ -119,16 +119,16 @@ namespace SavescumBuddy.ViewModels
                     try
                     {
                         var latest = SqliteDataAccess.GetLatestBackup();
-                        if (latest is object)
-                            _backupRepository.Remove(latest);
-                        var backup = BackupFactory.CreateBackup();
                         var mainVm = ViewModels.OfType<MainViewModel>().First();
-                        mainVm.AddCommand.Execute(backup);
-                        Util.PlaySound(WavLocator.backup_cue);
+                        mainVm.AddCommand.Execute();
+                        if (Settings.Default.SoundCuesOn)
+                            Util.PlaySound(WavLocator.backup_cue);
+                        if (latest is object)
+                            mainVm.RemoveCommand.Execute(latest);
                     }
-                    catch (NullReferenceException ex)
+                    catch (BackupFactoryException)
                     {
-                        Util.PopUp(ex.Message);
+                        return;
                     }
                     catch (Exception ex)
                     {

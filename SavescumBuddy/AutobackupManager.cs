@@ -13,15 +13,15 @@ namespace SavescumBuddy
         private int _progress;
         private DispatcherTimer _backupTimer;
         private DispatcherTimer _progressBarTimer;
-        public event Action<Backup> RemovalRequested;
-        public event Action<Backup> AdditionRequested;
+        public event Action<Backup> DeletionRequested;
+        public event Action AdditionRequested;
 
         public int Progress { get => _progress; private set => SetProperty(ref _progress, value); }
 
         public AutobackupManager()
         {
             // If false puts the timer on pause.
-            var isEnabled = Settings.Default.AutobackupsOn; 
+            var isEnabled = Settings.Default.AutobackupsOn;
 
             _backupTimer = new DispatcherTimer();
             _backupTimer.Interval = TimeSpan.FromMinutes(Settings.Default.Interval);
@@ -62,7 +62,7 @@ namespace SavescumBuddy
         {
             if (isEnabled)
             {
-                Stop(); 
+                Stop();
                 Start();
             }
         }
@@ -70,27 +70,27 @@ namespace SavescumBuddy
         #region SmartAutobackup implementation
         private void SmartAutobackup()
         {
-            if (SqliteDataAccess.GetCurrentGame() == null || ItIsTimeToSkip()) 
+            if (SqliteDataAccess.GetCurrentGame() is null || ItIsTimeToSkip())
                 return;
 
             var backup = SqliteDataAccess.GetLatestAutobackup();
 
-            if (backup != null)
+            if (backup is object)
             {
                 if (PreviousAutobackupShouldBeDeleted(backup))
                 {
-                    RemovalRequested?.Invoke(backup);
+                    DeletionRequested?.Invoke(backup);
                 }
             }
 
-            AdditionRequested?.Invoke(BackupFactory.CreateAutobackup());
+            AdditionRequested?.Invoke();
         }
 
         private bool ItIsTimeToSkip()
         {
             var lastBackup = SqliteDataAccess.GetLatestBackup();
 
-            if (lastBackup != null)
+            if (lastBackup is object)
             {
                 var timeSinceLastBackup = DateTime.Now - DateTime.Parse(lastBackup.DateTimeTag);
 
