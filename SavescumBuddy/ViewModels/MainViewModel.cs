@@ -77,10 +77,10 @@ namespace SavescumBuddy.ViewModels
         public MainViewModel(AutobackupManager manager)
         {
             Autobackuper = manager ?? throw new ArgumentNullException(nameof(manager));
-            Autobackuper.AdditionRequested += () => Add();
+            Autobackuper.AdditionRequested += Add;
             Autobackuper.DeletionRequested += x => Remove(x);
 
-            AddCommand = new DelegateCommand(() => Add());
+            AddCommand = new DelegateCommand(Add);
             RemoveCommand = new DelegateCommand<Backup>(b => Remove(b));
             RestoreCommand = new DelegateCommand<Backup>(b => Util.Restore(b));
 
@@ -110,10 +110,21 @@ namespace SavescumBuddy.ViewModels
 
         private void Add()
         {
-            var backup = BackupFactory.CreateBackup();
-            SqliteDataAccess.SaveBackup(backup);
-            Util.BackupFiles(backup);
-            UpdateBackupList();
+            try
+            {
+                var backup = BackupFactory.CreateBackup();
+                SqliteDataAccess.SaveBackup(backup);
+                Util.BackupFiles(backup);
+                UpdateBackupList();
+            }
+            catch (BackupFactoryException)
+            {
+                return;
+            }
+            catch (Exception ex)
+            {
+                Util.PopUp(ex.Message);
+            }
         }
 
         private void Remove(Backup backup)

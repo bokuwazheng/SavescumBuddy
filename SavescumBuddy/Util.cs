@@ -53,7 +53,7 @@ namespace SavescumBuddy
             File.Copy(backup.FilePath, backup.Origin, true);
         }
 
-        public static Backup FindNewFilePaths(Backup backup)
+        public static Backup PromptLocateNewFilePaths(Backup backup)
         {
             using (var dialog = new CommonOpenFileDialog())
             {

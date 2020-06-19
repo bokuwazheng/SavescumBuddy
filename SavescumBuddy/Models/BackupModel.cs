@@ -43,7 +43,7 @@ namespace SavescumBuddy.Models
 
         private void Locate()
         {
-            var newBackup = Util.FindNewFilePaths(Backup);
+            var newBackup = Util.PromptLocateNewFilePaths(Backup);
             if (newBackup is null)
             {
                 Util.PopUp("Seems like the chosen folder is not the right one.\n\nUse import function instead.");

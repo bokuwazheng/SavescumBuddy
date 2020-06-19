@@ -164,6 +164,7 @@
                                                 <Setter Property="FontSize" TargetName="statusIcon" Value="11"/>
                                                 <Setter Property="FontWeight" TargetName="statusIcon" Value="Bold"/>
                                                 <Setter Property="ToolTip" Value="Not authorized"/>
+                                                <Setter Property="Cursor" Value="No"/>
                                             </Trigger>
                                             <!--false-->
                                             <Trigger Property="IsChecked" Value="False">
