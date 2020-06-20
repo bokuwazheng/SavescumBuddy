@@ -17,8 +17,8 @@ namespace SavescumBuddy.ViewModels
 
         // Properties
         public List<BackupModel> Backups { get; private set; }
+        public DateTime TimeSinceLastBackup { get; private set; }
         public double Interval => Settings.Default.Interval * 60;
-        public AutobackupManager Autobackuper { get; }
         public bool CurrentGameIsSet => SqliteDataAccess.GetCurrentGame() is object;
         public int CurrentPageIndex { get => _currentPageIndex; private set => SetProperty(ref _currentPageIndex, value, () => Filter.Offset = value * PageSize); }
         public BackupModel SelectedBackup { get => _selectedBackup; set => SetProperty(ref _selectedBackup, value); }
@@ -74,12 +74,8 @@ namespace SavescumBuddy.ViewModels
         }
         #endregion
 
-        public MainViewModel(AutobackupManager manager)
+        public MainViewModel()
         {
-            Autobackuper = manager ?? throw new ArgumentNullException(nameof(manager));
-            Autobackuper.AdditionRequested += Add;
-            Autobackuper.DeletionRequested += x => Remove(x);
-
             AddCommand = new DelegateCommand(Add);
             RemoveCommand = new DelegateCommand<Backup>(b => Remove(b));
             RestoreCommand = new DelegateCommand<Backup>(b => Util.Restore(b));
@@ -110,20 +106,14 @@ namespace SavescumBuddy.ViewModels
 
         private void Add()
         {
-            try
+            var now = DateTime.Now;
+            if (now - TimeSinceLastBackup > TimeSpan.FromSeconds(1d))
             {
+                TimeSinceLastBackup = now;
                 var backup = BackupFactory.CreateBackup();
                 SqliteDataAccess.SaveBackup(backup);
                 Util.BackupFiles(backup);
                 UpdateBackupList();
-            }
-            catch (BackupFactoryException)
-            {
-                return;
-            }
-            catch (Exception ex)
-            {
-                Util.PopUp(ex.Message);
             }
         }
 
