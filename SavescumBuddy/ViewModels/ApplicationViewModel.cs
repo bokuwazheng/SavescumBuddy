@@ -75,10 +75,6 @@ namespace SavescumBuddy.ViewModels
                         if (Settings.Default.SoundCuesOn)
                             Util.PlaySound(WavLocator.backup_cue);
                     }
-                    catch (BackupFactoryException)
-                    {
-                        return;
-                    }
                     catch (Exception ex)
                     {
                         Util.PopUp(ex.Message);

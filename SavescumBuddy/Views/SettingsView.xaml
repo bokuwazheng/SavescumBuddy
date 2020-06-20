@@ -265,16 +265,7 @@
                                         </TextBlock.Text>
                                     </TextBlock>
                                 </Border>
-                                <ToggleButton Grid.Column="1" IsChecked="{Binding SaveHookIsEnabled}" Style="{StaticResource RecordHotkeyToggleButton}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Checked">
-                                            <i:InvokeCommandAction Command="{Binding RegisterHotkeyCommand}"/>
-                                        </i:EventTrigger>
-                                        <i:EventTrigger EventName="Unchecked">
-                                            <i:InvokeCommandAction Command="{Binding RegisterHotkeyCommand}"/>
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </ToggleButton>
+                                <ToggleButton Grid.Column="1" IsChecked="{Binding SaveHookIsEnabled}" Style="{StaticResource RecordHotkeyToggleButton}" Command="{Binding RegisterHotkeyCommand}"/>
                             </Grid>
                         </GroupBox>
                         <!--Quick load-->
@@ -307,16 +298,7 @@
                                         </TextBlock.Text>
                                     </TextBlock>
                                 </Border>
-                                <ToggleButton Grid.Column="1" IsChecked="{Binding RestoreHookIsEnabled}" Style="{StaticResource RecordHotkeyToggleButton}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Checked">
-                                            <i:InvokeCommandAction Command="{Binding RegisterHotkeyCommand}"/>
-                                        </i:EventTrigger>
-                                        <i:EventTrigger EventName="Unchecked">
-                                            <i:InvokeCommandAction Command="{Binding RegisterHotkeyCommand}"/>
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </ToggleButton>
+                                <ToggleButton Grid.Column="1" IsChecked="{Binding RestoreHookIsEnabled}" Style="{StaticResource RecordHotkeyToggleButton}" Command="{Binding RegisterHotkeyCommand}"/>
                             </Grid>
                         </GroupBox>
                         <!--Save and overwrite-->
@@ -349,16 +331,7 @@
                                         </TextBlock.Text>
                                     </TextBlock>
                                 </Border>
-                                <ToggleButton Grid.Column="1" IsChecked="{Binding OverwriteHookIsEnabled}" Style="{StaticResource RecordHotkeyToggleButton}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Checked">
-                                            <i:InvokeCommandAction Command="{Binding RegisterHotkeyCommand}"/>
-                                        </i:EventTrigger>
-                                        <i:EventTrigger EventName="Unchecked">
-                                            <i:InvokeCommandAction Command="{Binding RegisterHotkeyCommand}"/>
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </ToggleButton>
+                                <ToggleButton Grid.Column="1" IsChecked="{Binding OverwriteHookIsEnabled}" Style="{StaticResource RecordHotkeyToggleButton}" Command="{Binding RegisterHotkeyCommand}"/>
                             </Grid>
                         </GroupBox>
                     </StackPanel>

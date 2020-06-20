@@ -23,10 +23,10 @@ namespace SavescumBuddy.Views
             var settingsVm = appVm.ViewModels.OfType<SettingsViewModel>().First();
             if (settingsVm.HookIsEnabled)
             {
-                settingsVm.RegisterHotkeyCommand?.Execute(false);
                 settingsVm.SaveHookIsEnabled = false;
                 settingsVm.RestoreHookIsEnabled = false;
                 settingsVm.OverwriteHookIsEnabled = false;
+                settingsVm.RegisterHotkeyCommand?.Execute();
             }
         }
     }

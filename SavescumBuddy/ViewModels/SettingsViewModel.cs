@@ -1,8 +1,6 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using Prism.Commands;
-using System;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -55,7 +53,7 @@ namespace SavescumBuddy.ViewModels
 
             AddGameCommand = new DelegateCommand(AddEmptyGame);
             UploadCustomCommand = new DelegateCommand(async () => await UploadBackups());
-            RegisterHotkeyCommand = new DelegateCommand<bool?>(isEnabled => RegisterHotkey(isEnabled));
+            RegisterHotkeyCommand = new DelegateCommand(RegisterHotkey);
             AuthorizeCommand = new DelegateCommand(async () => await AuthorizeAsync());
             ReauthorizeCommand = new DelegateCommand(async () => await ReauthorizeAsync());
 
@@ -79,11 +77,9 @@ namespace SavescumBuddy.ViewModels
             }
         }
 
-        private void RegisterHotkey(bool? isEnabled)
+        private void RegisterHotkey()
         {
-            var enabled = isEnabled ?? HookIsEnabled;
-
-            if (enabled)
+            if (HookIsEnabled)
             {
                 _keyboardHook.Hook();
                 _keyboardHook.KeyDown += _keyboardHook_KeyDown;
@@ -97,6 +93,17 @@ namespace SavescumBuddy.ViewModels
 
         private void _keyboardHook_KeyDown(object sender, KeyEventArgs e)
         {
+            if (e.KeyCode == Keys.Escape)
+            {
+                SaveHookIsEnabled = false;
+                RestoreHookIsEnabled = false;
+                OverwriteHookIsEnabled = false;
+                return;
+            }
+
+            if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Space)
+                return;
+
             var mod = Keys.None;
             if (e.Alt) mod = Keys.Alt;
             if (e.Shift) mod = Keys.Shift;
@@ -147,7 +154,6 @@ namespace SavescumBuddy.ViewModels
                 {
                     var folders = dialog.FileNames;
                     var savefileName = Path.GetFileName(game.SavefilePath);
-                    //var ext = Path.GetExtension(savefileName);
                     var fileList = new List<string>();
                     foreach(var folder in folders)
                     {
@@ -284,7 +290,7 @@ namespace SavescumBuddy.ViewModels
 
         public DelegateCommand AddGameCommand { get; }
         public DelegateCommand UploadCustomCommand { get; }
-        public DelegateCommand<bool?> RegisterHotkeyCommand { get; }
+        public DelegateCommand RegisterHotkeyCommand { get; }
         public DelegateCommand AuthorizeCommand { get; }
         public DelegateCommand ReauthorizeCommand { get; }
     }
