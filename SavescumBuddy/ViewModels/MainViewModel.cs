@@ -22,7 +22,7 @@ namespace SavescumBuddy.ViewModels
         public bool CurrentGameIsSet => SqliteDataAccess.GetCurrentGame() is object;
         public int CurrentPageIndex { get => _currentPageIndex; private set => SetProperty(ref _currentPageIndex, value, () => Filter.Offset = value * PageSize); }
         public BackupModel SelectedBackup { get => _selectedBackup; set => SetProperty(ref _selectedBackup, value); }
-        public BackupSearchRequest Filter { get => _filter ?? (_filter = GetFilter()); private set => SetProperty(ref _filter, value); }
+        public BackupSearchRequest Filter { get => _filter ?? (_filter = new BackupSearchRequest()); private set => SetProperty(ref _filter, value); }
         public int TotalNumberOfBackups => SqliteDataAccess.GetTotalNumberOfBackups(Filter);
         public int PageSize => Settings.Default.BackupsPerPage;
         public int From => Backups.Count > 0 ? Filter.Offset.Value + 1 : 0;
@@ -134,20 +134,6 @@ namespace SavescumBuddy.ViewModels
             RaisePropertyChanged(nameof(From));
             RaisePropertyChanged(nameof(To));
             RaiseNavigateCanExecute();
-        }
-
-        private BackupSearchRequest GetFilter()
-        {
-            return new BackupSearchRequest()
-            {
-                LikedOnly = Settings.Default.LikedOnly,
-                HideAutobackups = Settings.Default.HideAutobackups,
-                CurrentOnly = Settings.Default.CurrentOnly,
-                Order = Settings.Default.OrderByDesc ? "desc" : "asc",
-                Offset = CurrentPageIndex * PageSize,
-                Limit = PageSize,
-                Note = null
-            };
         }
 
         public DelegateCommand<Backup> RemoveCommand { get; }

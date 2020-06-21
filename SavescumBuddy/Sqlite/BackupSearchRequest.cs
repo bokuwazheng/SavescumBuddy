@@ -1,4 +1,5 @@
 ﻿using Prism.Mvvm;
+using Settings = SavescumBuddy.Properties.Settings;
 
 namespace SavescumBuddy.Sqlite
 {
@@ -12,7 +13,7 @@ namespace SavescumBuddy.Sqlite
         private bool _hideAutobackups;
         private bool _currentOnly;
         private string _searchQuery;
-        
+
         public int? Offset { get => _offset; set => SetProperty(ref _offset, value); }
         public int? Limit { get => _limit; set => SetProperty(ref _limit, value); }
         public string Order { get => _order; set => SetProperty(ref _order, value); }
@@ -21,5 +22,16 @@ namespace SavescumBuddy.Sqlite
         public bool HideAutobackups { get => _hideAutobackups; set => SetProperty(ref _hideAutobackups, value); }
         public bool CurrentOnly { get => _currentOnly; set => SetProperty(ref _currentOnly, value); }
         public string Note { get => _searchQuery; set => SetProperty(ref _searchQuery, value); }
+
+        public BackupSearchRequest()
+        {
+            LikedOnly = Settings.Default.LikedOnly;
+            HideAutobackups = Settings.Default.HideAutobackups;
+            CurrentOnly = Settings.Default.CurrentOnly;
+            Order = Settings.Default.OrderByDesc ? "desc" : "asc";
+            Offset = 0;
+            Limit = Settings.Default.BackupsPerPage;
+            Note = null;
+        }
     }
 }
