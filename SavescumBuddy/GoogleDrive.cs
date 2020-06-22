@@ -147,7 +147,7 @@ namespace SavescumBuddy
         }
 
         public async Task<string> GetAppRootFolderIdAsync(CancellationToken ct = default) =>
-            await GetIdByNameAsync(_applicationName, "root", MimeType.Folder, ct);
+            await GetIdByNameAsync(_applicationName, "root", MimeType.Folder, ct).ConfigureAwait(false);
 
         public async Task<string> CreateAppRootFolderAsync(CancellationToken ct = default)
         {

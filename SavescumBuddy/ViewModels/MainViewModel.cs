@@ -17,12 +17,12 @@ namespace SavescumBuddy.ViewModels
 
         // Properties
         public List<BackupModel> Backups { get; private set; }
+        public DateTime TimeSinceLastBackup { get; private set; }
         public double Interval => Settings.Default.Interval * 60;
-        public AutobackupManager Autobackuper { get; }
         public bool CurrentGameIsSet => SqliteDataAccess.GetCurrentGame() is object;
         public int CurrentPageIndex { get => _currentPageIndex; private set => SetProperty(ref _currentPageIndex, value, () => Filter.Offset = value * PageSize); }
         public BackupModel SelectedBackup { get => _selectedBackup; set => SetProperty(ref _selectedBackup, value); }
-        public BackupSearchRequest Filter { get => _filter ?? (_filter = GetFilter()); private set => SetProperty(ref _filter, value); }
+        public BackupSearchRequest Filter { get => _filter ?? (_filter = new BackupSearchRequest()); private set => SetProperty(ref _filter, value); }
         public int TotalNumberOfBackups => SqliteDataAccess.GetTotalNumberOfBackups(Filter);
         public int PageSize => Settings.Default.BackupsPerPage;
         public int From => Backups.Count > 0 ? Filter.Offset.Value + 1 : 0;
@@ -74,12 +74,8 @@ namespace SavescumBuddy.ViewModels
         }
         #endregion
 
-        public MainViewModel(AutobackupManager manager)
+        public MainViewModel()
         {
-            Autobackuper = manager ?? throw new ArgumentNullException(nameof(manager));
-            Autobackuper.AdditionRequested += Add;
-            Autobackuper.DeletionRequested += x => Remove(x);
-
             AddCommand = new DelegateCommand(Add);
             RemoveCommand = new DelegateCommand<Backup>(b => Remove(b));
             RestoreCommand = new DelegateCommand<Backup>(b => Util.Restore(b));
@@ -110,20 +106,14 @@ namespace SavescumBuddy.ViewModels
 
         private void Add()
         {
-            try
+            var now = DateTime.Now;
+            if (now - TimeSinceLastBackup > TimeSpan.FromSeconds(1d))
             {
+                TimeSinceLastBackup = now;
                 var backup = BackupFactory.CreateBackup();
                 SqliteDataAccess.SaveBackup(backup);
                 Util.BackupFiles(backup);
                 UpdateBackupList();
-            }
-            catch (BackupFactoryException)
-            {
-                return;
-            }
-            catch (Exception ex)
-            {
-                Util.PopUp(ex.Message);
             }
         }
 
@@ -144,20 +134,6 @@ namespace SavescumBuddy.ViewModels
             RaisePropertyChanged(nameof(From));
             RaisePropertyChanged(nameof(To));
             RaiseNavigateCanExecute();
-        }
-
-        private BackupSearchRequest GetFilter()
-        {
-            return new BackupSearchRequest()
-            {
-                LikedOnly = Settings.Default.LikedOnly,
-                HideAutobackups = Settings.Default.HideAutobackups,
-                CurrentOnly = Settings.Default.CurrentOnly,
-                Order = Settings.Default.OrderByDesc ? "desc" : "asc",
-                Offset = CurrentPageIndex * PageSize,
-                Limit = PageSize,
-                Note = null
-            };
         }
 
         public DelegateCommand<Backup> RemoveCommand { get; }

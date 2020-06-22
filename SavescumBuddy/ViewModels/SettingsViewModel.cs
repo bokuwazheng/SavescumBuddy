@@ -211,9 +211,9 @@ namespace SavescumBuddy.ViewModels
 
         private async Task CreateAppRootFolderAsync()
         {
-            var rootId = await GoogleDrive.Current.GetAppRootFolderIdAsync();
+            var rootId = await GoogleDrive.Current.GetAppRootFolderIdAsync().ConfigureAwait(false);
             if (rootId is null)
-                rootId = await GoogleDrive.Current.CreateAppRootFolderAsync();
+                rootId = await GoogleDrive.Current.CreateAppRootFolderAsync().ConfigureAwait(false);
 
             Settings.CloudAppRootFolderId = rootId;
             Settings.Save();
@@ -224,11 +224,11 @@ namespace SavescumBuddy.ViewModels
             var mode = GoogleDrive.CurrentMode;
             var credentials = GoogleDrive.GetCredentials(mode);
             var token = GoogleDrive.GetToken(mode);
-            var userCredential = await GoogleDrive.Current.AuthorizeAsync(credentials, token);
+            var userCredential = await GoogleDrive.Current.AuthorizeAsync(credentials, token).ConfigureAwait(false);
             if (userCredential is null)
                 return;
             GoogleDrive.Current.UserCredential = userCredential;
-            await CreateAppRootFolderAsync();
+            await CreateAppRootFolderAsync().ConfigureAwait(false);
 
             RaisePropertyChanged(nameof(AuthorizedAs));
         }
@@ -238,13 +238,13 @@ namespace SavescumBuddy.ViewModels
             var userCredential = GoogleDrive.Current.UserCredential;
             if (userCredential is object)
             {
-                await GoogleDrive.Current.ReauthorizeAsync(userCredential);
-                await CreateAppRootFolderAsync();
+                await GoogleDrive.Current.ReauthorizeAsync(userCredential).ConfigureAwait(false);
+                await CreateAppRootFolderAsync().ConfigureAwait(false);
                 RaisePropertyChanged(nameof(AuthorizedAs));
             }
             else
             {
-                await AuthorizeAsync();
+                await AuthorizeAsync().ConfigureAwait(false);
                 RaisePropertyChanged(nameof(AuthorizedAs));
             }
         }

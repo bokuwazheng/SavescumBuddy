@@ -79,12 +79,12 @@ namespace SavescumBuddy.Models
                 var rootId = Settings.Default.CloudAppRootFolderId;
                 if (rootId is null)
                 {
-                    rootId = await GoogleDrive.Current.GetAppRootFolderIdAsync(ct);
+                    rootId = await GoogleDrive.Current.GetAppRootFolderIdAsync(ct).ConfigureAwait(false);
                 }
                 if (rootId is null)
                 {
                     DriveStatus = "Creating app root folder...";
-                    rootId = await GoogleDrive.Current.CreateAppRootFolderAsync(ct);
+                    rootId = await GoogleDrive.Current.CreateAppRootFolderAsync(ct).ConfigureAwait(false);
                 }
                 if (rootId != null)
                 {
@@ -92,18 +92,18 @@ namespace SavescumBuddy.Models
                     Settings.Default.Save();
                 }
                 DriveStatus = "Retrieving game folder id...";
-                var gameFolderId = await GoogleDrive.Current.GetIdByNameAsync(backup.GameId, rootId, MimeType.Folder, ct);
+                var gameFolderId = await GoogleDrive.Current.GetIdByNameAsync(backup.GameId, rootId, MimeType.Folder, ct).ConfigureAwait(false);
                 if (gameFolderId is null)
                 {
                     DriveStatus = "Creating game folder...";
-                    gameFolderId = await GoogleDrive.Current.CreateFolderAsync(backup.GameId, rootId, ct);
+                    gameFolderId = await GoogleDrive.Current.CreateFolderAsync(backup.GameId, rootId, ct).ConfigureAwait(false);
                 }
                 DriveStatus = "Creating backup folder...";
-                backupCloudFolderId = await GoogleDrive.Current.CreateFolderAsync(backup.DateTimeTag, gameFolderId, ct);
+                backupCloudFolderId = await GoogleDrive.Current.CreateFolderAsync(backup.DateTimeTag, gameFolderId, ct).ConfigureAwait(false);
                 DriveStatus = "Uploading backup file...";
-                await GoogleDrive.Current.UploadFileAsync(backup.FilePath, backupCloudFolderId, ct);
+                await GoogleDrive.Current.UploadFileAsync(backup.FilePath, backupCloudFolderId, ct).ConfigureAwait(false);
                 DriveStatus = "Uploading image...";
-                await GoogleDrive.Current.UploadFileAsync(backup.Picture, backupCloudFolderId, ct);
+                await GoogleDrive.Current.UploadFileAsync(backup.Picture, backupCloudFolderId, ct).ConfigureAwait(false);
 
                 if (!ct.IsCancellationRequested)
                 {
@@ -116,7 +116,7 @@ namespace SavescumBuddy.Models
                 if (!string.IsNullOrEmpty(backupCloudFolderId))
                 {
                     DriveStatus = "Deleting uploaded files...";
-                    await GoogleDrive.Current.DeleteFromCloudAsync(backupCloudFolderId);
+                    await GoogleDrive.Current.DeleteFromCloudAsync(backupCloudFolderId).ConfigureAwait(false);
                 }
             }
             finally
@@ -131,8 +131,8 @@ namespace SavescumBuddy.Models
             try
             {
                 DriveStatus = "Deleting backup folder...";
-                await Task.Delay(2000, ct);
-                await GoogleDrive.Current.DeleteFromCloudAsync(backup.DriveId, ct);
+                await Task.Delay(2000, ct).ConfigureAwait(false);
+                await GoogleDrive.Current.DeleteFromCloudAsync(backup.DriveId, ct).ConfigureAwait(false);
 
                 if (!ct.IsCancellationRequested)
                 {
@@ -143,7 +143,7 @@ namespace SavescumBuddy.Models
             catch (OperationCanceledException) 
             {
                 DriveStatus = "Checking if succeeded...";
-                var file = await GoogleDrive.Current.GetById(Backup.DriveId, false);
+                var file = await GoogleDrive.Current.GetById(Backup.DriveId, false).ConfigureAwait(false);
                 if (file is null)
                 {
                     Backup.DriveId = null;

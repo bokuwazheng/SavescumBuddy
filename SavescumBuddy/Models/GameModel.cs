@@ -14,53 +14,59 @@ namespace SavescumBuddy.Models
         public GameModel(Game game)
         {
             Game = game ?? throw new ArgumentNullException(nameof(game));
-            
-            UpdateGameCommand = new DelegateCommand(() =>
-            {
-                SqliteDataAccess.UpdateGame(Game);
-                StateChanged?.Invoke();
-            });
 
-            SetCurrentCommand = new DelegateCommand(() =>
-            {
-                SqliteDataAccess.SetGameAsCurrent(Game);
-                StateChanged?.Invoke();
-            });
+            UpdateGameCommand = new DelegateCommand(UpdateGame);
+            SetCurrentCommand = new DelegateCommand(SetCurrentGame);
+            RemoveGameCommand = new DelegateCommand(RemoveGame);
+            OpenFilePickerCommand = new DelegateCommand(OpenFilePicker);
+            OpenFolderPickerCommand = new DelegateCommand(OpenFolderPicker);
+        }
 
-            RemoveGameCommand = new DelegateCommand(() =>
-            {
-                SqliteDataAccess.RemoveGame(Game);
-                StateChanged?.Invoke();
-            });
+        private void UpdateGame()
+        {
+            SqliteDataAccess.UpdateGame(Game);
+            StateChanged?.Invoke();
+        }
 
-            OpenFilePickerCommand = new DelegateCommand(() =>
+        private void SetCurrentGame()
+        {
+            SqliteDataAccess.SetGameAsCurrent(Game);
+            StateChanged?.Invoke();
+        }
+
+        private void RemoveGame()
+        {
+            SqliteDataAccess.RemoveGame(Game);
+            StateChanged?.Invoke();
+        }
+
+        private void OpenFilePicker()
+        {
+            using (var dialog = new CommonOpenFileDialog())
             {
-                using (var dialog = new CommonOpenFileDialog())
+                dialog.Multiselect = false;
+                dialog.ShowHiddenItems = true;
+
+                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
-                    dialog.Multiselect = false;
-                    dialog.ShowHiddenItems = true;
-
-                    if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-                    {
-                        Game.SavefilePath = dialog.FileName;
-                    }
+                    Game.SavefilePath = dialog.FileName;
                 }
-            });
+            }
+        }
 
-            OpenFolderPickerCommand = new DelegateCommand(() =>
+        private void OpenFolderPicker()
+        {
+            using (var dialog = new CommonOpenFileDialog())
             {
-                using (var dialog = new CommonOpenFileDialog())
-                {
-                    dialog.Multiselect = false;
-                    dialog.IsFolderPicker = true;
-                    dialog.ShowHiddenItems = true;
+                dialog.Multiselect = false;
+                dialog.IsFolderPicker = true;
+                dialog.ShowHiddenItems = true;
 
-                    if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-                    {
-                        Game.BackupFolder = dialog.FileName;
-                    }
+                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+                {
+                    Game.BackupFolder = dialog.FileName;
                 }
-            });
+            }
         }
 
         public DelegateCommand UpdateGameCommand { get; }

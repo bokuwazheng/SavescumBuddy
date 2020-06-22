@@ -22,12 +22,15 @@ namespace SavescumBuddy.ViewModels
             _autobackupManager = new AutobackupManager();
             _keyboardListener = new GlobalKeyboardHook();
 
-            var mainVm = new MainViewModel(_autobackupManager);
+            var mainVm = new MainViewModel();
             var settingsVm = new SettingsViewModel();
             var aboutVm = new AboutViewModel();
 
             settingsVm.Settings.AutobackupsIsEnabledChanged += isEnabled => _autobackupManager.OnIsEnabledChanged(isEnabled);
             settingsVm.Settings.SelectedInvervalChanged += isEnabled => _autobackupManager.OnIntervalChanged(isEnabled);
+
+            _autobackupManager.AdditionRequested += () => mainVm.AddCommand.Execute();
+            _autobackupManager.DeletionRequested += x => mainVm.RemoveCommand.Execute(x);
 
             ViewModels = new List<BaseViewModel>()
             {
@@ -121,10 +124,6 @@ namespace SavescumBuddy.ViewModels
                             Util.PlaySound(WavLocator.backup_cue);
                         if (latest is object)
                             mainVm.RemoveCommand.Execute(latest);
-                    }
-                    catch (BackupFactoryException)
-                    {
-                        return;
                     }
                     catch (Exception ex)
                     {
