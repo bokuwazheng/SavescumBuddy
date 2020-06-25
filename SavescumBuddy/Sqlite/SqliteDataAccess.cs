@@ -4,10 +4,7 @@ using System.Configuration;
 using System.Data;
 using System.Data.SQLite;
 using System.Linq;
-using System;
 using System.Text;
-using System.Data.Common;
-using System.Data.SqlClient;
 
 namespace SavescumBuddy.Sqlite
 {

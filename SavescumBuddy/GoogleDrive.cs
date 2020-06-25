@@ -35,12 +35,15 @@ namespace SavescumBuddy
         private readonly TimeSpan _timeoutDelay;
         private readonly string _timeoutError;
 
+        private static readonly string _credentialsFileName = "sb_credentials.json";
+        private static readonly string _tokenFolderName = "token.json";
+
 #if DEBUG
-        public const string CredentialsFileName = "sb_credentials.json";
-        public const string TokenFolderName = "token.json";
+        public static readonly string CredentialsFileName = _credentialsFileName;
+        public static readonly string TokenFolderName = _tokenFolderName;
 #else
-        public const string CredentialsFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "bokuwazheng", CredentialsFileName);
-        public const string TokenFolderName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "bokuwazheng", TokenFolderName);
+        public static readonly string CredentialsFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "bokuwazheng", _credentialsFileName);
+        public static readonly string TokenFolderName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "bokuwazheng", _tokenFolderName);
 #endif
 
         public UserCredential UserCredential { get; set; }
