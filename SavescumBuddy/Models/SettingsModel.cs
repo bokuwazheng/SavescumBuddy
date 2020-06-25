@@ -1,32 +1,11 @@
 ﻿using Prism.Mvvm;
 using System;
-using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Settings = SavescumBuddy.Properties.Settings;
 
 namespace SavescumBuddy.Models
 {
-    public enum OverwriteOption
-    {
-        [Description("Never")]
-        Never,
-        [Description("Always")]
-        Always,
-        [Description("Keep liked autobackups")]
-        KeepLiked
-    }
-
-    public enum SkipOption
-    {
-        [Description("Never")]
-        Never,
-        [Description("If any backup was created <5 min ago")]
-        FiveMin,
-        [Description("If any backup was created <10 min ago")]
-        TenMin
-    }
-
     public class SettingsModel : BindableBase
     {
         public event Action<bool> AutobackupsIsEnabledChanged;

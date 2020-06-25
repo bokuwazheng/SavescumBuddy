@@ -20,14 +20,9 @@ namespace SavescumBuddy.Views
             // Disable hotkey recorder.
             var dc = Application.Current.MainWindow.DataContext;
             var appVm = dc as ApplicationViewModel;
-            var settingsVm = appVm.ViewModels.OfType<SettingsViewModel>().First();
-            if (settingsVm.HookIsEnabled)
-            {
-                settingsVm.SaveHookIsEnabled = false;
-                settingsVm.RestoreHookIsEnabled = false;
-                settingsVm.OverwriteHookIsEnabled = false;
-                settingsVm.RegisterHotkeyCommand?.Execute();
-            }
+            var settingsVm = appVm.GetViewModel<SettingsViewModel>();
+            if (settingsVm.SelectedHotkeyAction != null)
+                settingsVm.RegisterHotkeyCommand?.Execute(settingsVm.SelectedHotkeyAction);
         }
     }
 }

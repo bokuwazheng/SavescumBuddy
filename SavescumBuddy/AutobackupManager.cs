@@ -5,6 +5,7 @@ using Settings = SavescumBuddy.Properties.Settings;
 using SavescumBuddy.Models;
 using SavescumBuddy.MarkupExtensions;
 using SavescumBuddy.Sqlite;
+using SavescumBuddy.Enums;
 
 namespace SavescumBuddy
 {
