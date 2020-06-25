@@ -28,12 +28,6 @@ namespace SavescumBuddy
         static GoogleDrive() { }
         #endregion
 
-        public enum Mode
-        {
-            Debug,
-            Release
-        }
-
         private CancellationTokenSource _cts;
         // If modifying these scopes, delete your previously saved credentials.
         private readonly string[] _scopes;
@@ -41,9 +35,13 @@ namespace SavescumBuddy
         private readonly TimeSpan _timeoutDelay;
         private readonly string _timeoutError;
 
+#if DEBUG
         public const string CredentialsFileName = "sb_credentials.json";
         public const string TokenFolderName = "token.json";
-        public const Mode CurrentMode = Mode.Debug;
+#else
+        public const string CredentialsFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "bokuwazheng", CredentialsFileName);
+        public const string TokenFolderName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "bokuwazheng", TokenFolderName);
+#endif
 
         public UserCredential UserCredential { get; set; }
 
@@ -53,32 +51,6 @@ namespace SavescumBuddy
             _applicationName = "Savescum Buddy";
             _timeoutDelay = TimeSpan.FromSeconds(180d);
             _timeoutError = $"Error: Timeout. Authorization canceled after { _timeoutDelay.TotalSeconds } seconds.";
-        }
-
-        public static string GetCredentials(Mode mode)
-        {
-            switch (mode)
-            {
-                case (Mode.Debug):
-                    return CredentialsFileName;
-                case (Mode.Release):
-                    return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "bokuwazheng", CredentialsFileName);
-                default:
-                    return null;
-            }
-        }
-
-        public static string GetToken(Mode mode)
-        {
-            switch (mode)
-            {
-                case (Mode.Debug):
-                    return TokenFolderName;
-                case (Mode.Release):
-                    return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "bokuwazheng", TokenFolderName);
-                default:
-                    return null;
-            }
         }
 
         public DriveService GetDriveApiService()

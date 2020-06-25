@@ -50,8 +50,7 @@ namespace SavescumBuddy.ViewModels
 
         private void TryAuthorize()
         {
-            var mode = GoogleDrive.CurrentMode;
-            var tokenFolder = GoogleDrive.GetToken(mode);
+            var tokenFolder = GoogleDrive.TokenFolderName;
             var folderExists = Directory.Exists(tokenFolder);
             if (folderExists)
             {
@@ -213,9 +212,8 @@ namespace SavescumBuddy.ViewModels
 
         private async Task AuthorizeAsync()
         {
-            var mode = GoogleDrive.CurrentMode;
-            var credentials = GoogleDrive.GetCredentials(mode);
-            var token = GoogleDrive.GetToken(mode);
+            var credentials = GoogleDrive.CredentialsFileName;
+            var token = GoogleDrive.TokenFolderName;
             var userCredential = await GoogleDrive.Current.AuthorizeAsync(credentials, token).ConfigureAwait(false);
             if (userCredential is null)
                 return;
