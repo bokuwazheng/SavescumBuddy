@@ -82,7 +82,7 @@ namespace SavescumBuddy
                         _scopes,
                         "user",
                         _cts.Token,
-                        new FileDataStore(token, true));
+                        new FileDataStore(token, true)).ConfigureAwait(false);
 
                     return credential;
                 }
@@ -135,7 +135,7 @@ namespace SavescumBuddy
                 };
                 var request = GetDriveApiService().Files.Create(fileMetadata);
                 request.Fields = "id";
-                var folder = await request.ExecuteAsync(ct);
+                var folder = await request.ExecuteAsync(ct).ConfigureAwait(false);
                 var rootId = folder.Id;
                 return rootId;
             }
@@ -162,7 +162,7 @@ namespace SavescumBuddy
                 };
                 var request = GetDriveApiService().Files.Create(fileMetadata);
                 request.Fields = "id";
-                var folder = await request.ExecuteAsync(ct);
+                var folder = await request.ExecuteAsync(ct).ConfigureAwait(false);
                 return folder.Id;
             }
             catch (OperationCanceledException)
@@ -191,7 +191,7 @@ namespace SavescumBuddy
                 {
                     var request = GetDriveApiService().Files.Create(fileMetadata, stream, GetMimeType(name));
                     request.Fields = "id";
-                    await request.UploadAsync(ct);
+                    await request.UploadAsync(ct).ConfigureAwait(false);
                 }
             }
             catch (OperationCanceledException) { }
@@ -206,7 +206,7 @@ namespace SavescumBuddy
             try
             {
                 var service = GetDriveApiService();
-                await service.Files.Delete(id).ExecuteAsync(ct);
+                await service.Files.Delete(id).ExecuteAsync(ct).ConfigureAwait(false);
             }
             catch (OperationCanceledException) { }
             catch (Exception ex)
@@ -222,7 +222,7 @@ namespace SavescumBuddy
                 var service = GetDriveApiService();
                 var request = service.About.Get();
                 request.Fields = "user(emailAddress)";
-                var result = await request.ExecuteAsync(ct);
+                var result = await request.ExecuteAsync(ct).ConfigureAwait(false);
                 return result?.User.EmailAddress;
             }
             catch (OperationCanceledException)
@@ -243,7 +243,7 @@ namespace SavescumBuddy
                 var service = GetDriveApiService();
                 var request = service.Files.Get(id);
                 request.Fields = "*";
-                var result = await request.ExecuteAsync();
+                var result = await request.ExecuteAsync().ConfigureAwait(false);
                 return result;
             }
             catch (OperationCanceledException)
@@ -267,12 +267,12 @@ namespace SavescumBuddy
             listRequest.Spaces = "drive";
             listRequest.Q = mimeType + $" and '{ parentId }' in parents and trashed = false";
 
-            var result = await listRequest.ExecuteAsync(ct);
+            var result = await listRequest.ExecuteAsync(ct).ConfigureAwait(false);
             var files = result.Files.ToList();
-            if (result.NextPageToken is object)
+            while (result.NextPageToken is object)
             {
                 listRequest.PageToken = result.NextPageToken;
-                result = await listRequest.ExecuteAsync(ct);
+                result = await listRequest.ExecuteAsync(ct).ConfigureAwait(false);
                 files.AddRange(result.Files);
             }
 
@@ -286,7 +286,7 @@ namespace SavescumBuddy
             listRequest.Spaces = "drive";
             listRequest.Q = mimeType + $" and '{ parentId }' in parents and trashed = false";
 
-            var list = await listRequest.ExecuteAsync(ct);
+            var list = await listRequest.ExecuteAsync(ct).ConfigureAwait(false);
             var result = list.Files.FirstOrDefault(x => x.Name == name);
             return result?.Id;
         }

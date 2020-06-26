@@ -83,7 +83,6 @@ namespace SavescumBuddy.ViewModels
                         Util.PopUp(ex.Message);
                     }
 
-                    e.Handled = true;
                     return;
                 }
             }
@@ -106,7 +105,6 @@ namespace SavescumBuddy.ViewModels
                         Util.PopUp(ex.Message);
                     }
 
-                    e.Handled = true;
                     return;
                 }
             }
@@ -130,7 +128,6 @@ namespace SavescumBuddy.ViewModels
                         Util.PopUp(ex.Message);
                     }
 
-                    e.Handled = true;
                     return;
                 }
             }

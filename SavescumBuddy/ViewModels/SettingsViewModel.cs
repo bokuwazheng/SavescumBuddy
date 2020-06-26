@@ -60,6 +60,7 @@ namespace SavescumBuddy.ViewModels
             }
         }
 
+        // TODO: better way to unhook cuz passing SelectedHotkeyAction is kinda tricky
         private void ToggleKeyboardHook(HotkeyAction? actionType)
         {
             if (actionType != SelectedHotkeyAction)
