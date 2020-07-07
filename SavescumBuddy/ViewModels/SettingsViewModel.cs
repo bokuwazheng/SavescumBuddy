@@ -10,6 +10,7 @@ using Common;
 using System.Windows.Forms;
 using SavescumBuddy.Sqlite;
 using System.Collections.Generic;
+using SavescumBuddy.Enums;
 
 namespace SavescumBuddy.ViewModels
 {
@@ -18,27 +19,10 @@ namespace SavescumBuddy.ViewModels
         private bool _importInProgress;
         private int _importProgress;
         private GlobalKeyboardHook _keyboardHook;
-        private bool _saveHookIsEnabled;
-        private bool _restoreHookIsEnabled;
-        private bool _overwriteHookIsEnabled;
+        private HotkeyAction? _recordedHotkeyType = null;
 
         public SettingsModel Settings { get; }
-        public bool HookIsEnabled => SaveHookIsEnabled || RestoreHookIsEnabled || OverwriteHookIsEnabled;
-        public bool SaveHookIsEnabled
-        {
-            get => _saveHookIsEnabled; set => SetProperty(ref _saveHookIsEnabled, value,
-                () => { if (value) { RestoreHookIsEnabled = false; OverwriteHookIsEnabled = false; } });
-        }
-        public bool RestoreHookIsEnabled
-        {
-            get => _restoreHookIsEnabled; set => SetProperty(ref _restoreHookIsEnabled, value,
-                () => { if (value) { SaveHookIsEnabled = false; OverwriteHookIsEnabled = false; } });
-        }
-        public bool OverwriteHookIsEnabled
-        {
-            get => _overwriteHookIsEnabled; set => SetProperty(ref _overwriteHookIsEnabled, value,
-                () => { if (value) { SaveHookIsEnabled = false; RestoreHookIsEnabled = false; } });
-        }
+        public HotkeyAction? SelectedHotkeyAction { get => _recordedHotkeyType; set => SetProperty(ref _recordedHotkeyType, value); }
         public string AuthorizedAs => GetUserEmail();
         public int ImportProgress { get => _importProgress; private set => SetProperty(ref _importProgress, value); }
         public bool ImportInProgress { get => _importInProgress; private set => SetProperty(ref _importInProgress, value); }
@@ -52,10 +36,10 @@ namespace SavescumBuddy.ViewModels
             Settings.PropertyChanged += (s, e) => Properties.Settings.Default.Save();
 
             AddGameCommand = new DelegateCommand(AddEmptyGame);
-            UploadCustomCommand = new DelegateCommand(async () => await UploadBackups());
-            RegisterHotkeyCommand = new DelegateCommand(RegisterHotkey);
-            AuthorizeCommand = new DelegateCommand(async () => await AuthorizeAsync());
-            ReauthorizeCommand = new DelegateCommand(async () => await ReauthorizeAsync());
+            UploadCustomCommand = new DelegateCommand(async () => await UploadBackups().ConfigureAwait(false));
+            RegisterHotkeyCommand = new DelegateCommand<HotkeyAction?>(x => ToggleKeyboardHook(x));
+            AuthorizeCommand = new DelegateCommand(async () => await AuthorizeAsync().ConfigureAwait(false));
+            ReauthorizeCommand = new DelegateCommand(async () => await ReauthorizeAsync().ConfigureAwait(false));
 
             UpdateGameList();
             if (Games.Count == 0)
@@ -66,8 +50,7 @@ namespace SavescumBuddy.ViewModels
 
         private void TryAuthorize()
         {
-            var mode = GoogleDrive.CurrentMode;
-            var tokenFolder = GoogleDrive.GetToken(mode);
+            var tokenFolder = GoogleDrive.TokenFolderName;
             var folderExists = Directory.Exists(tokenFolder);
             if (folderExists)
             {
@@ -77,27 +60,36 @@ namespace SavescumBuddy.ViewModels
             }
         }
 
-        private void RegisterHotkey()
+        // TODO: better way to unhook cuz passing SelectedHotkeyAction is kinda tricky
+        private void ToggleKeyboardHook(HotkeyAction? actionType)
         {
-            if (HookIsEnabled)
+            if (actionType != SelectedHotkeyAction)
             {
-                _keyboardHook.Hook();
-                _keyboardHook.KeyDown += _keyboardHook_KeyDown;
+                if (!_keyboardHook.HookActive)
+                {
+                    _keyboardHook.Hook();
+                    _keyboardHook.KeyDown += keyboardHook_KeyDown;
+                }
+
+                SelectedHotkeyAction = actionType;
             }
-            else
+            else 
             {
-                _keyboardHook.Unhook();
-                _keyboardHook.KeyDown -= _keyboardHook_KeyDown;
+                if (_keyboardHook.HookActive)
+                {
+                    _keyboardHook.Unhook();
+                    _keyboardHook.KeyDown -= keyboardHook_KeyDown;
+                }
+
+                SelectedHotkeyAction = null;
             }
         }
 
-        private void _keyboardHook_KeyDown(object sender, KeyEventArgs e)
+        private void keyboardHook_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
             {
-                SaveHookIsEnabled = false;
-                RestoreHookIsEnabled = false;
-                OverwriteHookIsEnabled = false;
+                ToggleKeyboardHook(SelectedHotkeyAction);
                 return;
             }
 
@@ -117,17 +109,17 @@ namespace SavescumBuddy.ViewModels
                 key == Keys.LControlKey || key == Keys.RControlKey)
                 mod = Keys.None;
 
-            if (SaveHookIsEnabled)
+            if (SelectedHotkeyAction == HotkeyAction.Save)
             {
                 Settings.SelectedQSKey = key;
                 Settings.SelectedQSMod = mod;
             }
-            else if (RestoreHookIsEnabled)
+            else if (SelectedHotkeyAction == HotkeyAction.Restore)
             {
                 Settings.SelectedQLKey = key;
                 Settings.SelectedQLMod = mod;
             }
-            else if (OverwriteHookIsEnabled)
+            else if (SelectedHotkeyAction == HotkeyAction.Overwrite)
             {
                 Settings.SelectedSOKey = key;
                 Settings.SelectedSOMod = mod;
@@ -221,9 +213,8 @@ namespace SavescumBuddy.ViewModels
 
         private async Task AuthorizeAsync()
         {
-            var mode = GoogleDrive.CurrentMode;
-            var credentials = GoogleDrive.GetCredentials(mode);
-            var token = GoogleDrive.GetToken(mode);
+            var credentials = GoogleDrive.CredentialsFileName;
+            var token = GoogleDrive.TokenFolderName;
             var userCredential = await GoogleDrive.Current.AuthorizeAsync(credentials, token).ConfigureAwait(false);
             if (userCredential is null)
                 return;
@@ -290,7 +281,7 @@ namespace SavescumBuddy.ViewModels
 
         public DelegateCommand AddGameCommand { get; }
         public DelegateCommand UploadCustomCommand { get; }
-        public DelegateCommand RegisterHotkeyCommand { get; }
+        public DelegateCommand<HotkeyAction?> RegisterHotkeyCommand { get; }
         public DelegateCommand AuthorizeCommand { get; }
         public DelegateCommand ReauthorizeCommand { get; }
     }

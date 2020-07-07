@@ -25,4 +25,12 @@ namespace SavescumBuddy.MarkupExtensions
                         .FirstOrDefault()?.Description ?? value.ToString();
         }
     }
+
+    public static class StringExtensions
+    {
+        public static bool EqualsEnumDescription(this string description, Enum value)
+        {
+            return description == EnumToCollectionExtension.EnumToDescriptionOrString(value);
+        }
+    }
 }

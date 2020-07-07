@@ -4,7 +4,6 @@ using System.Configuration;
 using System.Data;
 using System.Data.SQLite;
 using System.Linq;
-using System;
 using System.Text;
 
 namespace SavescumBuddy.Sqlite
@@ -13,11 +12,18 @@ namespace SavescumBuddy.Sqlite
 
     class SqliteDataAccess
     {
-        private static string LoadConnectionString(string id = "Debug") // string id = "Debug" for debugging, otherwise "Release"
+#if DEBUG
+        private static string LoadConnectionString()
         {
-            var cnnstr = ConfigurationManager.ConnectionStrings[id].ConnectionString;
+            return ConfigurationManager.ConnectionStrings["Debug"].ConnectionString;
+        }
+#else
+        private static string LoadConnectionString()
+        {
+            var cnnstr = ConfigurationManager.ConnectionStrings["Release"].ConnectionString;
             return cnnstr.Replace("%APPDATA%", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
         }
+#endif
 
         private static readonly object _locker = new object();
 
@@ -67,7 +73,7 @@ namespace SavescumBuddy.Sqlite
             }
         }
 
-        #region Backup table
+#region Backup table
         public static int GetTotalNumberOfBackups(BackupSearchRequest request)
         {
             var isLiked = request.LikedOnly ? "1" : "0";
@@ -196,9 +202,9 @@ namespace SavescumBuddy.Sqlite
         {
             Execute("update Backup set FilePath = @FilePath, Picture = @Picture where Id = @Id;", new { FilePath = backup.FilePath, Picture = backup.Picture, Id = backup.Id });
         }
-        #endregion
+#endregion
 
-        #region Game table
+#region Game table
         public static List<Game> LoadGames()
         {
             return Query<Game>("select * from Game order by Id asc");
@@ -230,6 +236,6 @@ namespace SavescumBuddy.Sqlite
             Execute("update Game set Title = @Title, SavefilePath = @SavefilePath, BackupFolder = @BackupFolder, CanBeSetCurrent = @CanBeSetCurrent where Id = @Id;",
                 new { Id = game.Id, Title = game.Title, SavefilePath = game.SavefilePath, BackupFolder = game.BackupFolder, CanBeSetCurrent = 1 });
         }
-        #endregion
+#endregion
     }
 }

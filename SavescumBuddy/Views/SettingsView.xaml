@@ -3,12 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:SavescumBuddy"
-             xmlns:models="clr-namespace:SavescumBuddy.Models"
              xmlns:views="clr-namespace:SavescumBuddy.Views"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
-             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:ext="clr-namespace:SavescumBuddy.MarkupExtensions"
+             xmlns:enums="clr-namespace:SavescumBuddy.Enums"
              mc:Ignorable="d" 
              d:DesignHeight="660" d:DesignWidth="1160" 
              Unloaded="UserControl_Unloaded">
@@ -183,10 +181,10 @@
                             <sys:String>60 min</sys:String>
                         </ComboBox>
                         <ComboBox Grid.Column="1" Grid.Row="1" Height="28" Foreground="{StaticResource Ash}"
-                                  ItemsSource="{ext:EnumToCollection EnumType={x:Type models:SkipOption}}" 
+                                  ItemsSource="{ext:EnumToCollection EnumType={x:Type enums:SkipOption}}" 
                                   SelectedItem="{Binding Settings.SelectedSkipOption}"/>
                         <ComboBox Grid.Column="1" Grid.Row="2" Height="28" Foreground="{StaticResource Ash}" 
-                                  ItemsSource="{ext:EnumToCollection EnumType={x:Type models:OverwriteOption}}"
+                                  ItemsSource="{ext:EnumToCollection EnumType={x:Type enums:OverwriteOption}}"
                                   SelectedItem="{Binding Settings.SelectedOverwriteOption}"/>
                     </Grid>
                 </Expander>
@@ -265,7 +263,8 @@
                                         </TextBlock.Text>
                                     </TextBlock>
                                 </Border>
-                                <ToggleButton Grid.Column="1" IsChecked="{Binding SaveHookIsEnabled}" Style="{StaticResource RecordHotkeyToggleButton}" Command="{Binding RegisterHotkeyCommand}"/>
+                                <ToggleButton Grid.Column="1" IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource HotkeyActionToBoolConverter}, ConverterParameter={x:Static enums:HotkeyAction.Save}, Mode=OneWay}" 
+                                              Style="{StaticResource RecordHotkeyToggleButton}" Command="{Binding RegisterHotkeyCommand}" CommandParameter="{x:Static enums:HotkeyAction.Save}"/>
                             </Grid>
                         </GroupBox>
                         <!--Quick load-->
@@ -298,7 +297,8 @@
                                         </TextBlock.Text>
                                     </TextBlock>
                                 </Border>
-                                <ToggleButton Grid.Column="1" IsChecked="{Binding RestoreHookIsEnabled}" Style="{StaticResource RecordHotkeyToggleButton}" Command="{Binding RegisterHotkeyCommand}"/>
+                                <ToggleButton Grid.Column="1" IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource HotkeyActionToBoolConverter}, ConverterParameter={x:Static enums:HotkeyAction.Restore}, Mode=OneWay}" 
+                                              Style="{StaticResource RecordHotkeyToggleButton}" Command="{Binding RegisterHotkeyCommand}" CommandParameter="{x:Static enums:HotkeyAction.Restore}"/>
                             </Grid>
                         </GroupBox>
                         <!--Save and overwrite-->
@@ -331,7 +331,8 @@
                                         </TextBlock.Text>
                                     </TextBlock>
                                 </Border>
-                                <ToggleButton Grid.Column="1" IsChecked="{Binding OverwriteHookIsEnabled}" Style="{StaticResource RecordHotkeyToggleButton}" Command="{Binding RegisterHotkeyCommand}"/>
+                                <ToggleButton Grid.Column="1" IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource HotkeyActionToBoolConverter}, ConverterParameter={x:Static enums:HotkeyAction.Overwrite}, Mode=OneWay}" 
+                                              Style="{StaticResource RecordHotkeyToggleButton}" Command="{Binding RegisterHotkeyCommand}" CommandParameter="{x:Static enums:HotkeyAction.Overwrite}"/>
                             </Grid>
                         </GroupBox>
                     </StackPanel>

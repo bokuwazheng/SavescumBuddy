@@ -53,7 +53,7 @@ namespace SavescumBuddy
             File.Copy(backup.FilePath, backup.Origin, true);
         }
 
-        public static Backup PromptLocateNewFilePaths(Backup backup)
+        public static bool? PromptLocateNewFilePaths(Backup backup)
         {
             using (var dialog = new CommonOpenFileDialog())
             {
@@ -67,25 +67,31 @@ namespace SavescumBuddy
                     var folderName = Path.GetFileNameWithoutExtension(backup.Picture);
                     var isRightFolder = newFolder.Contains(folderName);
                     if (!isRightFolder)
-                        return null;
+                        return false;
 
                     var backupFile = Path.GetFileName(backup.FilePath);
                     var newFilePath = Path.Combine(newFolder, backupFile);
                     var fileExists = File.Exists(newFilePath);
-                    if (fileExists)
-                        backup.FilePath = newFilePath;
 
                     var imageFile = Path.GetFileName(backup.Picture);
                     var newPicture = Path.Combine(newFolder, imageFile);
                     var imageExists = File.Exists(newPicture);
-                    if (imageExists)
+
+                    if (fileExists && imageExists)
+                    {
+                        backup.FilePath = newFilePath;
                         backup.Picture = newPicture;
-
-                    return backup;
+                    }
+                    else
+                        return false;
                 }
-            }
+                else
+                {
+                    return null;
+                }
 
-            return null;
+                return true;
+            }
         }
 
         public static void MoveToTrash(Backup backup)

@@ -2,9 +2,9 @@
 using System;
 using System.Windows.Threading;
 using Settings = SavescumBuddy.Properties.Settings;
-using SavescumBuddy.Models;
 using SavescumBuddy.MarkupExtensions;
 using SavescumBuddy.Sqlite;
+using SavescumBuddy.Enums;
 
 namespace SavescumBuddy
 {
@@ -94,11 +94,11 @@ namespace SavescumBuddy
             {
                 var timeSinceLastBackup = DateTime.Now - DateTime.Parse(lastBackup.DateTimeTag);
 
-                if (Settings.Default.Skip.Equals(EnumToCollectionExtension.EnumToDescriptionOrString(SkipOption.FiveMin)))
+                if (Settings.Default.Skip.EqualsEnumDescription(SkipOption.FiveMin))
                 {
                     return timeSinceLastBackup > TimeSpan.FromMinutes(5d);
                 }
-                else if (Settings.Default.Skip.Equals(EnumToCollectionExtension.EnumToDescriptionOrString(SkipOption.TenMin)))
+                else if (Settings.Default.Skip.EqualsEnumDescription(SkipOption.TenMin))
                 {
                     return timeSinceLastBackup > TimeSpan.FromMinutes(10d);
                 }
@@ -109,11 +109,11 @@ namespace SavescumBuddy
 
         private bool PreviousAutobackupShouldBeDeleted(Backup previous)
         {
-            if (Settings.Default.Overwrite.Equals(EnumToCollectionExtension.EnumToDescriptionOrString(OverwriteOption.Always)))
+            if (Settings.Default.Overwrite.EqualsEnumDescription(OverwriteOption.Always))
             {
                 return true;
             }
-            else if (Settings.Default.Overwrite.Equals(EnumToCollectionExtension.EnumToDescriptionOrString(OverwriteOption.KeepLiked)))
+            else if (Settings.Default.Overwrite.EqualsEnumDescription(OverwriteOption.KeepLiked))
             {
                 return !previous.IsLiked.Equals(1);
             }

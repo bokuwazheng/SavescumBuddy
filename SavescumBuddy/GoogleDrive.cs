@@ -28,12 +28,6 @@ namespace SavescumBuddy
         static GoogleDrive() { }
         #endregion
 
-        public enum Mode
-        {
-            Debug,
-            Release
-        }
-
         private CancellationTokenSource _cts;
         // If modifying these scopes, delete your previously saved credentials.
         private readonly string[] _scopes;
@@ -41,9 +35,16 @@ namespace SavescumBuddy
         private readonly TimeSpan _timeoutDelay;
         private readonly string _timeoutError;
 
-        public const string CredentialsFileName = "sb_credentials.json";
-        public const string TokenFolderName = "token.json";
-        public const Mode CurrentMode = Mode.Debug;
+        private static readonly string _credentialsFileName = "sb_credentials.json";
+        private static readonly string _tokenFolderName = "token.json";
+
+#if DEBUG
+        public static readonly string CredentialsFileName = _credentialsFileName;
+        public static readonly string TokenFolderName = _tokenFolderName;
+#else
+        public static readonly string CredentialsFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "bokuwazheng", _credentialsFileName);
+        public static readonly string TokenFolderName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "bokuwazheng", _tokenFolderName);
+#endif
 
         public UserCredential UserCredential { get; set; }
 
@@ -53,32 +54,6 @@ namespace SavescumBuddy
             _applicationName = "Savescum Buddy";
             _timeoutDelay = TimeSpan.FromSeconds(180d);
             _timeoutError = $"Error: Timeout. Authorization canceled after { _timeoutDelay.TotalSeconds } seconds.";
-        }
-
-        public static string GetCredentials(Mode mode)
-        {
-            switch (mode)
-            {
-                case (Mode.Debug):
-                    return CredentialsFileName;
-                case (Mode.Release):
-                    return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "bokuwazheng", CredentialsFileName);
-                default:
-                    return null;
-            }
-        }
-
-        public static string GetToken(Mode mode)
-        {
-            switch (mode)
-            {
-                case (Mode.Debug):
-                    return TokenFolderName;
-                case (Mode.Release):
-                    return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "bokuwazheng", TokenFolderName);
-                default:
-                    return null;
-            }
         }
 
         public DriveService GetDriveApiService()
@@ -107,7 +82,7 @@ namespace SavescumBuddy
                         _scopes,
                         "user",
                         _cts.Token,
-                        new FileDataStore(token, true));
+                        new FileDataStore(token, true)).ConfigureAwait(false);
 
                     return credential;
                 }
@@ -160,7 +135,7 @@ namespace SavescumBuddy
                 };
                 var request = GetDriveApiService().Files.Create(fileMetadata);
                 request.Fields = "id";
-                var folder = await request.ExecuteAsync(ct);
+                var folder = await request.ExecuteAsync(ct).ConfigureAwait(false);
                 var rootId = folder.Id;
                 return rootId;
             }
@@ -187,7 +162,7 @@ namespace SavescumBuddy
                 };
                 var request = GetDriveApiService().Files.Create(fileMetadata);
                 request.Fields = "id";
-                var folder = await request.ExecuteAsync(ct);
+                var folder = await request.ExecuteAsync(ct).ConfigureAwait(false);
                 return folder.Id;
             }
             catch (OperationCanceledException)
@@ -216,7 +191,7 @@ namespace SavescumBuddy
                 {
                     var request = GetDriveApiService().Files.Create(fileMetadata, stream, GetMimeType(name));
                     request.Fields = "id";
-                    await request.UploadAsync(ct);
+                    await request.UploadAsync(ct).ConfigureAwait(false);
                 }
             }
             catch (OperationCanceledException) { }
@@ -231,7 +206,7 @@ namespace SavescumBuddy
             try
             {
                 var service = GetDriveApiService();
-                await service.Files.Delete(id).ExecuteAsync(ct);
+                await service.Files.Delete(id).ExecuteAsync(ct).ConfigureAwait(false);
             }
             catch (OperationCanceledException) { }
             catch (Exception ex)
@@ -247,7 +222,7 @@ namespace SavescumBuddy
                 var service = GetDriveApiService();
                 var request = service.About.Get();
                 request.Fields = "user(emailAddress)";
-                var result = await request.ExecuteAsync(ct);
+                var result = await request.ExecuteAsync(ct).ConfigureAwait(false);
                 return result?.User.EmailAddress;
             }
             catch (OperationCanceledException)
@@ -268,7 +243,7 @@ namespace SavescumBuddy
                 var service = GetDriveApiService();
                 var request = service.Files.Get(id);
                 request.Fields = "*";
-                var result = await request.ExecuteAsync();
+                var result = await request.ExecuteAsync().ConfigureAwait(false);
                 return result;
             }
             catch (OperationCanceledException)
@@ -292,12 +267,12 @@ namespace SavescumBuddy
             listRequest.Spaces = "drive";
             listRequest.Q = mimeType + $" and '{ parentId }' in parents and trashed = false";
 
-            var result = await listRequest.ExecuteAsync(ct);
+            var result = await listRequest.ExecuteAsync(ct).ConfigureAwait(false);
             var files = result.Files.ToList();
-            if (result.NextPageToken is object)
+            while (result.NextPageToken is object)
             {
                 listRequest.PageToken = result.NextPageToken;
-                result = await listRequest.ExecuteAsync(ct);
+                result = await listRequest.ExecuteAsync(ct).ConfigureAwait(false);
                 files.AddRange(result.Files);
             }
 
@@ -311,7 +286,7 @@ namespace SavescumBuddy
             listRequest.Spaces = "drive";
             listRequest.Q = mimeType + $" and '{ parentId }' in parents and trashed = false";
 
-            var list = await listRequest.ExecuteAsync(ct);
+            var list = await listRequest.ExecuteAsync(ct).ConfigureAwait(false);
             var result = list.Files.FirstOrDefault(x => x.Name == name);
             return result?.Id;
         }

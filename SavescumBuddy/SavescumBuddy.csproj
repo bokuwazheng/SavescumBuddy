@@ -127,6 +127,7 @@
     </ApplicationDefinition>
     <Compile Include="AutobackupManager.cs" />
     <Compile Include="BackupFactory.cs" />
+    <Compile Include="Enums\Enums.cs" />
     <Compile Include="Sqlite\BackupSearchRequest.cs" />
     <Compile Include="GoogleDrive.cs" />
     <Compile Include="Sqlite\ISearchRequest.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="Sqlite\SqliteDataAccess.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="ValueConverters\ExistsToVisibilityConverter.cs" />
+    <Compile Include="ValueConverters\HotkeyActionToBoolConverter.cs" />
     <Compile Include="ValueConverters\IntToBoolConverter.cs" />
     <Compile Include="ValueConverters\InverseBooleanConverter.cs" />
     <Compile Include="ValueConverters\InverseBooleanToVisibilityConverter.cs" />

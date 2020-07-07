@@ -51,6 +51,7 @@
         <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
         <converters:KeysToStringConverter x:Key="KeysToStringConverter"/>
         <converters:InverseExistsToVisibilityConverter x:Key="InverseExistsToVisibilityConverter"/>
+        <converters:HotkeyActionToBoolConverter x:Key="HotkeyActionToBoolConverter"/>
 
         <!--Expander style-->
         <SolidColorBrush x:Key="Expander.MouseOver.Circle.Stroke" Color="#FF5593FF"/>
