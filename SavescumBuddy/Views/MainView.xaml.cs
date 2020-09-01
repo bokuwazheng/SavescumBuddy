@@ -25,7 +25,7 @@ namespace SavescumBuddy.Views
             appVm.Hook();
 
             // Update backup list.
-            var mainVm = appVm.ViewModels.OfType<MainViewModel>().First();
+            var mainVm = App.GetService<MainViewModel>();
             mainVm.UpdateBackupList();
             mainVm.NavigateToStartCommand?.Execute();
         }

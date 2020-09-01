@@ -74,7 +74,7 @@ namespace SavescumBuddy.ViewModels
         }
         #endregion
 
-        public MainViewModel()
+        public MainViewModel(IDataAccess dataAccess) : base(dataAccess)
         {
             AddCommand = new DelegateCommand(Add);
             RemoveCommand = new DelegateCommand<Backup>(b => Remove(b));
@@ -110,7 +110,8 @@ namespace SavescumBuddy.ViewModels
             if (now - TimeSinceLastBackup > TimeSpan.FromSeconds(1d))
             {
                 TimeSinceLastBackup = now;
-                var backup = BackupFactory.CreateBackup();
+                var game = SqliteDataAccess.GetCurrentGame();
+                var backup = App.GetService<BackupFactory>().CreateBackup(game);
                 SqliteDataAccess.SaveBackup(backup);
                 Util.BackupFiles(backup);
                 UpdateBackupList();

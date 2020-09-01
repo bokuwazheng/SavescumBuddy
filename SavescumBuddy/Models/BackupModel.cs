@@ -33,8 +33,10 @@ namespace SavescumBuddy.Models
 
             _cts = new CancellationTokenSource();
 
-            UpdateNoteCommand = new DelegateCommand(() => SqliteDataAccess.UpdateNote(Backup));
-            UpdateIsLikedCommand = new DelegateCommand(() => SqliteDataAccess.UpdateIsLiked(Backup));
+            //UpdateNoteCommand = new DelegateCommand(() => SqliteDataAccess.UpdateNote(Backup));
+            //UpdateIsLikedCommand = new DelegateCommand(() => SqliteDataAccess.UpdateIsLiked(Backup));
+            UpdateNoteCommand = new DelegateCommand(() => { });
+            UpdateIsLikedCommand = new DelegateCommand(() => { });
             ShowInExplorerCommand = new DelegateCommand(() => Util.ShowFolderInExplorer(Backup.FilePath));
             CancelCommand = new DelegateCommand(_cts.Cancel);
             ExecuteDriveActionCommand = new DelegateCommand(async () => await ExecuteCloudActionAsync(Ct));
@@ -43,17 +45,17 @@ namespace SavescumBuddy.Models
 
         private void Locate()
         {
-            var newBackup = Util.PromptLocateNewFilePaths(Backup);
-            if (newBackup is null)
-            {
-                Util.PopUp("Seems like the chosen folder is not the right one.\n\nUse import function instead.");
-            }
-            else
-            {
-                SqliteDataAccess.UpdateFilePaths(newBackup);
-                Backup.FilePath = newBackup.FilePath;
-                Backup.Picture = newBackup.Picture;
-            }
+            //var newBackup = Util.PromptLocateNewFilePaths(Backup);
+            //if (newBackup is null)
+            //{
+            //    Util.PopUp("Seems like the chosen folder is not the right one.\n\nUse import function instead.");
+            //}
+            //else
+            //{
+            //    SqliteDataAccess.UpdateFilePaths(newBackup);
+            //    Backup.FilePath = newBackup.FilePath;
+            //    Backup.Picture = newBackup.Picture;
+            //}
         }
 
         private async Task ExecuteCloudActionAsync(CancellationToken ct)
@@ -107,8 +109,8 @@ namespace SavescumBuddy.Models
 
                 if (!ct.IsCancellationRequested)
                 {
-                    Backup.DriveId = backupCloudFolderId;
-                    SqliteDataAccess.UpdateDriveId(Backup);
+                    //Backup.DriveId = backupCloudFolderId;
+                    //SqliteDataAccess.UpdateDriveId(Backup);
                 }
             }
             catch (OperationCanceledException) 
@@ -136,8 +138,8 @@ namespace SavescumBuddy.Models
 
                 if (!ct.IsCancellationRequested)
                 {
-                    Backup.DriveId = null;
-                    SqliteDataAccess.UpdateDriveId(Backup);
+                    //Backup.DriveId = null;
+                    //SqliteDataAccess.UpdateDriveId(Backup);
                 }
             }
             catch (OperationCanceledException) 
@@ -146,8 +148,8 @@ namespace SavescumBuddy.Models
                 var file = await GoogleDrive.Current.GetById(Backup.DriveId, false).ConfigureAwait(false);
                 if (file is null)
                 {
-                    Backup.DriveId = null;
-                    SqliteDataAccess.UpdateDriveId(Backup);
+                    //Backup.DriveId = null;
+                    //SqliteDataAccess.UpdateDriveId(Backup);
                 }
             }
             finally

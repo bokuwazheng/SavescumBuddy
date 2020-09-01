@@ -1,5 +1,4 @@
 ﻿using Prism.Mvvm;
-using System;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -29,9 +28,8 @@ namespace SavescumBuddy.Models
 
     public class SettingsModel : BindableBase
     {
-        public event Action<bool> AutobackupsIsEnabledChanged;
-        public event Action<bool> SelectedInvervalChanged;
-
+        private AutobackupManager AutobackupManager => App.GetService<AutobackupManager>();
+        
         public void Save() => Settings.Default.Save();
 
         public bool AutobackupsOn
@@ -40,7 +38,7 @@ namespace SavescumBuddy.Models
             set
             {
                 Settings.Default.AutobackupsOn = value;
-                AutobackupsIsEnabledChanged?.Invoke(value);
+                AutobackupManager.OnIsEnabledChanged(value);
                 RaisePropertyChanged(nameof(AutobackupsOn));
             }
         }
@@ -57,7 +55,7 @@ namespace SavescumBuddy.Models
             set
             {
                 Settings.Default.Interval = int.Parse(Regex.Match(value, @"\d+").Value);
-                SelectedInvervalChanged?.Invoke(AutobackupsOn);
+                AutobackupManager.OnIntervalChanged(AutobackupsOn);
                 RaisePropertyChanged(nameof(SelectedInterval));
             }
         }

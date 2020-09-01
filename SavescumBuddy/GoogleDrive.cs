@@ -28,12 +28,6 @@ namespace SavescumBuddy
         static GoogleDrive() { }
         #endregion
 
-        public enum Mode
-        {
-            Debug,
-            Release
-        }
-
         private CancellationTokenSource _cts;
         // If modifying these scopes, delete your previously saved credentials.
         private readonly string[] _scopes;
@@ -43,9 +37,8 @@ namespace SavescumBuddy
 
         public const string CredentialsFileName = "sb_credentials.json";
         public const string TokenFolderName = "token.json";
-        public const Mode CurrentMode = Mode.Debug;
 
-        public UserCredential UserCredential { get; set; }
+        public UserCredential UserCredential { get; private set; }
 
         private GoogleDrive()
         {
@@ -55,46 +48,40 @@ namespace SavescumBuddy
             _timeoutError = $"Error: Timeout. Authorization canceled after { _timeoutDelay.TotalSeconds } seconds.";
         }
 
-        public static string GetCredentials(Mode mode)
+        public static string GetCredentials()
         {
-            switch (mode)
-            {
-                case (Mode.Debug):
-                    return CredentialsFileName;
-                case (Mode.Release):
-                    return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "bokuwazheng", CredentialsFileName);
-                default:
-                    return null;
-            }
+        #if DEBUG
+            return CredentialsFileName;
+        #else
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "bokuwazheng", CredentialsFileName);
+        #endif
         }
 
-        public static string GetToken(Mode mode)
+        public static string GetToken()
         {
-            switch (mode)
-            {
-                case (Mode.Debug):
-                    return TokenFolderName;
-                case (Mode.Release):
-                    return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "bokuwazheng", TokenFolderName);
-                default:
-                    return null;
-            }
+        #if DEBUG
+            return TokenFolderName;
+        #else
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "bokuwazheng", TokenFolderName);
+        #endif
         }
 
         public DriveService GetDriveApiService()
         {
-            var service = new DriveService(new BaseClientService.Initializer()
+            return new DriveService(new BaseClientService.Initializer()
             {
                 HttpClientInitializer = UserCredential,
                 ApplicationName = _applicationName,
             });
-            return service;
         }
 
-        public async Task<UserCredential> AuthorizeAsync(string credentials, string token)
+        public async Task<UserCredential> AuthorizeAsync()
         {
             _cts = new CancellationTokenSource();
             _cts.CancelAfter(_timeoutDelay);
+
+            var credentials = GetCredentials();
+            var token = GetToken();
 
             try
             {
@@ -108,6 +95,8 @@ namespace SavescumBuddy
                         "user",
                         _cts.Token,
                         new FileDataStore(token, true));
+
+                    UserCredential = credential;
 
                     return credential;
                 }

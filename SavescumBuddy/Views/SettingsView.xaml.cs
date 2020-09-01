@@ -1,5 +1,4 @@
 ﻿using SavescumBuddy.ViewModels;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -18,9 +17,7 @@ namespace SavescumBuddy.Views
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
             // Disable hotkey recorder.
-            var dc = Application.Current.MainWindow.DataContext;
-            var appVm = dc as ApplicationViewModel;
-            var settingsVm = appVm.ViewModels.OfType<SettingsViewModel>().First();
+            var settingsVm = App.GetService<SettingsViewModel>();
             if (settingsVm.HookIsEnabled)
             {
                 settingsVm.SaveHookIsEnabled = false;

@@ -5,6 +5,7 @@ using Settings = SavescumBuddy.Properties.Settings;
 using SavescumBuddy.Models;
 using SavescumBuddy.MarkupExtensions;
 using SavescumBuddy.Sqlite;
+using SavescumBuddy.ViewModels;
 
 namespace SavescumBuddy
 {
@@ -13,8 +14,6 @@ namespace SavescumBuddy
         private int _progress;
         private DispatcherTimer _backupTimer;
         private DispatcherTimer _progressBarTimer;
-        public event Action<Backup> DeletionRequested;
-        public event Action AdditionRequested;
 
         public int Progress { get => _progress; private set => SetProperty(ref _progress, value); }
 
@@ -70,53 +69,49 @@ namespace SavescumBuddy
         #region SmartAutobackup implementation
         private void SmartAutobackup()
         {
-            if (SqliteDataAccess.GetCurrentGame() is null || ItIsTimeToSkip())
-                return;
+            //if (SqliteDataAccess.GetCurrentGame() is null || ItIsTimeToSkip())
+            //    return;
 
-            var backup = SqliteDataAccess.GetLatestAutobackup();
+            //var backup = SqliteDataAccess.GetLatestAutobackup();
+            //var mainVm = App.GetService<MainViewModel>();
 
-            if (backup is object)
-            {
-                if (PreviousAutobackupShouldBeDeleted(backup))
-                {
-                    DeletionRequested?.Invoke(backup);
-                }
-            }
+            //if (backup is object && PreviousAutobackupShouldBeDeleted(backup))
+            //    mainVm.RemoveCommand.Execute(backup);
 
-            AdditionRequested?.Invoke();
+            //mainVm.AddCommand.Execute();
         }
 
         private bool ItIsTimeToSkip()
         {
-            var lastBackup = SqliteDataAccess.GetLatestBackup();
+            //var lastBackup = SqliteDataAccess.GetLatestBackup();
 
-            if (lastBackup is object)
-            {
-                var timeSinceLastBackup = DateTime.Now - DateTime.Parse(lastBackup.DateTimeTag);
+            //if (lastBackup is object)
+            //{
+            //    var timeSinceLastBackup = DateTime.Now - DateTime.Parse(lastBackup.DateTimeTag);
 
-                if (Settings.Default.Skip.Equals(EnumToCollectionExtension.EnumToDescriptionOrString(SkipOption.FiveMin)))
-                {
-                    return timeSinceLastBackup > TimeSpan.FromMinutes(5d);
-                }
-                else if (Settings.Default.Skip.Equals(EnumToCollectionExtension.EnumToDescriptionOrString(SkipOption.TenMin)))
-                {
-                    return timeSinceLastBackup > TimeSpan.FromMinutes(10d);
-                }
-            }
+            //    if (Settings.Default.Skip.Equals(EnumToCollectionExtension.EnumToDescriptionOrString(SkipOption.FiveMin)))
+            //    {
+            //        return timeSinceLastBackup > TimeSpan.FromMinutes(5d);
+            //    }
+            //    else if (Settings.Default.Skip.Equals(EnumToCollectionExtension.EnumToDescriptionOrString(SkipOption.TenMin)))
+            //    {
+            //        return timeSinceLastBackup > TimeSpan.FromMinutes(10d);
+            //    }
+            //}
 
             return false;
         }
 
         private bool PreviousAutobackupShouldBeDeleted(Backup previous)
         {
-            if (Settings.Default.Overwrite.Equals(EnumToCollectionExtension.EnumToDescriptionOrString(OverwriteOption.Always)))
-            {
-                return true;
-            }
-            else if (Settings.Default.Overwrite.Equals(EnumToCollectionExtension.EnumToDescriptionOrString(OverwriteOption.KeepLiked)))
-            {
-                return !previous.IsLiked.Equals(1);
-            }
+            //if (Settings.Default.Overwrite.Equals(EnumToCollectionExtension.EnumToDescriptionOrString(OverwriteOption.Always)))
+            //{
+            //    return true;
+            //}
+            //else if (Settings.Default.Overwrite.Equals(EnumToCollectionExtension.EnumToDescriptionOrString(OverwriteOption.KeepLiked)))
+            //{
+            //    return !previous.IsLiked.Equals(1);
+            //}
 
             return false;
         }

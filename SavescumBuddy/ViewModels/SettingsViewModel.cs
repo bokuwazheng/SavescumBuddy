@@ -45,7 +45,7 @@ namespace SavescumBuddy.ViewModels
         public string CurrentGameTitle => SqliteDataAccess.GetCurrentGame()?.Title ?? "none";
         public ObservableCollection<GameModel> Games { get; private set; }
 
-        public SettingsViewModel()
+        public SettingsViewModel(IDataAccess dataAccess) : base(dataAccess)
         {
             _keyboardHook = new GlobalKeyboardHook();
             Settings = new SettingsModel();
@@ -66,8 +66,7 @@ namespace SavescumBuddy.ViewModels
 
         private void TryAuthorize()
         {
-            var mode = GoogleDrive.CurrentMode;
-            var tokenFolder = GoogleDrive.GetToken(mode);
+            var tokenFolder = GoogleDrive.GetToken();
             var folderExists = Directory.Exists(tokenFolder);
             if (folderExists)
             {
@@ -221,14 +220,9 @@ namespace SavescumBuddy.ViewModels
 
         private async Task AuthorizeAsync()
         {
-            var mode = GoogleDrive.CurrentMode;
-            var credentials = GoogleDrive.GetCredentials(mode);
-            var token = GoogleDrive.GetToken(mode);
-            var userCredential = await GoogleDrive.Current.AuthorizeAsync(credentials, token).ConfigureAwait(false);
-            if (userCredential is null)
-                return;
-            GoogleDrive.Current.UserCredential = userCredential;
-            await CreateAppRootFolderAsync().ConfigureAwait(false);
+            var userCredential = await GoogleDrive.Current.AuthorizeAsync().ConfigureAwait(false);
+            if (userCredential is object)
+                await CreateAppRootFolderAsync().ConfigureAwait(false);
 
             RaisePropertyChanged(nameof(AuthorizedAs));
         }
