@@ -1,0 +1,10 @@
+﻿<UserControl x:Class="SavescumBuddy.Modules.Main.Views.Settings"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:SavescumBuddy.Modules.Main.Views"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:core="clr-namespace:SavescumBuddy.Core;assembly=SavescumBuddy.Core">
+    <Grid>
+        <TextBlock Text="Settings desu"/>
+    </Grid>
+</UserControl>
