@@ -43,7 +43,7 @@
 
     <!--Main brushes-->
     <SolidColorBrush x:Key="Dark" Color="#FF464646"/>
-    <SolidColorBrush x:Key="Ash" Color="Red"/>
+    <SolidColorBrush x:Key="Ash" Color="#FF7D7D7D"/>
     <SolidColorBrush x:Key="Grayish" Color="#FFB4B4B4"/>
     <SolidColorBrush x:Key="Bright" Color="#FFE6E6E6"/>
     <SolidColorBrush x:Key="SkyBlue" Color="#FF80C8FA"/>

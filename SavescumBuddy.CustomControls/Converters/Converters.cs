@@ -25,7 +25,7 @@ namespace SavescumBuddy.CustomControls.Converters
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => (HotkeyAction)parameter;
     }
 
-    class IntToBoolConverter : IValueConverter
+    public class IntToBoolConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) => value is int val ? val != 0 : (bool?)null;
 
@@ -46,7 +46,7 @@ namespace SavescumBuddy.CustomControls.Converters
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 
-    class InverseExistsToVisibilityConverter : IValueConverter
+    public class InverseExistsToVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
             => File.Exists((string)value) ? Visibility.Collapsed : Visibility.Visible;
