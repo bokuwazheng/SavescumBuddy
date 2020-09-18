@@ -8,7 +8,9 @@
     <PackageReference Include="Prism.Wpf" Version="7.2.0.1422" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\PrismTemplateTest\PrismTemplateTest\Services\PrismTemplateTest.Services\SavescumBuddy.Services.csproj" />
-    <ProjectReference Include="..\..\SavescumBuddyRe\SavescumBuddy\SavescumBuddy.Core\SavescumBuddy.Core.csproj" />
+    <ProjectReference Include="..\SavescumBuddy.Core\SavescumBuddy.Core.csproj" />
+    <ProjectReference Include="..\SavescumBuddy.Data\SavescumBuddy.Data.csproj" />
+    <ProjectReference Include="..\SavescumBuddy.Services.Interfaces\SavescumBuddy.Services.Interfaces.csproj" />
+    <ProjectReference Include="..\SavescumBuddy.Services\SavescumBuddy.Services.csproj" />
   </ItemGroup>
 </Project>

@@ -8,6 +8,6 @@
     <PackageReference Include="Prism.Wpf" Version="7.2.0.1422" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\PrismTemplateTest\PrismTemplateTest.Data\SavescumBuddy.Data.csproj" />
+    <ProjectReference Include="..\SavescumBuddy.Data\SavescumBuddy.Data.csproj" />
   </ItemGroup>
 </Project>

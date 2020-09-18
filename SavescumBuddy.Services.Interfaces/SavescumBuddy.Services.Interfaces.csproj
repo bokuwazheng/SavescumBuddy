@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\PrismTemplateTest.Data\SavescumBuddy.Data.csproj" />
+    <ProjectReference Include="..\SavescumBuddy.Data\SavescumBuddy.Data.csproj" />
   </ItemGroup>
 
 </Project>

@@ -29,10 +29,10 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             RemoveCommand = new DelegateCommand<Backup>(Remove);
             RestoreCommand = new DelegateCommand<Backup>(_eventAggregator.GetEvent<BackupRestoredEvent>().Publish);
 
-            NavigateForwardCommand = new DelegateCommand(() => ++CurrentPageIndex, () => To < TotalNumberOfBackups);
-            NavigateBackwardCommand = new DelegateCommand(() => --CurrentPageIndex, () => From > 1);
-            NavigateToStartCommand = new DelegateCommand(() => CurrentPageIndex = 0, () => From > 1);
-            NavigateToEndCommand = new DelegateCommand(() => CurrentPageIndex = TotalNumberOfBackups / PageSize, () => To < TotalNumberOfBackups);
+            //NavigateForwardCommand = new DelegateCommand(() => ++CurrentPageIndex, () => To < TotalNumberOfBackups);
+            //NavigateBackwardCommand = new DelegateCommand(() => --CurrentPageIndex, () => From > 1);
+            //NavigateToStartCommand = new DelegateCommand(() => CurrentPageIndex = 0, () => From > 1);
+            //NavigateToEndCommand = new DelegateCommand(() => CurrentPageIndex = TotalNumberOfBackups / PageSize, () => To < TotalNumberOfBackups);
 
             //Filter.PropertyChanged += (s, e) => OnFilterPropertyChanged(e.PropertyName);
             UpdateBackupList();
@@ -48,7 +48,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         public DateTime TimeSinceLastBackup { get; private set; }
         //public double Interval => Settings.Default.Interval * 60;
         public bool CurrentGameIsSet => _dataAccess.GetCurrentGame() is object;
-        public int CurrentPageIndex { get => _currentPageIndex; private set => SetProperty(ref _currentPageIndex, value, () => Filter.Offset = value * PageSize); }
+        //public int CurrentPageIndex { get => _currentPageIndex; private set => SetProperty(ref _currentPageIndex, value, () => Filter.Offset = value * PageSize); }
         public Backup SelectedBackup { get => _selectedBackup; set => SetProperty(ref _selectedBackup, value); }
         public BackupSearchRequest Filter { get => _filter ?? (_filter = new BackupSearchRequest()); private set => SetProperty(ref _filter, value); }
         public int TotalNumberOfBackups => _dataAccess.GetTotalNumberOfBackups(Filter);

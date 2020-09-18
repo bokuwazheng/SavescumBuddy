@@ -17,9 +17,7 @@
     <PackageReference Include="Prism.DryIoc" Version="7.2.0.1422" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\PrismTemplateTest\PrismTemplateTest\Services\PrismTemplateTest.Services.Interfaces\SavescumBuddy.Services.Interfaces.csproj" />
-    <ProjectReference Include="..\..\..\PrismTemplateTest\PrismTemplateTest\Services\PrismTemplateTest.Services\SavescumBuddy.Services.csproj" />
-    <ProjectReference Include="..\..\..\SavescumBuddy\SavescumBuddy.Modules.Main\SavescumBuddy.Modules.Main.csproj" />
     <ProjectReference Include="..\SavescumBuddy.Core\SavescumBuddy.Core.csproj" />
+    <ProjectReference Include="..\SavescumBuddy.Modules.Main\SavescumBuddy.Modules.Main.csproj" />
   </ItemGroup>
 </Project>

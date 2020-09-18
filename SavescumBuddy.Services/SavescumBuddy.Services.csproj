@@ -10,8 +10,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\PrismTemplateTest.Data\SavescumBuddy.Data.csproj" />
-    <ProjectReference Include="..\PrismTemplateTest.Services.Interfaces\SavescumBuddy.Services.Interfaces.csproj" />
+    <ProjectReference Include="..\SavescumBuddy.Data\SavescumBuddy.Data.csproj" />
+    <ProjectReference Include="..\SavescumBuddy.Services.Interfaces\SavescumBuddy.Services.Interfaces.csproj" />
   </ItemGroup>
 
 </Project>

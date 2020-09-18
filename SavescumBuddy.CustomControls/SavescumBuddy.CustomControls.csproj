@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\SavescumBuddyRe\SavescumBuddy\SavescumBuddy.Core\SavescumBuddy.Core.csproj" />
+    <ProjectReference Include="..\SavescumBuddy.Core\SavescumBuddy.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
