@@ -16,7 +16,7 @@ namespace SavescumBuddy.Services
         }
 
         #region Backup table methods
-        public int GetTotalNumberOfBackups(BackupSearchRequest request)
+        public int GetTotalNumberOfBackups(IBackupSearchRequest request)
         {
             var isLiked = request.LikedOnly ? "1" : "0";
             var isAutobackup = request.HideAutobackups ? "0" : "1";
@@ -56,7 +56,7 @@ namespace SavescumBuddy.Services
             return _sqlService.ExecuteScalar<int>(sql, args);
         }
 
-        public List<Backup> SearchBackups(BackupSearchRequest request)
+        public List<Backup> SearchBackups(IBackupSearchRequest request)
         {
             var isLiked = request.LikedOnly ? "1" : "0";
             var isAutobackup = request.HideAutobackups ? "0" : "1";
@@ -68,7 +68,7 @@ namespace SavescumBuddy.Services
                 queryBuilder.Append("(b.Note like @LC or b.Note like @UC) and ");
             queryBuilder.Append("b.IsLiked >= @IsLiked and b.IsAutobackup <= @IsAutobackup ");
             if (request.CurrentOnly)
-                queryBuilder.Append("and b.GameId = (select g.Title from [Game] g where g.IsCurrent = 1) ");
+                queryBuilder.Append("and b.GameId = (select g.Id from [Game] g where g.IsCurrent = 1) ");
             queryBuilder.Append($"order by b.Id { request.Order } limit { request.Limit } offset { request.Offset }");
 
             var sql = queryBuilder.ToString();
@@ -97,9 +97,55 @@ namespace SavescumBuddy.Services
             return _sqlService.Query<Backup>(sql, args);
         }
 
+        public List<Backup> LoadBackups()
+        {
+            //var queryBuilder = new StringBuilder();
+            //queryBuilder.Append("select * from [Backup] b where ");
+            //if (!string.IsNullOrWhiteSpace(note))
+            //    queryBuilder.Append("(b.Note like @LC or b.Note like @UC) and ");
+            //queryBuilder.Append("b.IsLiked >= @IsLiked and b.IsAutobackup <= @IsAutobackup ");
+            //if (request.CurrentOnly)
+            //    queryBuilder.Append("and b.GameId = (select g.Title from [Game] g where g.IsCurrent = 1) ");
+            //queryBuilder.Append($"order by b.Id { request.Order } limit { request.Limit } offset { request.Offset }");
+
+            //var query = $@"SELECT * 
+            //    FROM 
+            //    [Backup] b
+            //    LEFT JOIN [Game] g ON Backup.GameId = Game.Id
+            //    LEFT JOIN [Filter] f ON Filter.
+            //    WHERE 
+            //    ";
+
+            //var sql = queryBuilder.ToString();
+
+            //object args;
+
+            //if (string.IsNullOrWhiteSpace(request.Note))
+            //{
+            //    args = new
+            //    {
+            //        IsLiked = isLiked,
+            //        IsAutobackup = isAutobackup
+            //    };
+            //}
+            //else
+            //{
+            //    args = new
+            //    {
+            //        LC = "%" + note.ToLower() + "%",
+            //        UC = "%" + note.ToUpper() + "%",
+            //        IsLiked = isLiked,
+            //        IsAutobackup = isAutobackup
+            //    };
+            //}
+
+            //return _sqlService.Query<Backup>(sql, args);
+            return null;
+        }
+
         public void SaveBackup(Backup backup)
         {
-            _sqlService.Execute("insert into Backup (GameId, DateTimeTag, Picture, Origin, FilePath, IsAutobackup) values (@GameId, @DateTimeTag, @Picture, @Origin, @FilePath, @IsAutobackup)", backup);
+            _sqlService.Execute("insert into Backup (GameId, TimeStamp, PicturePath, OriginPath, SavefilePath, IsAutobackup) values (@GameId, @TimeStamp, @PicturePath, @OriginPath, @SavefilePath, @IsAutobackup)", backup);
         }
 
         public void RemoveBackup(Backup backup)
@@ -134,12 +180,12 @@ namespace SavescumBuddy.Services
 
         public void UpdateDriveId(Backup backup)
         {
-            _sqlService.Execute("update Backup set DriveId = @DriveId where Id = @Id;", new { Id = backup.Id, DriveId = backup.DriveId });
+            _sqlService.Execute("update Backup set GoogleDriveId = @GoogleDriveId where Id = @Id;", new { Id = backup.Id, DriveId = backup.GoogleDriveId });
         }
 
         public void UpdateFilePaths(Backup backup)
         {
-            _sqlService.Execute("update Backup set FilePath = @FilePath, Picture = @Picture where Id = @Id;", new { FilePath = backup.FilePath, Picture = backup.Picture, Id = backup.Id });
+            _sqlService.Execute("update Backup set FilePath = @FilePath, Picture = @Picture where Id = @Id;", new { FilePath = backup.SavefilePath, Picture = backup.PicturePath, Id = backup.Id });
         }
         #endregion
 
@@ -172,8 +218,8 @@ namespace SavescumBuddy.Services
 
         public void UpdateGame(Game game)
         {
-            _sqlService.Execute("update Game set Title = @Title, SavefilePath = @SavefilePath, BackupFolder = @BackupFolder, CanBeSetCurrent = @CanBeSetCurrent where Id = @Id;",
-                new { Id = game.Id, Title = game.Title, SavefilePath = game.SavefilePath, BackupFolder = game.BackupFolder, CanBeSetCurrent = 1 });
+            _sqlService.Execute("update Game set Title = @Title, SavefilePath = @SavefilePath, BackupFolder = @BackupFolder where Id = @Id;",
+                new { Id = game.Id, Title = game.Title, SavefilePath = game.SavefilePath, BackupFolder = game.BackupFolder});
         }
         #endregion
     }

@@ -1,5 +1,8 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Windows.Markup;
 
 namespace SavescumBuddy.Core.Extensions
 {
@@ -20,5 +23,33 @@ namespace SavescumBuddy.Core.Extensions
                     return false;
             }
         }
+
+        public static bool EqualsEnumDescription(this string description, Enum value)
+            => description == value.ToDescriptionOrString();
+
+        public static string ToWindowsFriendlyFormat(this DateTime dateTime)
+            => dateTime.ToString("dd.MM.yyyy--HH.mm.ss");
+
+        public static string ToUserFriendlyFormat(this DateTime dateTime, IFormatProvider formatProvider)
+            => dateTime.ToString("MMM dd, yyyy h:mm:ss tt", formatProvider);
+    }
+
+    public static class EnumExtensions
+    {
+        public static string ToDescriptionOrString(this Enum value)
+            => value.GetType().GetField(value.ToString())
+                        .GetCustomAttributes(typeof(DescriptionAttribute), false)
+                        .Cast<DescriptionAttribute>()
+                        .FirstOrDefault()?.Description ?? value.ToString();
+    }
+
+    public class EnumToCollectionExtension : MarkupExtension
+    {
+        public Type EnumType { get; set; }
+
+        public override object ProvideValue(IServiceProvider serviceProvider)
+            => EnumType is null
+            ? throw new ArgumentNullException(nameof(EnumType))
+            : Enum.GetValues(EnumType).Cast<Enum>().Select(x => x.ToDescriptionOrString());
     }
 }

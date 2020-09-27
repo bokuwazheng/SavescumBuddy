@@ -8,12 +8,22 @@
     <PackageReference Include="Prism.Wpf" Version="7.2.0.1422" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\SavescumBuddyRe\SavescumBuddy\SavescumBuddy.Core\SavescumBuddy.Core.csproj" />
-    <ProjectReference Include="..\SavescumBuddy.Core\SavescumBuddy.Core.csproj" />
     <ProjectReference Include="..\SavescumBuddy.CustomControls\SavescumBuddy.CustomControls.csproj" />
     <ProjectReference Include="..\SavescumBuddy.Data\SavescumBuddy.Data.csproj" />
-    <ProjectReference Include="..\SavescumBuddy.Modules.List\SavescumBuddy.Modules.List.csproj" />
     <ProjectReference Include="..\SavescumBuddy.Services.Interfaces\SavescumBuddy.Services.Interfaces.csproj" />
     <ProjectReference Include="..\SavescumBuddy.Services\SavescumBuddy.Services.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 </Project>

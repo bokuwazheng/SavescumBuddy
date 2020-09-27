@@ -6,6 +6,7 @@ using SavescumBuddy.Services.Interfaces;
 using SavescumBuddy.Services;
 using SavescumBuddy.Modules.Main;
 using System;
+using DryIoc;
 
 namespace SavescumBuddy
 {
@@ -21,8 +22,11 @@ namespace SavescumBuddy
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            //containerRegistry.RegisterSingleton<IMessageService, MessageService>();
-            containerRegistry.RegisterInstance<IDataAccess>(new SqliteDataAccess(new SqliteDbService(LoadConnectionString())));
+            containerRegistry
+                .RegisterInstance<IDataAccess>(new SqliteDataAccess(new SqliteDbService(LoadConnectionString())))
+                .Register<IOpenFileService, OpenFileService>()
+                .Register<IBackupService, BackupService>()
+                .Register<IBackupFactory, BackupFactory>();
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)

@@ -40,7 +40,7 @@ namespace SavescumBuddy.Modules.List.ViewModels
             _eventAggregator.GetEvent<BackupListChangedEvent>().Publish();
         }
 
-        private void OnBackupFilterChanged(BackupSearchRequest request)
+        private void OnBackupFilterChanged(IBackupSearchRequest request)
         {
             Backups = _dataAccess.SearchBackups(request);
         }

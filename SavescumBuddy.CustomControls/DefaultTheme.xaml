@@ -588,7 +588,7 @@
             <AdornedElementPlaceholder/>
             <TextBlock Foreground="#FFE20944" FontSize="12" Margin="5,0,0,0">
                     <Run Text="&#xEB90;" FontFamily="Segoe MDL2 Assets" FontSize="10"/>
-                    <Run Text="Selected directory either doesn't exist or isn't writable..."/>
+                    <Run Text="Selected path either doesn't exist or isn't writable..."/>
             </TextBlock>
         </StackPanel>
     </ControlTemplate>

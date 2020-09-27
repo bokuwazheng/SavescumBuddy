@@ -2,7 +2,7 @@
 
 namespace SavescumBuddy.Services.Interfaces
 {
-    public interface IFileHelper
+    public interface IBackupService
     {
         void BackupSavefile(Backup backup);
         void SaveScreenshot(string filePath);

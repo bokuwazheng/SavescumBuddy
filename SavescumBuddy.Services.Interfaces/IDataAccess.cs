@@ -5,8 +5,9 @@ namespace SavescumBuddy.Services.Interfaces
 {
     public interface IDataAccess
     {
-        int GetTotalNumberOfBackups(BackupSearchRequest request);
-        List<Backup> SearchBackups(BackupSearchRequest request);
+        int GetTotalNumberOfBackups(IBackupSearchRequest request);
+        List<Backup> SearchBackups(IBackupSearchRequest request);
+        List<Backup> LoadBackups();
         void SaveBackup(Backup backup);
         void RemoveBackup(Backup backup);
         Backup GetBackup(Backup backup);

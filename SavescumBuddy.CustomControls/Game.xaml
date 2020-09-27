@@ -10,7 +10,6 @@
              d:DesignHeight="250" d:DesignWidth="485">
 
     <UserControl.Resources>
-
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.CustomControls;component/DefaultTheme.xaml"/>
@@ -67,7 +66,8 @@
         <Border BorderThickness="0,0,0,1" BorderBrush="#FFF0F0F0" Grid.ColumnSpan="3" Grid.Row="5"/>
         <!--Delete button-->
         <Button FontFamily="Segoe MDL2 Assets" Content="&#xE711;" FontSize="14" Grid.Column="2" Grid.Row="0" Cursor="Hand"
-                HorizontalAlignment="Right" VerticalAlignment="Center" Margin="2" Command="{Binding RemoveGameCommand}" ToolTip="Delete">
+                HorizontalAlignment="Right" VerticalAlignment="Center" Margin="2" 
+                Command="{Binding DataContext.RemoveGameCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" ToolTip="Delete">
             <Button.Style >
                 <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
                     <Style.Triggers>

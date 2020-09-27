@@ -5,6 +5,8 @@ using Prism.Regions;
 using SavescumBuddy.Core;
 using SavescumBuddy.Core.Events;
 using SavescumBuddy.Data;
+using SavescumBuddy.Modules.Main.Models;
+using SavescumBuddy.Modules.Main.Properties;
 using SavescumBuddy.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -16,91 +18,95 @@ namespace SavescumBuddy.Modules.Main.ViewModels
     {
         private readonly IRegionManager _regionManager;
         private readonly IDataAccess _dataAccess;
-        private readonly IFileHelper _fileHelper;
         private readonly IEventAggregator _eventAggregator;
+        private readonly IBackupService _backupService;
+        private readonly IBackupFactory _backupFactory;
 
-        public BackupsViewModel(IRegionManager regionManager, IDataAccess dataAccess, IFileHelper fileHelper, IEventAggregator eventAggregator)
+        public BackupsViewModel(IRegionManager regionManager, IDataAccess dataAccess, IEventAggregator eventAggregator, IBackupService backupService, IBackupFactory backupFactory)
         {
             _regionManager = regionManager;
             _dataAccess = dataAccess;
             _eventAggregator = eventAggregator;
+            _backupService = backupService;
+            _backupFactory = backupFactory;
 
             AddCommand = new DelegateCommand(Add);
             RemoveCommand = new DelegateCommand<Backup>(Remove);
-            RestoreCommand = new DelegateCommand<Backup>(_eventAggregator.GetEvent<BackupRestoredEvent>().Publish);
+            RestoreCommand = new DelegateCommand<Backup>(_backupService.RestoreBackup);
 
-            //NavigateForwardCommand = new DelegateCommand(() => ++CurrentPageIndex, () => To < TotalNumberOfBackups);
-            //NavigateBackwardCommand = new DelegateCommand(() => --CurrentPageIndex, () => From > 1);
-            //NavigateToStartCommand = new DelegateCommand(() => CurrentPageIndex = 0, () => From > 1);
-            //NavigateToEndCommand = new DelegateCommand(() => CurrentPageIndex = TotalNumberOfBackups / PageSize, () => To < TotalNumberOfBackups);
+            NavigateForwardCommand = new DelegateCommand(() => ++CurrentPageIndex, () => To < TotalNumberOfBackups);
+            NavigateBackwardCommand = new DelegateCommand(() => --CurrentPageIndex, () => From > 1);
+            NavigateToStartCommand = new DelegateCommand(() => CurrentPageIndex = 0, () => From > 1);
+            NavigateToEndCommand = new DelegateCommand(() => CurrentPageIndex = TotalNumberOfBackups / PageSize, () => To < TotalNumberOfBackups);
 
-            //Filter.PropertyChanged += (s, e) => OnFilterPropertyChanged(e.PropertyName);
+            NavigateToSettingsCommand = new DelegateCommand(() => _regionManager.RequestNavigate(RegionNames.ContentRegion, "Settings"));
+
+            Filter.PropertyChanged += (s, e) => OnFilterPropertyChanged(e.PropertyName);
             UpdateBackupList();
         }
 
         // Backing fields
-        private BackupSearchRequest _filter;
+        private FilterModel _filter;
         private Backup _selectedBackup;
         private int _currentPageIndex;
 
         // Properties
         public List<Backup> Backups { get; private set; }
         public DateTime TimeSinceLastBackup { get; private set; }
-        //public double Interval => Settings.Default.Interval * 60;
         public bool CurrentGameIsSet => _dataAccess.GetCurrentGame() is object;
-        //public int CurrentPageIndex { get => _currentPageIndex; private set => SetProperty(ref _currentPageIndex, value, () => Filter.Offset = value * PageSize); }
+        public int CurrentPageIndex { get => _currentPageIndex; private set => SetProperty(ref _currentPageIndex, value, () => Filter.Offset = value * PageSize); }
         public Backup SelectedBackup { get => _selectedBackup; set => SetProperty(ref _selectedBackup, value); }
-        public BackupSearchRequest Filter { get => _filter ?? (_filter = new BackupSearchRequest()); private set => SetProperty(ref _filter, value); }
+        public FilterModel Filter { get => _filter ??= new FilterModel(); private set => SetProperty(ref _filter, value); }
         public int TotalNumberOfBackups => _dataAccess.GetTotalNumberOfBackups(Filter);
-        //public int PageSize => Settings.Default.BackupsPerPage;
+        public int PageSize => Settings.Default.BackupsPerPage;
         public int From => Backups.Count > 0 ? Filter.Offset.Value + 1 : 0;
         public int To => Filter.Offset.Value + Backups.Count;
 
-        //#region Sorting options
-        //public bool LikedOnly
-        //{
-        //    get => Settings.Default.LikedOnly;
-        //    set
-        //    {
-        //        Settings.Default.LikedOnly = value;
-        //        Filter.LikedOnly = value;
-        //        RaisePropertyChanged(nameof(LikedOnly));
-        //    }
-        //}
+        #region Sorting options
+        public bool LikedOnly
+        {
+            get => Settings.Default.LikedOnly;
+            set
+            {
+                Settings.Default.LikedOnly = value;
+                Filter.LikedOnly = value;
+                RaisePropertyChanged(nameof(LikedOnly));
+            }
+        }
 
-        //public bool HideAutobackups
-        //{
-        //    get => Settings.Default.HideAutobackups;
-        //    set
-        //    {
-        //        Settings.Default.HideAutobackups = value;
-        //        Filter.HideAutobackups = value;
-        //        RaisePropertyChanged(nameof(HideAutobackups));
-        //    }
-        //}
+        public bool HideAutobackups
+        {
+            get => Settings.Default.HideAutobackups;
+            set
+            {
+                Settings.Default.HideAutobackups = value;
+                Filter.HideAutobackups = value;
+                RaisePropertyChanged(nameof(HideAutobackups));
+            }
+        }
 
-        //public bool CurrentOnly
-        //{
-        //    get => Settings.Default.CurrentOnly;
-        //    set
-        //    {
-        //        Settings.Default.CurrentOnly = value;
-        //        Filter.CurrentOnly = value;
-        //        RaisePropertyChanged(nameof(CurrentOnly));
-        //    }
-        //}
+        public bool CurrentOnly
+        {
+            get => Settings.Default.CurrentOnly;
+            set
+            {
+                Settings.Default.CurrentOnly = value;
+                Filter.CurrentOnly = value;
+                RaisePropertyChanged(nameof(CurrentOnly));
+            }
+        }
 
-        //public bool OrderByDesc
-        //{
-        //    get => Settings.Default.OrderByDesc;
-        //    set
-        //    {
-        //        Settings.Default.OrderByDesc = value;
-        //        Filter.Order = value ? "desc" : "asc";
-        //        RaisePropertyChanged(nameof(OrderByDesc));
-        //    }
-        //}
-        //#endregion
+        public bool OrderByDesc
+        {
+            get => Settings.Default.OrderByDesc;
+            set
+            {
+                Settings.Default.OrderByDesc = value;
+                Filter.Order = value ? "desc" : "asc";
+                RaisePropertyChanged(nameof(OrderByDesc));
+            }
+        }
+        #endregion
 
         private void OnFilterPropertyChanged(string propName)
         {
@@ -123,11 +129,10 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             if (now - TimeSinceLastBackup > TimeSpan.FromSeconds(1d))
             {
                 TimeSinceLastBackup = now;
-                var backup = new Backup();
+                var backup = _backupFactory.CreateBackup();
                 _dataAccess.SaveBackup(backup);
-                //_fileHelper.BackupSavefile(backup);
-                //_fileHelper.SaveScreenshot(backup.Picture);
-                _eventAggregator.GetEvent<BackupCreatedEvent>().Publish(backup);
+                _backupService.BackupSavefile(backup);
+                _backupService.SaveScreenshot(backup.PicturePath);
                 UpdateBackupList();
             }
         }
@@ -137,8 +142,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             if (backup is null)
                 return;
             _dataAccess.RemoveBackup(backup);
-            //_fileHelper.DeleteFiles(backup);
-            _eventAggregator.GetEvent<BackupDeletedEvent>().Publish(backup);
+            _backupService.DeleteFiles(backup);
             UpdateBackupList();
         }
 
@@ -159,5 +163,6 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         public DelegateCommand NavigateBackwardCommand { get; }
         public DelegateCommand NavigateToEndCommand { get; }
         public DelegateCommand NavigateToStartCommand { get; }
+        public DelegateCommand NavigateToSettingsCommand { get; }
     }
 }
