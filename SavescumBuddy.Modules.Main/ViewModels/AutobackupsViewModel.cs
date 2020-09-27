@@ -1,0 +1,139 @@
+﻿using Prism.Events;
+using Prism.Mvvm;
+using Prism.Regions;
+using SavescumBuddy.Core.Enums;
+using SavescumBuddy.Core.Events;
+using SavescumBuddy.Core.Extensions;
+using SavescumBuddy.Data;
+using SavescumBuddy.Services.Interfaces;
+using System;
+using System.Windows.Threading;
+
+namespace SavescumBuddy.Modules.Main.ViewModels
+{
+    public class AutobackupsViewModel : BindableBase
+    {
+        private readonly IRegionManager _regionManager;
+        private readonly IDataAccess _dataAccess;
+        private readonly ISettingsAccess _settingsAccess;
+        private readonly IEventAggregator _eventAggregator;
+        private readonly IBackupService _backupService;
+
+        private int _progress;
+        private DispatcherTimer _backupTimer;
+        private DispatcherTimer _progressBarTimer;
+
+        public int Progress { get => _progress; private set => SetProperty(ref _progress, value); }
+
+        public AutobackupsViewModel(IRegionManager regionManager, IDataAccess dataAccess, ISettingsAccess settingsAccess, IEventAggregator eventAggregator, IBackupService backupService)
+        {
+            _regionManager = regionManager;
+            _dataAccess = dataAccess;
+            _settingsAccess = settingsAccess;
+            _eventAggregator = eventAggregator;
+            _backupService = backupService;
+
+            // If false puts the timer on pause.
+            var isEnabled = _settingsAccess.AutobackupsEnabled;
+
+            _backupTimer = new DispatcherTimer();
+            _backupTimer.Interval = TimeSpan.FromMinutes(_settingsAccess.AutobackupInterval);
+            _backupTimer.Tick += (s, ea) => { Autobackup(); Progress = 0; };
+            _backupTimer.Start();
+            _backupTimer.IsEnabled = isEnabled;
+
+            _progressBarTimer = new DispatcherTimer();
+            _progressBarTimer.Interval = TimeSpan.FromSeconds(1);
+            _progressBarTimer.Tick += (s, ea) => Progress++;
+            _progressBarTimer.Start();
+            _progressBarTimer.IsEnabled = isEnabled;
+
+            _eventAggregator.GetEvent<AutobackupIntervalChangedEvent>().Subscribe(OnIntervalChanged);
+            _eventAggregator.GetEvent<AutobackupsEnabledChangedEvent>().Subscribe(OnIsEnabledChanged);
+        }
+
+        private void Start()
+        {
+            _backupTimer.Interval = TimeSpan.FromMinutes(_settingsAccess.AutobackupInterval);
+            _backupTimer.Start();
+            _progressBarTimer.Start();
+        }
+
+        private void Stop()
+        {
+            _backupTimer.Stop();
+            _progressBarTimer.Stop();
+            Progress = 0;
+        }
+
+        public void OnIsEnabledChanged(bool isEnabled)
+        {
+            if (isEnabled)
+                Start();
+            else
+                Stop();
+        }
+
+        public void OnIntervalChanged(bool isEnabled)
+        {
+            if (isEnabled)
+            {
+                Stop();
+                Start();
+            }
+        }
+
+        private void Autobackup()
+        {
+            if (_dataAccess.GetCurrentGame() is null || ItIsTimeToSkip())
+                return;
+
+            var backup = _dataAccess.GetLatestAutobackup();
+
+            if (backup is object)
+            {
+                if (PreviousAutobackupShouldBeDeleted(backup))
+                {
+                    _eventAggregator.GetEvent<BackupDeletionRequestedEvent>().Publish(backup);
+                }
+            }
+
+            _eventAggregator.GetEvent<BackupCreationRequestedEvent>().Publish(backup);
+        }
+
+        private bool ItIsTimeToSkip()
+        {
+            var lastBackup = _dataAccess.GetLatestBackup();
+
+            if (lastBackup is object)
+            {
+                var timeSinceLastBackup = DateTime.Now - DateTime.Parse(lastBackup.TimeStamp);
+
+                if (_settingsAccess.AutobackupSkipType.EqualsEnumDescription(SkipOption.FiveMin))
+                {
+                    return timeSinceLastBackup > TimeSpan.FromMinutes(5d);
+                }
+                else if (_settingsAccess.AutobackupSkipType.EqualsEnumDescription(SkipOption.TenMin))
+                {
+                    return timeSinceLastBackup > TimeSpan.FromMinutes(10d);
+                }
+            }
+
+            return false;
+        }
+
+        private bool PreviousAutobackupShouldBeDeleted(Backup previous)
+        {
+            if (_settingsAccess.AutobackupOverwriteType.EqualsEnumDescription(OverwriteOption.Always))
+            {
+                return true;
+            }
+            else if (_settingsAccess.AutobackupOverwriteType.EqualsEnumDescription(OverwriteOption.KeepLiked))
+            {
+                return !previous.IsLiked.Equals(1);
+            }
+
+            return false;
+        }
+    }
+}

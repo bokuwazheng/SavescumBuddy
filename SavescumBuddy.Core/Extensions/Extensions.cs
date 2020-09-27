@@ -26,12 +26,6 @@ namespace SavescumBuddy.Core.Extensions
 
         public static bool EqualsEnumDescription(this string description, Enum value)
             => description == value.ToDescriptionOrString();
-
-        public static string ToWindowsFriendlyFormat(this DateTime dateTime)
-            => dateTime.ToString("dd.MM.yyyy--HH.mm.ss");
-
-        public static string ToUserFriendlyFormat(this DateTime dateTime, IFormatProvider formatProvider)
-            => dateTime.ToString("MMM dd, yyyy h:mm:ss tt", formatProvider);
     }
 
     public static class EnumExtensions
@@ -41,6 +35,15 @@ namespace SavescumBuddy.Core.Extensions
                         .GetCustomAttributes(typeof(DescriptionAttribute), false)
                         .Cast<DescriptionAttribute>()
                         .FirstOrDefault()?.Description ?? value.ToString();
+    }
+
+    public static class DateTimeExtensions
+    {
+        public static string ToWindowsFriendlyFormat(this DateTime dateTime)
+            => dateTime.ToString("dd.MM.yyyy--HH.mm.ss");
+
+        public static string ToUserFriendlyFormat(this DateTime dateTime, IFormatProvider formatProvider)
+            => dateTime.ToString("MMM dd, yyyy h:mm:ss tt", formatProvider);
     }
 
     public class EnumToCollectionExtension : MarkupExtension

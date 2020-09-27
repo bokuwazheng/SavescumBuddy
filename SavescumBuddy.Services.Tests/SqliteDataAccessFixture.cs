@@ -15,6 +15,7 @@ namespace SavescumBuddy.Services.Tests
         //Mock<IDataAccess> _dataAccess;
         //Mock<ISqliteDbService> _sqliteDbService;
         IDataAccess _dataAccess;
+        ISettingsAccess _settingsAccess;
 
         public SqliteDataAccessFixture()
         {
@@ -24,6 +25,16 @@ namespace SavescumBuddy.Services.Tests
             var user = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             var path = Path.Combine(user, "source\\repos\\SavescumBuddy\\SavescumBuddy.Services.Tests\\DB.db;Version=3;");
             _dataAccess = new SqliteDataAccess(new SqliteDbService($"Data Source={ path }"));
+            _settingsAccess = new SqliteSettingsAccess(new SqliteDbService($"Data Source={ path }"));
+        }
+
+        [Fact]
+        public void AutobackupIntervalIsNotNull()
+        {
+            var penis = 42069;
+            _settingsAccess.AutobackupInterval = penis;
+           var hueta = _settingsAccess.AutobackupInterval;
+            Assert.True(hueta == penis);
         }
 
         [Fact]

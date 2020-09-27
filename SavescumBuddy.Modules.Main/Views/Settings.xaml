@@ -7,6 +7,7 @@
              xmlns:core="clr-namespace:SavescumBuddy.Core;assembly=SavescumBuddy.Core"
              xmlns:enums="clr-namespace:SavescumBuddy.Core.Enums;assembly=SavescumBuddy.Core"
              xmlns:ext="clr-namespace:SavescumBuddy.Core.Extensions;assembly=SavescumBuddy.Core"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:controls="clr-namespace:SavescumBuddy.CustomControls;assembly=SavescumBuddy.CustomControls"
              prism:ViewModelLocator.AutoWireViewModel="True">
     
@@ -170,8 +171,7 @@
                         <TextBlock Text="Interval:" Grid.Column="0" Margin="0,0,10,0" VerticalAlignment="Center" HorizontalAlignment="Right" Grid.Row="0"/>
                         <TextBlock Text="Skip:" Grid.Column="0" Margin="0,0,10,0" VerticalAlignment="Center" HorizontalAlignment="Right" Grid.Row="1"/>
                         <TextBlock Text="Overwrite:" Grid.Column="0"  Margin="0,0,10,0" VerticalAlignment="Center" Grid.Row="2"/>
-                        <ComboBox Grid.Column="1" Grid.Row="0" Height="28" Foreground="{StaticResource Ash}"
-                                  SelectedItem="{Binding Settings.SelectedInterval}">
+                        <ComboBox Grid.Column="1" Grid.Row="0" Height="28" Foreground="{StaticResource Ash}" SelectedItem="{Binding Settings.SelectedInterval}">
                             <sys:String>5 min</sys:String>
                             <sys:String>10 min</sys:String>
                             <sys:String>15 min</sys:String>

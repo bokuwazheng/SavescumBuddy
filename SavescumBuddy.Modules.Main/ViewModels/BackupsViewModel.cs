@@ -2,15 +2,12 @@
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
-using SavescumBuddy.Core;
 using SavescumBuddy.Core.Events;
 using SavescumBuddy.Data;
 using SavescumBuddy.Modules.Main.Models;
-using SavescumBuddy.Modules.Main.Properties;
 using SavescumBuddy.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
@@ -18,14 +15,16 @@ namespace SavescumBuddy.Modules.Main.ViewModels
     {
         private readonly IRegionManager _regionManager;
         private readonly IDataAccess _dataAccess;
+        private readonly ISettingsAccess _settingsAccess;
         private readonly IEventAggregator _eventAggregator;
         private readonly IBackupService _backupService;
         private readonly IBackupFactory _backupFactory;
 
-        public BackupsViewModel(IRegionManager regionManager, IDataAccess dataAccess, IEventAggregator eventAggregator, IBackupService backupService, IBackupFactory backupFactory)
+        public BackupsViewModel(IRegionManager regionManager, IDataAccess dataAccess, ISettingsAccess settingsAccess, IEventAggregator eventAggregator, IBackupService backupService, IBackupFactory backupFactory)
         {
             _regionManager = regionManager;
             _dataAccess = dataAccess;
+            _settingsAccess = settingsAccess;
             _eventAggregator = eventAggregator;
             _backupService = backupService;
             _backupFactory = backupFactory;
@@ -39,7 +38,6 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             NavigateToStartCommand = new DelegateCommand(() => CurrentPageIndex = 0, () => From > 1);
             NavigateToEndCommand = new DelegateCommand(() => CurrentPageIndex = TotalNumberOfBackups / PageSize, () => To < TotalNumberOfBackups);
 
-            NavigateToSettingsCommand = new DelegateCommand(() => _regionManager.RequestNavigate(RegionNames.ContentRegion, "Settings"));
 
             Filter.PropertyChanged += (s, e) => OnFilterPropertyChanged(e.PropertyName);
             UpdateBackupList();
@@ -58,54 +56,54 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         public Backup SelectedBackup { get => _selectedBackup; set => SetProperty(ref _selectedBackup, value); }
         public FilterModel Filter { get => _filter ??= new FilterModel(); private set => SetProperty(ref _filter, value); }
         public int TotalNumberOfBackups => _dataAccess.GetTotalNumberOfBackups(Filter);
-        public int PageSize => Settings.Default.BackupsPerPage;
+        public int PageSize => 10; // _settingsAccess.BackupsPerPage
         public int From => Backups.Count > 0 ? Filter.Offset.Value + 1 : 0;
         public int To => Filter.Offset.Value + Backups.Count;
 
         #region Sorting options
-        public bool LikedOnly
-        {
-            get => Settings.Default.LikedOnly;
-            set
-            {
-                Settings.Default.LikedOnly = value;
-                Filter.LikedOnly = value;
-                RaisePropertyChanged(nameof(LikedOnly));
-            }
-        }
+        //public bool LikedOnly
+        //{
+        //    get => Settings.Default.LikedOnly;
+        //    set
+        //    {
+        //        Settings.Default.LikedOnly = value;
+        //        Filter.LikedOnly = value;
+        //        RaisePropertyChanged(nameof(LikedOnly));
+        //    }
+        //}
 
-        public bool HideAutobackups
-        {
-            get => Settings.Default.HideAutobackups;
-            set
-            {
-                Settings.Default.HideAutobackups = value;
-                Filter.HideAutobackups = value;
-                RaisePropertyChanged(nameof(HideAutobackups));
-            }
-        }
+        //public bool HideAutobackups
+        //{
+        //    get => Settings.Default.HideAutobackups;
+        //    set
+        //    {
+        //        Settings.Default.HideAutobackups = value;
+        //        Filter.HideAutobackups = value;
+        //        RaisePropertyChanged(nameof(HideAutobackups));
+        //    }
+        //}
 
-        public bool CurrentOnly
-        {
-            get => Settings.Default.CurrentOnly;
-            set
-            {
-                Settings.Default.CurrentOnly = value;
-                Filter.CurrentOnly = value;
-                RaisePropertyChanged(nameof(CurrentOnly));
-            }
-        }
+        //public bool CurrentOnly
+        //{
+        //    get => Settings.Default.CurrentOnly;
+        //    set
+        //    {
+        //        Settings.Default.CurrentOnly = value;
+        //        Filter.CurrentOnly = value;
+        //        RaisePropertyChanged(nameof(CurrentOnly));
+        //    }
+        //}
 
-        public bool OrderByDesc
-        {
-            get => Settings.Default.OrderByDesc;
-            set
-            {
-                Settings.Default.OrderByDesc = value;
-                Filter.Order = value ? "desc" : "asc";
-                RaisePropertyChanged(nameof(OrderByDesc));
-            }
-        }
+        //public bool OrderByDesc
+        //{
+        //    get => Settings.Default.OrderByDesc;
+        //    set
+        //    {
+        //        Settings.Default.OrderByDesc = value;
+        //        Filter.Order = value ? "desc" : "asc";
+        //        RaisePropertyChanged(nameof(OrderByDesc));
+        //    }
+        //}
         #endregion
 
         private void OnFilterPropertyChanged(string propName)
@@ -125,35 +123,56 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
         private void Add()
         {
-            var now = DateTime.Now;
-            if (now - TimeSinceLastBackup > TimeSpan.FromSeconds(1d))
+            try
             {
-                TimeSinceLastBackup = now;
-                var backup = _backupFactory.CreateBackup();
-                _dataAccess.SaveBackup(backup);
-                _backupService.BackupSavefile(backup);
-                _backupService.SaveScreenshot(backup.PicturePath);
-                UpdateBackupList();
+                var now = DateTime.Now;
+                if (now - TimeSinceLastBackup > TimeSpan.FromSeconds(1d))
+                {
+                    TimeSinceLastBackup = now;
+                    var backup = _backupFactory.CreateBackup();
+                    _dataAccess.SaveBackup(backup);
+                    _backupService.BackupSavefile(backup);
+                    _backupService.SaveScreenshot(backup.PicturePath);
+                    UpdateBackupList();
+                }
+            }
+            catch (Exception ex)
+            {
+                _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
             }
         }
 
         private void Remove(Backup backup)
         {
-            if (backup is null)
-                return;
-            _dataAccess.RemoveBackup(backup);
-            _backupService.DeleteFiles(backup);
-            UpdateBackupList();
+            try
+            {
+                if (backup is null)
+                    return;
+                _dataAccess.RemoveBackup(backup);
+                _backupService.DeleteFiles(backup);
+                UpdateBackupList();
+            }
+            catch (Exception ex)
+            {
+                _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
+            }
         }
 
         public void UpdateBackupList()
         {
-            Backups = _dataAccess.SearchBackups(Filter);
-            RaisePropertyChanged(nameof(Backups));
-            RaisePropertyChanged(nameof(TotalNumberOfBackups));
-            RaisePropertyChanged(nameof(From));
-            RaisePropertyChanged(nameof(To));
-            RaiseNavigateCanExecute();
+            try
+            {
+                Backups = _dataAccess.SearchBackups(Filter);
+                RaisePropertyChanged(nameof(Backups));
+                RaisePropertyChanged(nameof(TotalNumberOfBackups));
+                RaisePropertyChanged(nameof(From));
+                RaisePropertyChanged(nameof(To));
+                RaiseNavigateCanExecute();
+            }
+            catch (Exception ex)
+            {
+                _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
+            }
         }
 
         public DelegateCommand<Backup> RemoveCommand { get; }
@@ -163,6 +182,5 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         public DelegateCommand NavigateBackwardCommand { get; }
         public DelegateCommand NavigateToEndCommand { get; }
         public DelegateCommand NavigateToStartCommand { get; }
-        public DelegateCommand NavigateToSettingsCommand { get; }
     }
 }

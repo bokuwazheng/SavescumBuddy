@@ -1,86 +1,175 @@
 ﻿using Prism.Mvvm;
-using Settings = SavescumBuddy.Modules.Main.Properties.Settings;
+using SavescumBuddy.Services.Interfaces;
+using System;
 
 namespace SavescumBuddy.Modules.Main.Models
 {
-    public class SettingsModel : BindableBase
+    public class SettingsModel : BindableBase, ISettingsAccess
     {
+        private ISettingsAccess _settingsAccess;
+
+        public SettingsModel(ISettingsAccess settingsAccess)
+        {
+            _settingsAccess = settingsAccess ?? throw new ArgumentNullException(nameof(settingsAccess));
+        }
+        
         public bool AutobackupsEnabled
         {
-            get => Settings.Default.AutobackupsEnabled;
-            set { Settings.Default.AutobackupsEnabled = value; RaisePropertyChanged(nameof(AutobackupsEnabled)); }
+            get => _settingsAccess.AutobackupsEnabled;
+            set { _settingsAccess.AutobackupsEnabled = value; RaisePropertyChanged(nameof(AutobackupsEnabled)); }
         }
 
         public string AutobackupSkipType
         {
-            get => Settings.Default.AutobackupSkipType;
-            set { Settings.Default.AutobackupSkipType = value; RaisePropertyChanged(nameof(AutobackupSkipType)); }
+            get => _settingsAccess.AutobackupSkipType;
+            set { _settingsAccess.AutobackupSkipType = value; RaisePropertyChanged(nameof(AutobackupSkipType)); }
         }
 
         public int AutobackupInterval
         {
-            get => Settings.Default.AutobackupInterval;
-            set { Settings.Default.AutobackupInterval = value; RaisePropertyChanged(nameof(AutobackupInterval)); }
+            get => _settingsAccess.AutobackupInterval;
+            set { _settingsAccess.AutobackupInterval = value; RaisePropertyChanged(nameof(AutobackupInterval)); }
         }
 
         public string AutobackupOverwriteType
         {
-            get => Settings.Default.AutobackupOverwriteType;
-            set { Settings.Default.AutobackupOverwriteType = value; RaisePropertyChanged(nameof(AutobackupOverwriteType)); }
+            get => _settingsAccess.AutobackupOverwriteType;
+            set { _settingsAccess.AutobackupOverwriteType = value; RaisePropertyChanged(nameof(AutobackupOverwriteType)); }
         }
 
         public bool HotkeysEnabled
         {
-            get => Settings.Default.HotkeysEnabled;
-            set { Settings.Default.HotkeysEnabled = value; RaisePropertyChanged(nameof(HotkeysEnabled)); }
+            get => _settingsAccess.HotkeysEnabled;
+            set { _settingsAccess.HotkeysEnabled = value; RaisePropertyChanged(nameof(HotkeysEnabled)); }
         }
 
         public int RestoreKey
         {
-            get => Settings.Default.RestoreKey;
-            set { Settings.Default.RestoreKey = value; RaisePropertyChanged(nameof(RestoreKey)); }
+            get => _settingsAccess.RestoreKey;
+            set { _settingsAccess.RestoreKey = value; RaisePropertyChanged(nameof(RestoreKey)); }
         }
 
         public int BackupKey
         {
-            get => Settings.Default.BackupKey;
-            set { Settings.Default.BackupKey = value; RaisePropertyChanged(nameof(BackupKey)); }
+            get => _settingsAccess.BackupKey;
+            set { _settingsAccess.BackupKey = value; RaisePropertyChanged(nameof(BackupKey)); }
         }
 
         public int OverwriteKey
         {
-            get => Settings.Default.OverwriteKey;
-            set { Settings.Default.OverwriteKey = value; RaisePropertyChanged(nameof(OverwriteKey)); }
+            get => _settingsAccess.OverwriteKey;
+            set { _settingsAccess.OverwriteKey = value; RaisePropertyChanged(nameof(OverwriteKey)); }
         }
 
         public int RestoreModifier
         {
-            get => Settings.Default.RestoreModifier;
-            set { Settings.Default.RestoreModifier = value; RaisePropertyChanged(nameof(RestoreModifier)); }
+            get => _settingsAccess.RestoreModifier;
+            set { _settingsAccess.RestoreModifier = value; RaisePropertyChanged(nameof(RestoreModifier)); }
         }
 
         public int BackupModifier
         {
-            get => Settings.Default.BackupModifier;
-            set { Settings.Default.BackupModifier = value; RaisePropertyChanged(nameof(BackupModifier)); }
+            get => _settingsAccess.BackupModifier;
+            set { _settingsAccess.BackupModifier = value; RaisePropertyChanged(nameof(BackupModifier)); }
         }
 
         public int OverwriteModifier
         {
-            get => Settings.Default.OverwriteModifier;
-            set { Settings.Default.OverwriteModifier = value; RaisePropertyChanged(nameof(OverwriteModifier)); }
+            get => _settingsAccess.OverwriteModifier;
+            set { _settingsAccess.OverwriteModifier = value; RaisePropertyChanged(nameof(OverwriteModifier)); }
         }
 
         public bool SoundCuesEnabled
         {
-            get => Settings.Default.SoundCuesEnabled;
-            set { Settings.Default.SoundCuesEnabled = value; RaisePropertyChanged(nameof(SoundCuesEnabled)); }
+            get => _settingsAccess.SoundCuesEnabled;
+            set { _settingsAccess.SoundCuesEnabled = value; RaisePropertyChanged(nameof(SoundCuesEnabled)); }
         }
 
         public string CloudAppRootFolderId
         {
-            get => Settings.Default.CloudAppRootFolderId;
-            set { Settings.Default.CloudAppRootFolderId = value; RaisePropertyChanged(nameof(CloudAppRootFolderId)); }
+            get => _settingsAccess.CloudAppRootFolderId;
+            set { _settingsAccess.CloudAppRootFolderId = value; RaisePropertyChanged(nameof(CloudAppRootFolderId)); }
         }
     }
+
+    //public class SettingsModel : BindableBase, ISettingsModel
+    //{
+    //    public bool AutobackupsEnabled
+    //    {
+    //        get => _settingsAccess.AutobackupsEnabled;
+    //        set { _settingsAccess.AutobackupsEnabled = value; RaisePropertyChanged(nameof(AutobackupsEnabled)); }
+    //    }
+
+    //    public string AutobackupSkipType
+    //    {
+    //        get => _settingsAccess.AutobackupSkipType;
+    //        set { _settingsAccess.AutobackupSkipType = value; RaisePropertyChanged(nameof(AutobackupSkipType)); }
+    //    }
+
+    //    public int AutobackupInterval
+    //    {
+    //        get => _settingsAccess.AutobackupInterval;
+    //        set { _settingsAccess.AutobackupInterval = value; RaisePropertyChanged(nameof(AutobackupInterval)); }
+    //    }
+
+    //    public string AutobackupOverwriteType
+    //    {
+    //        get => _settingsAccess.AutobackupOverwriteType;
+    //        set { _settingsAccess.AutobackupOverwriteType = value; RaisePropertyChanged(nameof(AutobackupOverwriteType)); }
+    //    }
+
+    //    public bool HotkeysEnabled
+    //    {
+    //        get => _settingsAccess.HotkeysEnabled;
+    //        set { _settingsAccess.HotkeysEnabled = value; RaisePropertyChanged(nameof(HotkeysEnabled)); }
+    //    }
+
+    //    public int RestoreKey
+    //    {
+    //        get => _settingsAccess.RestoreKey;
+    //        set { _settingsAccess.RestoreKey = value; RaisePropertyChanged(nameof(RestoreKey)); }
+    //    }
+
+    //    public int BackupKey
+    //    {
+    //        get => _settingsAccess.BackupKey;
+    //        set { _settingsAccess.BackupKey = value; RaisePropertyChanged(nameof(BackupKey)); }
+    //    }
+
+    //    public int OverwriteKey
+    //    {
+    //        get => _settingsAccess.OverwriteKey;
+    //        set { _settingsAccess.OverwriteKey = value; RaisePropertyChanged(nameof(OverwriteKey)); }
+    //    }
+
+    //    public int RestoreModifier
+    //    {
+    //        get => _settingsAccess.RestoreModifier;
+    //        set { _settingsAccess.RestoreModifier = value; RaisePropertyChanged(nameof(RestoreModifier)); }
+    //    }
+
+    //    public int BackupModifier
+    //    {
+    //        get => _settingsAccess.BackupModifier;
+    //        set { _settingsAccess.BackupModifier = value; RaisePropertyChanged(nameof(BackupModifier)); }
+    //    }
+
+    //    public int OverwriteModifier
+    //    {
+    //        get => _settingsAccess.OverwriteModifier;
+    //        set { _settingsAccess.OverwriteModifier = value; RaisePropertyChanged(nameof(OverwriteModifier)); }
+    //    }
+
+    //    public bool SoundCuesEnabled
+    //    {
+    //        get => _settingsAccess.SoundCuesEnabled;
+    //        set { _settingsAccess.SoundCuesEnabled = value; RaisePropertyChanged(nameof(SoundCuesEnabled)); }
+    //    }
+
+    //    public string CloudAppRootFolderId
+    //    {
+    //        get => _settingsAccess.CloudAppRootFolderId;
+    //        set { _settingsAccess.CloudAppRootFolderId = value; RaisePropertyChanged(nameof(CloudAppRootFolderId)); }
+    //    }
+    //}
 }

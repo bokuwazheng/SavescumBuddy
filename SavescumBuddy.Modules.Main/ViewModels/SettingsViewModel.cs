@@ -21,7 +21,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
     public class SettingsViewModel : BindableBase
     {
         private readonly IRegionManager _regionManager;
-        private readonly IDataAccess _dataAccess;
+        private readonly ISettingsAccess _settingsAccess;
         private readonly IEventAggregator _eventAggregator;
 
         private HotkeyAction? _recordedHotkeyType = null;
@@ -29,28 +29,26 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         public SettingsModel Settings { get; }
         public HotkeyAction? SelectedHotkeyAction { get => _recordedHotkeyType; set => SetProperty(ref _recordedHotkeyType, value); }
 
-        public SettingsViewModel(IRegionManager regionManager, IDataAccess dataAccess, IEventAggregator eventAggregator)
+        public SettingsViewModel(IRegionManager regionManager, ISettingsAccess settingsAccess, IEventAggregator eventAggregator)
         {
             _regionManager = regionManager;
-            _dataAccess = dataAccess;
+            _settingsAccess = settingsAccess;
             _eventAggregator = eventAggregator;
 
-            Settings = new SettingsModel();
-            Settings.PropertyChanged += OnSettingsPropertyChanged;
+            Settings = new SettingsModel(_settingsAccess);
+            Settings.PropertyChanged += (s, e) => OnSettingsPropertyChanged(e.PropertyName);
 
             RegisterHotkeyCommand = new DelegateCommand<HotkeyAction?>(ToggleKeyboardHook);
             NavigateToBackupsCommand = new DelegateCommand(() => _regionManager.RequestNavigate(RegionNames.ContentRegion, "Backups"));
         }
 
-        private void OnSettingsPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void OnSettingsPropertyChanged(string propertyName)
         {
-            Properties.Settings.Default.Save();
-
-            if (e.PropertyName == nameof(SettingsModel.AutobackupsEnabled))
+            if (propertyName == nameof(SettingsModel.AutobackupsEnabled))
                 _eventAggregator.GetEvent<AutobackupsEnabledChangedEvent>().Publish(Settings.AutobackupsEnabled);
 
-            if (e.PropertyName == nameof(SettingsModel.AutobackupInterval))
-                _eventAggregator.GetEvent<AutobackupIntervalChangedEvent>().Publish(Settings.AutobackupInterval);
+            if (propertyName == nameof(SettingsModel.AutobackupInterval))
+                _eventAggregator.GetEvent<AutobackupIntervalChangedEvent>().Publish(Settings.AutobackupsEnabled);
         }
 
         // TODO: better way to unhook cuz passing SelectedHotkeyAction is kinda tricky

@@ -1,5 +1,6 @@
 ﻿using Prism.Events;
 using SavescumBuddy.Data;
+using System;
 
 namespace SavescumBuddy.Core.Events
 {
@@ -18,6 +19,9 @@ namespace SavescumBuddy.Core.Events
     public class FirstPageRequestedEvent : PubSubEvent<IBackupSearchRequest> { }
     public class LastPageRequestedEvent : PubSubEvent<IBackupSearchRequest> { }
     public class AutobackupsEnabledChangedEvent : PubSubEvent<bool> { }
-    public class AutobackupIntervalChangedEvent : PubSubEvent<int> { }
+    public class AutobackupIntervalChangedEvent : PubSubEvent<bool> { }
+    public class BackupCreationRequestedEvent : PubSubEvent<Backup> { }
+    public class BackupDeletionRequestedEvent : PubSubEvent<Backup> { }
 
+    public class ErrorOccuredEvent : PubSubEvent<Exception> { }
 }

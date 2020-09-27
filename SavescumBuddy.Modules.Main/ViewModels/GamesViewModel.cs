@@ -1,10 +1,11 @@
 ﻿using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
-using Prism.Regions;
+using SavescumBuddy.Core.Events;
 using SavescumBuddy.Data;
 using SavescumBuddy.Modules.Main.Models;
 using SavescumBuddy.Services.Interfaces;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -12,14 +13,12 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 {
     public class GamesViewModel : BindableBase
     {
-        private readonly IRegionManager _regionManager;
         private readonly IDataAccess _dataAccess;
         private readonly IEventAggregator _eventAggregator;
         private readonly IOpenFileService _openFileService;
 
-        public GamesViewModel(IRegionManager regionManager, IDataAccess dataAccess, IEventAggregator eventAggregator, IOpenFileService openFileService)
+        public GamesViewModel(IDataAccess dataAccess, IEventAggregator eventAggregator, IOpenFileService openFileService)
         {
-            _regionManager = regionManager;
             _dataAccess = dataAccess;
             _eventAggregator = eventAggregator;
             _openFileService = openFileService;
@@ -41,33 +40,52 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
         private void GetSavefilePath(GameModel game)
         {
-            _openFileService.IsFolderPicker = false;
-            _openFileService.Multiselect = false;
-            _openFileService.ShowHiddenItems = true;
-
-            if (_openFileService.OpenFile())
+            try
             {
-                game.SavefilePath = _openFileService.FileName;
+                _openFileService.IsFolderPicker = false;
+                _openFileService.Multiselect = false;
+                _openFileService.ShowHiddenItems = true;
+
+                if (_openFileService.OpenFile())
+                    game.SavefilePath = _openFileService.FileName;
+            }
+            catch (Exception ex)
+            {
+                _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
             }
         }
 
         private void GetBackupFolderPath(GameModel game)
         {
-            _openFileService.IsFolderPicker = true;
-            _openFileService.Multiselect = false;
-            _openFileService.ShowHiddenItems = true;
-
-            if (_openFileService.OpenFile())
+            try
             {
-                game.BackupFolder = _openFileService.FileName;
+                _openFileService.IsFolderPicker = true;
+                _openFileService.Multiselect = false;
+                _openFileService.ShowHiddenItems = true;
+
+                if (_openFileService.OpenFile())
+                {
+                    game.BackupFolder = _openFileService.FileName;
+                }
+            }
+            catch (Exception ex)
+            {
+                _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
             }
         }
 
         private void LoadGames()
         {
-            var games = _dataAccess.LoadGames();
-            var gameModels = games.Select(x => new GameModel(x));
-            Games = new ObservableCollection<GameModel>(gameModels);
+            try
+            {
+                var games = _dataAccess.LoadGames();
+                var gameModels = games.Select(x => new GameModel(x));
+                Games = new ObservableCollection<GameModel>(gameModels);
+            }
+            catch (Exception ex)
+            {
+                _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
+            }
         }
 
         private void UpdateGame(GameModel game)
@@ -79,9 +97,9 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 else
                     _dataAccess.UpdateGame(game.Game);
             }
-            catch
+            catch (Exception ex)
             {
-
+                _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
             }
         }
 
@@ -92,15 +110,14 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 Games.Remove(game);
                 _dataAccess.RemoveGame(game.Game);
             }
-            catch
+            catch (Exception ex)
             {
-
+                _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
             }
         }
 
         public DelegateCommand LoadGamesCommand { get; }
         public DelegateCommand AddGameCommand { get; }
-        public DelegateCommand<GameModel> SaveGameCommand { get; }
         public DelegateCommand<GameModel> UpdateGameCommand { get; }
         public DelegateCommand<GameModel> SetCurrentCommand { get; }
         public DelegateCommand<GameModel> RemoveGameCommand { get; }

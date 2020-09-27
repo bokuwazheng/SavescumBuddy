@@ -360,7 +360,6 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="23"/>
                     <ColumnDefinition />
-                    <ColumnDefinition Width="35"/>
                 </Grid.ColumnDefinitions>
                 <!--Add button-->
                 <Button Command="{Binding AddCommand}" FontFamily="Segoe MDL2 Assets" FontSize="18" Grid.Column="0" Height="25" Width="25" 
@@ -384,9 +383,6 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <!--Settings button-->
-                <Button FontFamily="Segoe MDL2 Assets" Content="&#xE713;" FontSize="18" Grid.Column="4" HorizontalAlignment="Left" VerticalAlignment="Center"
-                        Command="{Binding NavigateToSettingsCommand}" IsEnabled="True" Height="25" Width="25" />
                 <!--Sorting buttons-->
                 <StackPanel Orientation="Horizontal" Grid.Column="1">
                     <!--Heart button-->

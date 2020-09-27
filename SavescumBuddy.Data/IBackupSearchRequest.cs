@@ -1,6 +1,6 @@
 ﻿namespace SavescumBuddy.Data
 {
-    public class BackupSearchRequest : IBackupSearchRequest
+    public interface IBackupSearchRequest
     {
         public int? Offset { get; set; }
         public int? Limit { get; set; }

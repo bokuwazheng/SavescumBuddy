@@ -8,9 +8,9 @@ namespace SavescumBuddy.Services
 {
     public class SqliteDataAccess : IDataAccess
     {
-        private SqliteDbService _sqlService;
+        private ISqliteDbService _sqlService;
 
-        public SqliteDataAccess(SqliteDbService sqlService)
+        public SqliteDataAccess(ISqliteDbService sqlService)
         {
             _sqlService = sqlService ?? throw new ArgumentNullException(nameof(sqlService));
         }
