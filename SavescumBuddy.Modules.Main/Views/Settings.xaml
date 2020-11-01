@@ -91,22 +91,6 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!--Escape button-->
-        <Button Content="&#xE72B;" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Grid.Column="0"
-                Background="{x:Null}" BorderBrush="{x:Null}" FontSize="24" Grid.Row="0" Height="34"
-                Command="{Binding NavigateToBackupsCommand}" Margin="20,23"/>
-
-        <!--About button-->
-        <Button Content="About me" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Column="0" Cursor="Hand"
-                Background="{x:Null}" BorderBrush="{x:Null}" FontSize="{StaticResource CaptionFontSize}" Grid.Row="0" 
-                Command="{Binding DataContext.NavigateToAboutCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Margin="20,23">
-            <Button.Style>
-                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-                    <Setter Property="Foreground" Value="{StaticResource Grayish}"/>
-                </Style>
-            </Button.Style>
-        </Button>
-
         <!--CENTER COLUMN-->
         <ScrollViewer VerticalScrollBarVisibility="Hidden" Grid.Column="1">
             <Grid HorizontalAlignment="Stretch" Margin="0,20,0,20">
@@ -135,7 +119,7 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Style="{StaticResource Caption}">
                             <TextBlock.Text>
-                                <Binding StringFormat="A backup will be automatically created every {0}" Path="Settings.SelectedInterval"/>
+                                <Binding StringFormat="A backup will be automatically created every {0}" Path="Settings.AutobackupInterval"/>
                             </TextBlock.Text>
                         </TextBlock>
                         <TextBlock Text=", unless..." TextAlignment="Left">
@@ -154,7 +138,7 @@
                 </StackPanel>
                 <!--Autobackup ToggleButton-->
                 <ToggleButton Style="{StaticResource slidingToggleButton}" Grid.Column="1" Grid.Row="0" Margin="10,0,0,0"
-                              IsChecked="{Binding Settings.AutobackupsOn}"/>
+                              IsChecked="{Binding Settings.AutobackupsEnabled}"/>
 
                 <!--Auto backups Expander-->
                 <Expander Header="Advanced..." ExpandDirection="Down" Grid.ColumnSpan="2" Margin="0,0,0,15" FontSize="{StaticResource CaptionFontSize}" Grid.Row="1" Foreground="{StaticResource Ash}">
@@ -171,7 +155,7 @@
                         <TextBlock Text="Interval:" Grid.Column="0" Margin="0,0,10,0" VerticalAlignment="Center" HorizontalAlignment="Right" Grid.Row="0"/>
                         <TextBlock Text="Skip:" Grid.Column="0" Margin="0,0,10,0" VerticalAlignment="Center" HorizontalAlignment="Right" Grid.Row="1"/>
                         <TextBlock Text="Overwrite:" Grid.Column="0"  Margin="0,0,10,0" VerticalAlignment="Center" Grid.Row="2"/>
-                        <ComboBox Grid.Column="1" Grid.Row="0" Height="28" Foreground="{StaticResource Ash}" SelectedItem="{Binding Settings.SelectedInterval}">
+                        <ComboBox Grid.Column="1" Grid.Row="0" Height="28" Foreground="{StaticResource Ash}" SelectedItem="{Binding Settings.AutobackupInterval}">
                             <sys:String>5 min</sys:String>
                             <sys:String>10 min</sys:String>
                             <sys:String>15 min</sys:String>
@@ -183,10 +167,10 @@
                         </ComboBox>
                         <ComboBox Grid.Column="1" Grid.Row="1" Height="28" Foreground="{StaticResource Ash}"
                                   ItemsSource="{ext:EnumToCollection EnumType={x:Type enums:SkipOption}}" 
-                                  SelectedItem="{Binding Settings.SelectedSkipOption}"/>
+                                  SelectedItem="{Binding Settings.AutobackupOverwriteType}"/>
                         <ComboBox Grid.Column="1" Grid.Row="2" Height="28" Foreground="{StaticResource Ash}" 
                                   ItemsSource="{ext:EnumToCollection EnumType={x:Type enums:OverwriteOption}}"
-                                  SelectedItem="{Binding Settings.SelectedOverwriteOption}"/>
+                                  SelectedItem="{Binding Settings.AutobackupSkipType}"/>
                     </Grid>
                 </Expander>
                 <!--Auto backups region ends here-->
@@ -201,8 +185,8 @@
                         <TextBlock Style="{StaticResource Caption}">
                             <TextBlock.Text>
                                 <MultiBinding StringFormat="Save: {0}. " Converter="{StaticResource KeysToStringConverter}">
-                                    <Binding Path="Settings.SelectedQSKey"/>
-                                    <Binding Path="Settings.SelectedQSMod"/>
+                                    <Binding Path="Settings.BackupKey"/>
+                                    <Binding Path="Settings.BackupModifier"/>
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
@@ -210,8 +194,8 @@
                         <TextBlock Style="{StaticResource Caption}">
                             <TextBlock.Text>
                                 <MultiBinding StringFormat="Load: {0}. " Converter="{StaticResource KeysToStringConverter}">
-                                    <Binding Path="Settings.SelectedQLKey"/>
-                                    <Binding Path="Settings.SelectedQLMod"/>
+                                    <Binding Path="Settings.RestoreKey"/>
+                                    <Binding Path="Settings.RestoreModifier"/>
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
@@ -219,8 +203,8 @@
                         <TextBlock Style="{StaticResource Caption}">
                             <TextBlock.Text>
                                 <MultiBinding StringFormat="Overwrite: {0}. " Converter="{StaticResource KeysToStringConverter}">
-                                    <Binding Path="Settings.SelectedSOKey"/>
-                                    <Binding Path="Settings.SelectedSOMod"/>
+                                    <Binding Path="Settings.OverwriteKey"/>
+                                    <Binding Path="Settings.OverwriteModifier"/>
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
@@ -228,7 +212,7 @@
                 </StackPanel>
                 <!--Toggle Hotkeys Buttons-->
                 <ToggleButton Style="{StaticResource slidingToggleButton}" Grid.Column="1" Grid.Row="2" Margin="10,0,0,0"
-                              IsChecked="{Binding Settings.HotkeysOn}"/>
+                              IsChecked="{Binding Settings.HotkeysEnabled}"/>
                 <!--Hotkeys Expander-->
                 <Expander Header="Show more..." ExpandDirection="Down" Grid.ColumnSpan="2" Grid.Row="3" Margin="0,0,0,15" Foreground="{StaticResource Ash}"
                           FontSize="{StaticResource CaptionFontSize}" >
@@ -348,7 +332,7 @@
 
                 <!--Toggle sound cues Button-->
                 <ToggleButton Style="{StaticResource slidingToggleButton}" Grid.Column="1" Grid.Row="4" Margin="10,0,0,0"
-                              IsChecked="{Binding Settings.SoundCuesOn}"/>
+                              IsChecked="{Binding Settings.SoundCuesEnabled}"/>
             </Grid>
         </ScrollViewer>
     </Grid>

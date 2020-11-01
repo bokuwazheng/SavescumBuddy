@@ -386,7 +386,7 @@
                 <!--Sorting buttons-->
                 <StackPanel Orientation="Horizontal" Grid.Column="1">
                     <!--Heart button-->
-                    <ToggleButton FontFamily="Segoe MDL2 Assets" Width="25" Height="25" Margin="5,0,5,0" IsChecked="{Binding LikedOnly}" >
+                    <ToggleButton FontFamily="Segoe MDL2 Assets" Width="25" Height="25" Margin="5,0,5,0" IsChecked="{Binding Filter.LikedOnly}" >
                         <ToggleButton.Style>
                             <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
                                 <Setter Property="Content" Value="&#xEB51;"/>
@@ -400,7 +400,7 @@
                         </ToggleButton.Style>
                     </ToggleButton>
                     <!--Autobackups button-->
-                    <ToggleButton FontFamily="Segoe UI" FontSize="12" Width="40"  Margin="5,0,5,0" IsChecked="{Binding HideAutobackups}">
+                    <ToggleButton FontFamily="Segoe UI" FontSize="12" Width="40"  Margin="5,0,5,0" IsChecked="{Binding Filter.HideAutobackups}">
                         <StackPanel Orientation="Vertical">
                             <TextBlock Text="Hide" TextAlignment="Center"/>
                             <TextBlock Text="Autob.." TextAlignment="Center"/>
@@ -416,7 +416,7 @@
                         </ToggleButton.Style>
                     </ToggleButton>
                     <!--Current button-->
-                    <ToggleButton FontFamily="Segoe UI" FontSize="12" Width="40"  Margin="5,0,5,0" IsChecked="{Binding CurrentOnly}" >
+                    <ToggleButton FontFamily="Segoe UI" FontSize="12" Width="40"  Margin="5,0,5,0" IsChecked="{Binding Filter.CurrentOnly}" >
                         <StackPanel Orientation="Vertical">
                             <TextBlock Text="Current" TextAlignment="Center"/>
                             <TextBlock Text="Only" TextAlignment="Center"/>
@@ -432,7 +432,7 @@
                         </ToggleButton.Style>
                     </ToggleButton>
                     <!--Order button-->
-                    <ToggleButton FontFamily="Segoe MDL2 Assets" Content="&#xE8CB;" Width="25" Height="25" Margin="5,0,5,0" IsChecked="{Binding OrderByDesc}">
+                    <ToggleButton FontFamily="Segoe MDL2 Assets" Content="&#xE8CB;" Width="25" Height="25" Margin="5,0,5,0" IsChecked="{Binding Filter.OrderByDesc}">
                         <ToggleButton.Style>
                             <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
                                 <Style.Triggers>

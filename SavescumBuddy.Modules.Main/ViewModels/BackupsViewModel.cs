@@ -29,6 +29,8 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             _backupService = backupService;
             _backupFactory = backupFactory;
 
+            _eventAggregator.GetEvent<BackupListUpdateRequestedEvent>().Subscribe(UpdateBackupList);
+
             AddCommand = new DelegateCommand(Add);
             RemoveCommand = new DelegateCommand<Backup>(Remove);
             RestoreCommand = new DelegateCommand<Backup>(_backupService.RestoreBackup);
@@ -37,7 +39,6 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             NavigateBackwardCommand = new DelegateCommand(() => --CurrentPageIndex, () => From > 1);
             NavigateToStartCommand = new DelegateCommand(() => CurrentPageIndex = 0, () => From > 1);
             NavigateToEndCommand = new DelegateCommand(() => CurrentPageIndex = TotalNumberOfBackups / PageSize, () => To < TotalNumberOfBackups);
-
 
             Filter.PropertyChanged += (s, e) => OnFilterPropertyChanged(e.PropertyName);
             UpdateBackupList();

@@ -18,6 +18,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         private readonly ISettingsAccess _settingsAccess;
         private readonly IEventAggregator _eventAggregator;
         private readonly IBackupService _backupService;
+        private readonly IBackupFactory _backupFactory;
 
         private int _progress;
         private DispatcherTimer _backupTimer;
@@ -25,28 +26,34 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
         public int Progress { get => _progress; private set => SetProperty(ref _progress, value); }
 
-        public AutobackupsViewModel(IRegionManager regionManager, IDataAccess dataAccess, ISettingsAccess settingsAccess, IEventAggregator eventAggregator, IBackupService backupService)
+        public AutobackupsViewModel(IRegionManager regionManager, IDataAccess dataAccess, ISettingsAccess settingsAccess, IEventAggregator eventAggregator, IBackupService backupService, IBackupFactory backupFactory)
         {
             _regionManager = regionManager;
             _dataAccess = dataAccess;
             _settingsAccess = settingsAccess;
             _eventAggregator = eventAggregator;
             _backupService = backupService;
-
-            // If false puts the timer on pause.
-            var isEnabled = _settingsAccess.AutobackupsEnabled;
+            _backupFactory = backupFactory;
 
             _backupTimer = new DispatcherTimer();
             _backupTimer.Interval = TimeSpan.FromMinutes(_settingsAccess.AutobackupInterval);
-            _backupTimer.Tick += (s, ea) => { Autobackup(); Progress = 0; };
-            _backupTimer.Start();
-            _backupTimer.IsEnabled = isEnabled;
+            _backupTimer.Tick += (s, e) => { Autobackup(); Progress = 0; };
+            //_backupTimer.Start();
+            //_backupTimer.IsEnabled = isEnabled;
 
             _progressBarTimer = new DispatcherTimer();
             _progressBarTimer.Interval = TimeSpan.FromSeconds(1);
-            _progressBarTimer.Tick += (s, ea) => Progress++;
-            _progressBarTimer.Start();
-            _progressBarTimer.IsEnabled = isEnabled;
+            _progressBarTimer.Tick += (s, e) => Progress++;
+            //_progressBarTimer.Start();
+            //_progressBarTimer.IsEnabled = isEnabled;
+
+            // If false puts the timer on pause.
+            var isEnabled = _settingsAccess.AutobackupsEnabled;
+            if (isEnabled)
+            {
+                _backupTimer.Start();
+                _progressBarTimer.Start();
+            }
 
             _eventAggregator.GetEvent<AutobackupIntervalChangedEvent>().Subscribe(OnIntervalChanged);
             _eventAggregator.GetEvent<AutobackupsEnabledChangedEvent>().Subscribe(OnIsEnabledChanged);
@@ -90,15 +97,18 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
             var backup = _dataAccess.GetLatestAutobackup();
 
-            if (backup is object)
+            if (backup is object && PreviousAutobackupShouldBeDeleted(backup))
             {
-                if (PreviousAutobackupShouldBeDeleted(backup))
-                {
-                    _eventAggregator.GetEvent<BackupDeletionRequestedEvent>().Publish(backup);
-                }
+                _dataAccess.RemoveBackup(backup);
+                _backupService.DeleteFiles(backup);
             }
 
-            _eventAggregator.GetEvent<BackupCreationRequestedEvent>().Publish(backup);
+            var newBackup = _backupFactory.CreateBackup();
+            _dataAccess.SaveBackup(newBackup);
+            _backupService.BackupSavefile(newBackup);
+            _backupService.SaveScreenshot(newBackup.PicturePath);
+
+            _eventAggregator.GetEvent<BackupListUpdateRequestedEvent>().Publish();
         }
 
         private bool ItIsTimeToSkip()

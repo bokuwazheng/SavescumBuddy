@@ -22,6 +22,6 @@ namespace SavescumBuddy.Core.Events
     public class AutobackupIntervalChangedEvent : PubSubEvent<bool> { }
     public class BackupCreationRequestedEvent : PubSubEvent<Backup> { }
     public class BackupDeletionRequestedEvent : PubSubEvent<Backup> { }
-
+    public class BackupListUpdateRequestedEvent : PubSubEvent { }
     public class ErrorOccuredEvent : PubSubEvent<Exception> { }
 }

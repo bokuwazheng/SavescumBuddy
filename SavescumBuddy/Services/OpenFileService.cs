@@ -1,5 +1,4 @@
 ﻿using SavescumBuddy.Services.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
@@ -7,13 +6,8 @@ namespace SavescumBuddy.Services
 {
     public class OpenFileService : IOpenFileService
     {
-        private bool disposedValue;
-
-        private string _fileName;
-        private IEnumerable<string> _fileNames;
-
-        public string FileName => _fileName;
-        public IEnumerable<string> FileNames => _fileNames;
+        public string FileName { get; private set; }
+        public IEnumerable<string> FileNames { get; private set; }
 
         public bool IsFolderPicker { get; set; }
         public bool ShowHiddenItems { get; set; }
@@ -27,7 +21,7 @@ namespace SavescumBuddy.Services
                 var result = fbd.ShowDialog();
                 if (result == DialogResult.OK)
                 {
-                    _fileName = fbd.SelectedPath;
+                    FileName = fbd.SelectedPath;
                     return true;
                 }
                 else
@@ -40,9 +34,9 @@ namespace SavescumBuddy.Services
                 if (result == DialogResult.OK)
                 {
                     if (ofd.Multiselect)
-                        _fileNames = ofd.FileNames;
+                        FileNames = ofd.FileNames;
                     else
-                        _fileName = ofd.FileName;
+                        FileName = ofd.FileName;
 
                     return true;
                 }

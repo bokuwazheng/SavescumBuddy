@@ -4,15 +4,8 @@ using Prism.Mvvm;
 using Prism.Regions;
 using SavescumBuddy.Core.Enums;
 using SavescumBuddy.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using SavescumBuddy.Modules.Main.Models;
 using System.Windows.Input;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.ComponentModel;
 using SavescumBuddy.Core.Events;
 using SavescumBuddy.Core;
 
@@ -23,6 +16,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         private readonly IRegionManager _regionManager;
         private readonly ISettingsAccess _settingsAccess;
         private readonly IEventAggregator _eventAggregator;
+        private readonly IHotkeyListener<Key> _hotkeyListener;
 
         private HotkeyAction? _recordedHotkeyType = null;
 
@@ -54,43 +48,43 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         // TODO: better way to unhook cuz passing SelectedHotkeyAction is kinda tricky
         private void ToggleKeyboardHook(HotkeyAction? actionType)
         {
-            //if (actionType != SelectedHotkeyAction)
-            //{
-            //    if (!_keyboardHook.HookActive)
-            //    {
-            //        _keyboardHook.Hook();
-            //        _keyboardHook.KeyDown += keyboardHook_KeyDown;
-            //    }
+            if (actionType != SelectedHotkeyAction)
+            {
+                if (!_hotkeyListener.HookActive)
+                {
+                    _hotkeyListener.Hook();
+                    _hotkeyListener.KeyDown += keyboardHook_KeyDown;
+                }
 
-            //    SelectedHotkeyAction = actionType;
-            //}
-            //else
-            //{
-            //    if (_keyboardHook.HookActive)
-            //    {
-            //        _keyboardHook.Unhook();
-            //        _keyboardHook.KeyDown -= keyboardHook_KeyDown;
-            //    }
+                SelectedHotkeyAction = actionType;
+            }
+            else
+            {
+                if (_hotkeyListener.HookActive)
+                {
+                    _hotkeyListener.Unhook();
+                    _hotkeyListener.KeyDown -= keyboardHook_KeyDown;
+                }
 
-            //    SelectedHotkeyAction = null;
-            //}
+                SelectedHotkeyAction = null;
+            }
         }
 
-        private void keyboardHook_KeyDown(object sender, KeyEventArgs e)
+        private void keyboardHook_KeyDown(object sender, IKeyEventArgs<Key> e)
         {
-            //if (e.KeyCode == Keys.Escape)
+            //if (e.KeyCode == Key.Escape)
             //{
             //    ToggleKeyboardHook(SelectedHotkeyAction);
             //    return;
             //}
 
-            //if (e.KeyCode == Keys.Enter || e.KeyCode == Key.Space)
+            //if (e.KeyCode == Key.Enter || e.KeyCode == Key.Space)
             //    return;
 
-            //var mod = Keys.None;
-            //if (e.Alt) mod = Keys.Alt;
-            //if (e.Shift) mod = Keys.Shift;
-            //if (e.Control) mod = Keys.Control;
+            //var mod = Key.None;
+            //if (e.Alt) mod = Key.Alt;
+            //if (e.Shift) mod = Key.Shift;
+            //if (e.Control) mod = Key.Control;
 
             //var key = Keys.None;
             //if (e.KeyValue > 0) key = e.KeyCode;

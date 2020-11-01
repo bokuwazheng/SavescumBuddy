@@ -4,9 +4,26 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SavescumBuddy.Modules.Main.Views"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:core="clr-namespace:SavescumBuddy.Core;assembly=SavescumBuddy.Core"
+             xmlns:controls="clr-namespace:SavescumBuddy.CustomControls;assembly=SavescumBuddy.CustomControls"
+             xmlns:models="clr-namespace:SavescumBuddy.Modules.Main.Models"
+             xmlns:validation="clr-namespace:SavescumBuddy.CustomControls.Validation;assembly=SavescumBuddy.CustomControls"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.CustomControls;component/DefaultTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <!--ProgressBar-->
+    <Grid Margin="10">
+        <Border Height="1" Background="{StaticResource Grayish}" VerticalAlignment="Bottom"/>
+        <ProgressBar Minimum="0" Maximum="{Binding Interval, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                     Value="{Binding Progress, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=20}" 
+                     Height="2" Foreground="{StaticResource Ash}" BorderBrush="Transparent"/>
     </Grid>
 </UserControl>

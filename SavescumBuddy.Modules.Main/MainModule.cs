@@ -19,6 +19,7 @@ namespace SavescumBuddy.Modules.Main
         {
             _regionManager.RequestNavigate(RegionNames.ContentRegion, "Backups");
             _regionManager.RequestNavigate(RegionNames.Navigation, "Navigation");
+            _regionManager.RequestNavigate(RegionNames.Autobackuper, "Autobackups");
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
@@ -27,6 +28,7 @@ namespace SavescumBuddy.Modules.Main
             containerRegistry.RegisterForNavigation<Settings>();
             containerRegistry.RegisterForNavigation<Games>();
             containerRegistry.RegisterForNavigation<Navigation>();
+            containerRegistry.RegisterForNavigation<Autobackups>();
         }
     }
 }

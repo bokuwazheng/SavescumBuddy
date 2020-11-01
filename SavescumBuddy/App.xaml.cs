@@ -34,10 +34,10 @@ namespace SavescumBuddy
         {
             containerRegistry
                 .RegisterInstance<IDataAccess>(new SqliteDataAccess(new SqliteDbService(LoadConnectionString())))
+                .RegisterInstance<ISettingsAccess>(new SqliteSettingsAccess(new SqliteDbService(LoadConnectionString())))
                 .Register<IOpenFileService, OpenFileService>()
                 .Register<IBackupService, BackupService>()
-                .Register<IBackupFactory, BackupFactory>()
-                .RegisterInstance<ISettingsAccess>(new SqliteSettingsAccess(new SqliteDbService(LoadConnectionString())));
+                .Register<IBackupFactory, BackupFactory>();
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
