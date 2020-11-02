@@ -49,34 +49,34 @@
                         <ColumnDefinition Width="199"/>
                     </Grid.ColumnDefinitions>
                     <Grid.InputBindings>
-                        <MouseBinding Gesture="LeftDoubleClick" Command="{Binding ShowInExplorerCommand}"/>
+                        <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.ShowInExplorerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
                     </Grid.InputBindings>
                     <!--Thumbnail-->
                     <Grid HorizontalAlignment="Center" Height="100" VerticalAlignment="Center" Width="179" Grid.Column="0" Grid.RowSpan="3" >
                         <Border Background="White">
                             <TextBlock Text="NO IMAGE" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource Grayish}"
-                           FontWeight="Bold" Visibility="{Binding PicturePath, Converter={StaticResource InverseExistsToVisibilityConverter}}"/>
+                                       FontWeight="Bold" Visibility="{Binding PicturePath, Converter={StaticResource InverseExistsToVisibilityConverter}}"/>
                         </Border>
                         <Image Source="{Binding PicturePath, Converter={StaticResource UriToImgConverter}}" RenderOptions.BitmapScalingMode="Fant"
-                   Stretch="UniformToFill"/>
+                               Stretch="UniformToFill"/>
                     </Grid>
                     <!--NoteBox-->
-                    <TextBox x:Name="NoteBox" Text="{Binding Note, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MaxLength="180" TextWrapping="Wrap"  
-                 Margin="5,3,5,5" Grid.Column="1" MaxLines="2" Padding="4,0,0,0" BorderBrush="#FFDCDCDC" Foreground="{StaticResource Dark}" Style="{StaticResource TextBoxStyleFlat}" Grid.Row="2">
+                    <TextBox x:Name="NoteBox" Text="{Binding Note, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}" MaxLength="180" TextWrapping="Wrap"  
+                             Margin="5,3,5,5" Grid.Column="1" MaxLines="2" Padding="4,0,0,0" BorderBrush="#FFDCDCDC" Foreground="{StaticResource Dark}" Style="{StaticResource TextBoxStyleFlat}" Grid.Row="2">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="LostFocus">
-                                <i:InvokeCommandAction Command="{Binding UpdateNoteCommand}"/>
+                                <i:InvokeCommandAction Command="{Binding DataContext.UpdateNoteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </TextBox>
                     <!--Helper text-->
                     <TextBlock IsHitTestVisible="False" Text="Click to enter your note..." VerticalAlignment="Top" HorizontalAlignment="Left" 
-                   Foreground="{StaticResource Ash}" Margin="{Binding Margin, ElementName=NoteBox}" Padding="7,5,0,0" Grid.Column="1" Grid.Row="2">
+                               Foreground="{StaticResource Ash}" Margin="{Binding Margin, ElementName=NoteBox}" Padding="7,5,0,0" Grid.Column="1" Grid.Row="2">
                         <TextBlock.Style>
                             <Style TargetType="{x:Type TextBlock}">
                                 <Setter Property="Visibility" Value="Collapsed"/>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Text, ElementName=NoteBox}" Value="">
+                                    <DataTrigger Binding="{Binding Text, ElementName=NoteBox}" Value="{x:Null}">
                                         <Setter Property="Visibility" Value="Visible"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -85,7 +85,7 @@
                     </TextBlock>
                     <!--DateTimeTag-->
                     <TextBlock Text="{Binding TimeStamp, FallbackValue='00:00:00 00.00.00000'}"
-                   Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center">
+                               Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Foreground" Value="{StaticResource Dark}"/>
@@ -99,8 +99,8 @@
                     </TextBlock>
                     <!--Question mark-->
                     <TextBlock Text="&#xF142;" FontFamily="Segoe MDL2 Assets" Grid.Column="1" Grid.Row="0"
-                   VerticalAlignment="Top" HorizontalAlignment="Right" Cursor="Help"
-                   ToolTip="Double-click to show in windows explorer.">
+                               VerticalAlignment="Top" HorizontalAlignment="Right" Cursor="Help"
+                               ToolTip="Double-click to show in windows explorer.">
                         <TextBlock.Style>
                             <Style TargetType="{x:Type TextBlock}">
                                 <Setter Property="Visibility" Value="Visible"/>
@@ -115,8 +115,9 @@
                     <!--Buttons-->
                     <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" >
                         <!--Heart button-->
-                        <ToggleButton FontFamily="Segoe MDL2 Assets" Command="{Binding UpdateIsLikedCommand}" Width="22" FontSize="16" Height="20" 
-                          IsChecked="{Binding IsLiked, Mode=TwoWay, Converter={StaticResource IntToBoolConverter}}">
+                        <ToggleButton FontFamily="Segoe MDL2 Assets" Width="22" FontSize="16" Height="20" 
+                                      Command="{Binding DataContext.UpdateIsLikedCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" 
+                                      IsChecked="{Binding IsLiked, Mode=TwoWay, Converter={StaticResource IntToBoolConverter}}">
                             <ToggleButton.Style>
                                 <Style TargetType="{x:Type ToggleButton}">
                                     <Setter Property="Content" Value="&#x0000EB51;"/>
@@ -146,8 +147,8 @@
                         <Grid Margin="5,0,0,0" Visibility="{Binding SavefilePath, Converter={StaticResource ExistsToVisibilityConverter}}">
                             <!--Cloud icon-->
                             <ToggleButton FontFamily="Segoe MDL2 Assets" IsChecked="{Binding IsInDrive, Mode=OneWay}"
-                              Width="22" FontSize="20" Height="20" IsThreeState="True" Content="&#xE753;"
-                              Command="{Binding ExecuteDriveActionCommand}">
+                                          Width="22" FontSize="20" Height="20" IsThreeState="True" Content="&#xE753;"
+                                          Command="{Binding DataContext.ExecuteDriveActionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
                                 <ToggleButton.Style>
                                     <Style TargetType="{x:Type ToggleButton}">
                                         <Setter Property="Foreground" Value="{StaticResource Ash}"/>

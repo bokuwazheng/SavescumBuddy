@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Google.Apis.Drive.v3" Version="1.49.0.2117" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\SavescumBuddy.Data\SavescumBuddy.Data.csproj" />
   </ItemGroup>
 

@@ -27,4 +27,6 @@ namespace SavescumBuddy.Core.Events
     public class ErrorOccuredEvent : PubSubEvent<Exception> { }
     public class HookChangedEvent : PubSubEvent<bool> { }
     public class HookKeyDownEvent : PubSubEvent<(int Key, int Modifier)> { }
+    public class HookEnabledChangedEvent : PubSubEvent<bool> { }
+    public class ExecuteRequestedEvent : PubSubEvent<string> { }
 }

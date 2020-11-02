@@ -7,10 +7,11 @@ using SavescumBuddy.Services.Interfaces;
 using SavescumBuddy.Modules.Main.Models;
 using SavescumBuddy.Core.Events;
 using SavescumBuddy.Core;
+using System;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
-    public class SettingsViewModel : BindableBase
+    public class SettingsViewModel : BindableBase, INavigationAware
     {
         private readonly IRegionManager _regionManager;
         private readonly ISettingsAccess _settingsAccess;
@@ -43,6 +44,9 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
             if (propertyName == nameof(SettingsModel.AutobackupInterval))
                 _eventAggregator.GetEvent<AutobackupIntervalChangedEvent>().Publish(Settings.AutobackupsEnabled);
+
+            if (propertyName == nameof(SettingsModel.HotkeysEnabled))
+                _eventAggregator.GetEvent<HookEnabledChangedEvent>().Publish(Settings.HotkeysEnabled);
         }
 
         // TODO: better way to unhook cuz passing SelectedHotkeyAction is kinda tricky
@@ -82,6 +86,21 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 Settings.OverwriteKey = keys.Key;
                 Settings.OverwriteModifier = keys.Modifier;
             }
+        }
+
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            _eventAggregator.GetEvent<HookEnabledChangedEvent>().Publish(false);
+        }
+
+        public bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+            return true;
+        }
+
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
+            _eventAggregator.GetEvent<HookEnabledChangedEvent>().Publish(_settingsAccess.HotkeysEnabled);
         }
 
         public DelegateCommand<HotkeyAction?> RegisterHotkeyCommand { get; }

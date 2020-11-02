@@ -11,6 +11,7 @@ using Prism.Events;
 using SavescumBuddy.Core.Events;
 using System.Windows.Forms;
 using MessageBox = System.Windows.MessageBox;
+using System.Diagnostics;
 
 namespace SavescumBuddy
 {
@@ -24,27 +25,115 @@ namespace SavescumBuddy
             base.OnInitialized();
 
             var ea = Container.Resolve<IEventAggregator>();
-            ea.GetEvent<ErrorOccuredEvent>().Subscribe(ex => MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+            ea.GetEvent<ErrorOccuredEvent>().Subscribe(ex => MessageBox.Show(Current.MainWindow, ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error));
             ea.GetEvent<HookChangedEvent>().Subscribe(OnHookChanged);
+            ea.GetEvent<HookEnabledChangedEvent>().Subscribe(OnHookEnabledChanged);
+            ea.GetEvent<ExecuteRequestedEvent>().Subscribe(OnExecuteRequested);
+
+            var settings = Container.Resolve<ISettingsAccess>();
+            var hotkeysEnabled = settings.HotkeysEnabled;
+            if (hotkeysEnabled)
+            {
+                var hook = Container.Resolve<GlobalKeyboardHook>("Application");
+                hook.Hook();
+                hook.KeyDown += ApplicationHook_KeyDown;
+            }
         }
 
-        private void OnHookChanged(bool x)
+        private void OnExecuteRequested(string path)
         {
-            var hook = Container.Resolve<GlobalKeyboardHook>();
+            try
+            {
+                using var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo(path)
+                    {
+                        UseShellExecute = true
+                    }
+                };
+                process.Start();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(Current.MainWindow, ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
 
-            if (x)
+        private void ApplicationHook_KeyDown(object sender, KeyEventArgs e)
+        {
+            var settings = Container.Resolve<ISettingsAccess>();
+            var ea = Container.Resolve<IEventAggregator>();
+            var factory = Container.Resolve<IBackupFactory>();
+            var data = Container.Resolve<IDataAccess>();
+            var backuper = Container.Resolve<IBackupService>();
+
+            if (e.KeyValue == settings.BackupKey && (int)e.Modifiers == settings.BackupModifier)
+            {
+                var backup = factory.CreateBackup();
+                backuper.BackupSavefile(backup);
+                backuper.SaveScreenshot(backup.PicturePath);
+                data.SaveBackup(backup);
+                ea.GetEvent<BackupListUpdateRequestedEvent>().Publish();
+                return;
+            }
+
+            if (e.KeyValue == settings.RestoreKey && (int)e.Modifiers == settings.RestoreModifier)
+            {
+                var backup = data.GetLatestBackup();
+                if (backup is object)
+                    backuper.RestoreBackup(backup);
+                return;
+            }
+
+            if (e.KeyValue == settings.OverwriteKey && (int)e.Modifiers == settings.OverwriteModifier)
+            {
+                var latest = data.GetLatestBackup();
+                if (latest is object)
+                {
+                    backuper.DeleteFiles(latest);
+                    data.RemoveBackup(latest);
+                }
+                var backup = factory.CreateBackup();
+                backuper.BackupSavefile(backup);
+                backuper.SaveScreenshot(backup.PicturePath);
+                data.SaveBackup(backup);
+                ea.GetEvent<BackupListUpdateRequestedEvent>().Publish();
+            }
+        }
+
+        private void OnHookEnabledChanged(bool isActive)
+        {
+            var hook = Container.Resolve<GlobalKeyboardHook>("Application");
+
+            if (isActive)
             {
                 hook.Hook();
-                hook.KeyDown += Hook_KeyDown;
+                hook.KeyDown += ApplicationHook_KeyDown;
+            }
+            else
+            {
+                hook.Hook();
+                hook.KeyDown -= ApplicationHook_KeyDown;
+            }
+        }
+
+        private void OnHookChanged(bool isActive)
+        {
+            var hook = Container.Resolve<GlobalKeyboardHook>("Settings");
+
+            if (isActive)
+            {
+                hook.Hook();
+                hook.KeyDown += SettingsHook_KeyDown;
             }
             else
             {
                 hook.Unhook();
-                hook.KeyDown -= Hook_KeyDown;
+                hook.KeyDown -= SettingsHook_KeyDown;
             }
         }
 
-        private void Hook_KeyDown(object sender, KeyEventArgs e)
+        private void SettingsHook_KeyDown(object sender, KeyEventArgs e)
         {
             var mod = Keys.None;
             if (e.Alt) mod = Keys.Alt;
@@ -76,7 +165,8 @@ namespace SavescumBuddy
                 .Register<IOpenFileService, OpenFileService>()
                 .Register<IBackupService, BackupService>()
                 .Register<IBackupFactory, BackupFactory>()
-                .RegisterSingleton<GlobalKeyboardHook>();
+                .RegisterInstance(new GlobalKeyboardHook(), "Settings")
+                .RegisterInstance(new GlobalKeyboardHook(), "Application");
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)

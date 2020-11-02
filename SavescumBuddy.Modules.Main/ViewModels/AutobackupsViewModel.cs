@@ -38,14 +38,10 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             _backupTimer = new DispatcherTimer();
             _backupTimer.Interval = TimeSpan.FromMinutes(_settingsAccess.AutobackupInterval);
             _backupTimer.Tick += (s, e) => { Autobackup(); Progress = 0; };
-            //_backupTimer.Start();
-            //_backupTimer.IsEnabled = isEnabled;
 
             _progressBarTimer = new DispatcherTimer();
             _progressBarTimer.Interval = TimeSpan.FromSeconds(1);
             _progressBarTimer.Tick += (s, e) => Progress++;
-            //_progressBarTimer.Start();
-            //_progressBarTimer.IsEnabled = isEnabled;
 
             // If false puts the timer on pause.
             var isEnabled = _settingsAccess.AutobackupsEnabled;

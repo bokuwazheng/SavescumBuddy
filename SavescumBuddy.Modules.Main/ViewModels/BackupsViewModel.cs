@@ -8,6 +8,7 @@ using SavescumBuddy.Modules.Main.Models;
 using SavescumBuddy.Services.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
@@ -39,6 +40,11 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             NavigateBackwardCommand = new DelegateCommand(() => --CurrentPageIndex, () => From > 1);
             NavigateToStartCommand = new DelegateCommand(() => CurrentPageIndex = 0, () => From > 1);
             NavigateToEndCommand = new DelegateCommand(() => CurrentPageIndex = TotalNumberOfBackups / PageSize, () => To < TotalNumberOfBackups);
+
+            ShowInExplorerCommand = new DelegateCommand<Backup>(x => _eventAggregator.GetEvent<ExecuteRequestedEvent>().Publish(Path.GetDirectoryName(x.SavefilePath)));
+            UpdateNoteCommand = new DelegateCommand<Backup>(x => _dataAccess.UpdateNote(x));
+            UpdateIsLikedCommand = new DelegateCommand<Backup>(x => _dataAccess.UpdateIsLiked(x));
+            ExecuteDriveActionCommand = new DelegateCommand<Backup>(x => { });
 
             Filter.PropertyChanged += (s, e) => OnFilterPropertyChanged(e.PropertyName);
             UpdateBackupList();
@@ -183,5 +189,9 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         public DelegateCommand NavigateBackwardCommand { get; }
         public DelegateCommand NavigateToEndCommand { get; }
         public DelegateCommand NavigateToStartCommand { get; }
+        public DelegateCommand<Backup> ShowInExplorerCommand { get; }
+        public DelegateCommand<Backup> UpdateNoteCommand { get; }
+        public DelegateCommand<Backup> UpdateIsLikedCommand { get; }
+        public DelegateCommand<Backup> ExecuteDriveActionCommand { get; }
     }
 }
