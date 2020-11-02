@@ -5,7 +5,6 @@ using Prism.Regions;
 using SavescumBuddy.Core.Enums;
 using SavescumBuddy.Services.Interfaces;
 using SavescumBuddy.Modules.Main.Models;
-using System.Windows.Input;
 using SavescumBuddy.Core.Events;
 using SavescumBuddy.Core;
 
@@ -16,7 +15,6 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         private readonly IRegionManager _regionManager;
         private readonly ISettingsAccess _settingsAccess;
         private readonly IEventAggregator _eventAggregator;
-        private readonly IHotkeyListener<Key> _hotkeyListener;
 
         private HotkeyAction? _recordedHotkeyType = null;
 
@@ -28,6 +26,8 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             _regionManager = regionManager;
             _settingsAccess = settingsAccess;
             _eventAggregator = eventAggregator;
+
+            _eventAggregator.GetEvent<HookKeyDownEvent>().Subscribe(keyboardHook_KeyDown);
 
             Settings = new SettingsModel(_settingsAccess);
             Settings.PropertyChanged += (s, e) => OnSettingsPropertyChanged(e.PropertyName);
@@ -49,66 +49,39 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         private void ToggleKeyboardHook(HotkeyAction? actionType)
         {
             if (actionType != SelectedHotkeyAction)
-            {
-                if (!_hotkeyListener.HookActive)
-                {
-                    _hotkeyListener.Hook();
-                    _hotkeyListener.KeyDown += keyboardHook_KeyDown;
-                }
-
                 SelectedHotkeyAction = actionType;
-            }
             else
-            {
-                if (_hotkeyListener.HookActive)
-                {
-                    _hotkeyListener.Unhook();
-                    _hotkeyListener.KeyDown -= keyboardHook_KeyDown;
-                }
-
                 SelectedHotkeyAction = null;
-            }
+
+            _eventAggregator.GetEvent<HookChangedEvent>().Publish(SelectedHotkeyAction.HasValue);
         }
 
-        private void keyboardHook_KeyDown(object sender, IKeyEventArgs<Key> e)
+        private void keyboardHook_KeyDown((int Key, int Modifier) keys)
         {
-            //if (e.KeyCode == Key.Escape)
-            //{
-            //    ToggleKeyboardHook(SelectedHotkeyAction);
-            //    return;
-            //}
+            if (keys.Key == 27) // Keys.Escape
+            {
+                ToggleKeyboardHook(SelectedHotkeyAction);
+                return;
+            }
 
-            //if (e.KeyCode == Key.Enter || e.KeyCode == Key.Space)
-            //    return;
+            if (keys.Key == 13 || keys.Key == 32) // Keys.Enter or Keys.Space
+                return;
 
-            //var mod = Key.None;
-            //if (e.Alt) mod = Key.Alt;
-            //if (e.Shift) mod = Key.Shift;
-            //if (e.Control) mod = Key.Control;
-
-            //var key = Keys.None;
-            //if (e.KeyValue > 0) key = e.KeyCode;
-
-            //if (key == Keys.LMenu || key == Keys.RMenu ||
-            //    key == Keys.LShiftKey || key == Keys.RShiftKey ||
-            //    key == Keys.LControlKey || key == Keys.RControlKey)
-            //    mod = Keys.None;
-
-            //if (SelectedHotkeyAction == HotkeyAction.Save)
-            //{
-            //    Settings.SelectedQSKey = key;
-            //    Settings.SelectedQSMod = mod;
-            //}
-            //else if (SelectedHotkeyAction == HotkeyAction.Restore)
-            //{
-            //    Settings.SelectedQLKey = key;
-            //    Settings.SelectedQLMod = mod;
-            //}
-            //else if (SelectedHotkeyAction == HotkeyAction.Overwrite)
-            //{
-            //    Settings.SelectedSOKey = key;
-            //    Settings.SelectedSOMod = mod;
-            //}
+            if (SelectedHotkeyAction == HotkeyAction.Backup)
+            {
+                Settings.BackupKey = keys.Key;
+                Settings.BackupModifier = keys.Modifier;
+            }
+            else if (SelectedHotkeyAction == HotkeyAction.Restore)
+            {
+                Settings.RestoreKey = keys.Key;
+                Settings.RestoreModifier = keys.Modifier;
+            }
+            else if (SelectedHotkeyAction == HotkeyAction.Overwrite)
+            {
+                Settings.OverwriteKey = keys.Key;
+                Settings.OverwriteModifier = keys.Modifier;
+            }
         }
 
         public DelegateCommand<HotkeyAction?> RegisterHotkeyCommand { get; }

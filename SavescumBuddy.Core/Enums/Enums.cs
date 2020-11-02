@@ -4,7 +4,7 @@ namespace SavescumBuddy.Core.Enums
 {
     public enum HotkeyAction
     {
-        Save,
+        Backup,
         Restore,
         Overwrite
     }

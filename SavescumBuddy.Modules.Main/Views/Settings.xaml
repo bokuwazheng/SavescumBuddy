@@ -229,7 +229,7 @@
                                         <Style TargetType="Border">
                                             <Setter Property="BorderBrush" Value="Transparent"/>
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding SaveHookIsEnabled}" Value="True">
+                                                <DataTrigger Binding="{Binding SelectedHotkeyAction, Converter={StaticResource HotkeyActionToBoolConverter}, ConverterParameter={x:Static enums:HotkeyAction.Backup}}" Value="True">
                                                     <Setter Property="BorderBrush" Value="White"/>
                                                     <DataTrigger.EnterActions>
                                                         <BeginStoryboard Storyboard="{StaticResource Pulse}"/>
@@ -241,14 +241,14 @@
                                     <TextBlock VerticalAlignment="Center" Margin="10,0" FontWeight="Medium">
                                         <TextBlock.Text>
                                             <MultiBinding Converter="{StaticResource KeysToStringConverter}">
-                                                <Binding Path="Settings.SelectedQSKey"/>
-                                                <Binding Path="Settings.SelectedQSMod"/>
+                                                <Binding Path="Settings.BackupKey"/>
+                                                <Binding Path="Settings.BackupModifier"/>
                                             </MultiBinding>
                                         </TextBlock.Text>
                                     </TextBlock>
                                 </Border>
-                                <ToggleButton Grid.Column="1" IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource HotkeyActionToBoolConverter}, ConverterParameter={x:Static enums:HotkeyAction.Save}, Mode=OneWay}" 
-                                              Style="{StaticResource RecordHotkeyToggleButton}" Command="{Binding RegisterHotkeyCommand}" CommandParameter="{x:Static enums:HotkeyAction.Save}"/>
+                                <ToggleButton Grid.Column="1" IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource HotkeyActionToBoolConverter}, ConverterParameter={x:Static enums:HotkeyAction.Backup}, Mode=OneWay}" 
+                                              Style="{StaticResource RecordHotkeyToggleButton}" Command="{Binding RegisterHotkeyCommand}" CommandParameter="{x:Static enums:HotkeyAction.Backup}"/>
                             </Grid>
                         </GroupBox>
                         <!--Restore box-->
@@ -263,7 +263,7 @@
                                         <Style TargetType="Border">
                                             <Setter Property="BorderBrush" Value="Transparent"/>
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding RestoreHookIsEnabled}" Value="True">
+                                                <DataTrigger Binding="{Binding SelectedHotkeyAction, Converter={StaticResource HotkeyActionToBoolConverter}, ConverterParameter={x:Static enums:HotkeyAction.Restore}}" Value="True">
                                                     <Setter Property="BorderBrush" Value="White"/>
                                                     <DataTrigger.EnterActions>
                                                         <BeginStoryboard Storyboard="{StaticResource Pulse}"/>
@@ -275,8 +275,8 @@
                                     <TextBlock VerticalAlignment="Center" Margin="10,0" FontWeight="Medium">
                                         <TextBlock.Text>
                                             <MultiBinding Converter="{StaticResource KeysToStringConverter}">
-                                                <Binding Path="Settings.SelectedQLKey"/>
-                                                <Binding Path="Settings.SelectedQLMod"/>
+                                                <Binding Path="Settings.RestoreKey"/>
+                                                <Binding Path="Settings.RestoreModifier"/>
                                             </MultiBinding>
                                         </TextBlock.Text>
                                     </TextBlock>
@@ -297,7 +297,7 @@
                                         <Style TargetType="Border">
                                             <Setter Property="BorderBrush" Value="Transparent"/>
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding OverwriteHookIsEnabled}" Value="True">
+                                                <DataTrigger Binding="{Binding SelectedHotkeyAction, Converter={StaticResource HotkeyActionToBoolConverter}, ConverterParameter={x:Static enums:HotkeyAction.Overwrite}}" Value="True">
                                                     <Setter Property="BorderBrush" Value="White"/>
                                                     <DataTrigger.EnterActions>
                                                         <BeginStoryboard Storyboard="{StaticResource Pulse}"/>
@@ -309,8 +309,8 @@
                                     <TextBlock VerticalAlignment="Center" Margin="10,0" FontWeight="Medium">
                                         <TextBlock.Text>
                                             <MultiBinding Converter="{StaticResource KeysToStringConverter}">
-                                                <Binding Path="Settings.SelectedSOKey"/>
-                                                <Binding Path="Settings.SelectedSOMod"/>
+                                                <Binding Path="Settings.OverwriteKey"/>
+                                                <Binding Path="Settings.OverwriteModifier"/>
                                             </MultiBinding>
                                         </TextBlock.Text>
                                     </TextBlock>

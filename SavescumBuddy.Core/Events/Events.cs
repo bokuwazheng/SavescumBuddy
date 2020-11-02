@@ -1,4 +1,5 @@
 ﻿using Prism.Events;
+using SavescumBuddy.Core.Enums;
 using SavescumBuddy.Data;
 using System;
 
@@ -24,4 +25,6 @@ namespace SavescumBuddy.Core.Events
     public class BackupDeletionRequestedEvent : PubSubEvent<Backup> { }
     public class BackupListUpdateRequestedEvent : PubSubEvent { }
     public class ErrorOccuredEvent : PubSubEvent<Exception> { }
+    public class HookChangedEvent : PubSubEvent<bool> { }
+    public class HookKeyDownEvent : PubSubEvent<(int Key, int Modifier)> { }
 }

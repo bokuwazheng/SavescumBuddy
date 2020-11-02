@@ -4,7 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Input;
+using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 
 namespace SavescumBuddy.CustomControls.Converters
@@ -63,10 +63,10 @@ namespace SavescumBuddy.CustomControls.Converters
                 values[1] == DependencyProperty.UnsetValue)
                 return null;
 
-            var key = (Key)values[0];
-            var mod = (Key)values[1];
+            var key = (Keys)values[0];
+            var mod = (Keys)values[1];
 
-            if (mod == Key.None)
+            if (mod == Keys.None)
                 return key.ToString().ToUpper();
 
             return mod.ToString().ToUpper() + " + " + key.ToString().ToUpper();
