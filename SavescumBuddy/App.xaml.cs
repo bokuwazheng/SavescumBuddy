@@ -40,6 +40,39 @@ namespace SavescumBuddy
             }
         }
 
+        protected override Window CreateShell()
+        {
+            return Container.Resolve<MainWindow>();
+        }
+
+        protected override void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            containerRegistry
+                .RegisterInstance<IDataAccess>(new SqliteDataAccess(new SqliteDbService(LoadConnectionString())))
+                .RegisterInstance<ISettingsAccess>(new SqliteSettingsAccess(new SqliteDbService(LoadConnectionString())))
+                .Register<IOpenFileService, OpenFileService>()
+                .Register<IBackupService, BackupService>()
+                .Register<IBackupFactory, BackupFactory>()
+                .RegisterInstance(new GlobalKeyboardHook(), "Settings")
+                .RegisterInstance(new GlobalKeyboardHook(), "Application")
+                .RegisterSingleton<IGoogleDrive, GoogleDrive>();
+        }
+
+        protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
+        {
+            moduleCatalog.AddModule<MainModule>();
+        }
+
+        private string LoadConnectionString()
+        {
+#if DEBUG
+            var id = "Data Source=.\\DB.db;Version=3;";
+#else
+            var id = "Data Source=%APPDATA%\\bokuwazheng\\DB.db;Version=3;";
+#endif
+            return id.Replace("%APPDATA%", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
+        }
+
         private void OnExecuteRequested(string path)
         {
             try
@@ -150,38 +183,6 @@ namespace SavescumBuddy
 
             var ea = Container.Resolve<IEventAggregator>();
             ea.GetEvent<HookKeyDownEvent>().Publish(((int)key, (int)mod));
-        }
-
-        protected override Window CreateShell()
-        {
-            return Container.Resolve<MainWindow>();
-        }
-
-        protected override void RegisterTypes(IContainerRegistry containerRegistry)
-        {
-            containerRegistry
-                .RegisterInstance<IDataAccess>(new SqliteDataAccess(new SqliteDbService(LoadConnectionString())))
-                .RegisterInstance<ISettingsAccess>(new SqliteSettingsAccess(new SqliteDbService(LoadConnectionString())))
-                .Register<IOpenFileService, OpenFileService>()
-                .Register<IBackupService, BackupService>()
-                .Register<IBackupFactory, BackupFactory>()
-                .RegisterInstance(new GlobalKeyboardHook(), "Settings")
-                .RegisterInstance(new GlobalKeyboardHook(), "Application");
-        }
-
-        protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
-        {
-            moduleCatalog.AddModule<MainModule>();
-        }
-
-        private string LoadConnectionString()
-        {
-#if DEBUG
-            var id = "Data Source=.\\DB.db;Version=3;";
-#else
-            var id = "Data Source=%APPDATA%\\bokuwazheng\\DB.db;Version=3;";
-#endif
-            return id.Replace("%APPDATA%", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
         }
     }
 }

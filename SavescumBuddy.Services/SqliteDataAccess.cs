@@ -195,9 +195,9 @@ namespace SavescumBuddy.Services
             return _sqlService.Query<Game>("select * from Game order by Id asc");
         }
 
-        public void SaveGame(Game game)
+        public int SaveGame(Game game)
         {
-            _sqlService.Execute("insert into Game (Title, SavefilePath, BackupFolder) values (@Title, @SavefilePath, @BackupFolder)", game);
+            return _sqlService.ExecuteScalar<int>("insert into Game (Title, SavefilePath, BackupFolder) values (@Title, @SavefilePath, @BackupFolder); SELECT last_insert_rowid();", game);
         }
 
         public void RemoveGame(Game game)
@@ -220,6 +220,11 @@ namespace SavescumBuddy.Services
         {
             _sqlService.Execute("update Game set Title = @Title, SavefilePath = @SavefilePath, BackupFolder = @BackupFolder where Id = @Id;",
                 new { Id = game.Id, Title = game.Title, SavefilePath = game.SavefilePath, BackupFolder = game.BackupFolder});
+        }
+
+        public Game GetGame(int id)
+        {
+            return _sqlService.QueryFirstOrDefault<Game>("select * from Game where Id = @Id", new { Id = id });
         }
         #endregion
     }

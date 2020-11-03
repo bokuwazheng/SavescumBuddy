@@ -18,10 +18,11 @@ namespace SavescumBuddy.Services.Interfaces
         void UpdateDriveId(Backup backup);
         void UpdateFilePaths(Backup backup);
         List<Game> LoadGames();
-        void SaveGame(Game game);
+        int SaveGame(Game game);
         void RemoveGame(Game game);
         Game GetCurrentGame();
         void SetGameAsCurrent(Game game);
         void UpdateGame(Game game);
+        Game GetGame(int gameId);
     }
 }

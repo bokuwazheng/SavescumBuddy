@@ -20,8 +20,9 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         private readonly IEventAggregator _eventAggregator;
         private readonly IBackupService _backupService;
         private readonly IBackupFactory _backupFactory;
+        private readonly IGoogleDrive _googleDrive;
 
-        public BackupsViewModel(IRegionManager regionManager, IDataAccess dataAccess, ISettingsAccess settingsAccess, IEventAggregator eventAggregator, IBackupService backupService, IBackupFactory backupFactory)
+        public BackupsViewModel(IRegionManager regionManager, IDataAccess dataAccess, ISettingsAccess settingsAccess, IEventAggregator eventAggregator, IBackupService backupService, IBackupFactory backupFactory, IGoogleDrive googleDrive)
         {
             _regionManager = regionManager;
             _dataAccess = dataAccess;
@@ -29,6 +30,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             _eventAggregator = eventAggregator;
             _backupService = backupService;
             _backupFactory = backupFactory;
+            _googleDrive = googleDrive;
 
             _eventAggregator.GetEvent<BackupListUpdateRequestedEvent>().Subscribe(UpdateBackupList);
 
@@ -44,7 +46,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             ShowInExplorerCommand = new DelegateCommand<Backup>(x => _eventAggregator.GetEvent<ExecuteRequestedEvent>().Publish(Path.GetDirectoryName(x.SavefilePath)));
             UpdateNoteCommand = new DelegateCommand<Backup>(x => _dataAccess.UpdateNote(x));
             UpdateIsLikedCommand = new DelegateCommand<Backup>(x => _dataAccess.UpdateIsLiked(x));
-            ExecuteDriveActionCommand = new DelegateCommand<Backup>(x => { });
+            ExecuteDriveActionCommand = new DelegateCommand<Backup>(ExecuteCloudAction, x => _googleDrive.UserCredential is object);
 
             Filter.PropertyChanged += (s, e) => OnFilterPropertyChanged(e.PropertyName);
             UpdateBackupList();
@@ -180,6 +182,14 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             {
                 _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
             }
+        }
+
+        private void ExecuteCloudAction(Backup backup)
+        {
+            if (backup.GoogleDriveId is null)
+                _eventAggregator.GetEvent<GoogleDriveUploadRequestedEvent>().Publish(backup);
+            else
+                _eventAggregator.GetEvent<GoogleDriveDeletionRequestedEvent>().Publish(backup);
         }
 
         public DelegateCommand<Backup> RemoveCommand { get; }

@@ -93,7 +93,10 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             try
             {
                 if (game.Id == 0)
-                    _dataAccess.SaveGame(game.Game);
+                {
+                    var id = _dataAccess.SaveGame(game.Game);
+                    game.Id = id;
+                }
                 else
                     _dataAccess.UpdateGame(game.Game);
             }

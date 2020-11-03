@@ -6,13 +6,6 @@ namespace SavescumBuddy.Modules.Main.Models
 {
     public class GameModel : BindableBase
     {
-        private int _id;
-        private string _title;
-        private string _savefilePath;
-        private string _backupFolder;
-        private int _canBeSetCurrent;
-        private int _isCurrent;
-
         public GameModel(Game game)
         {
             Game = game ?? throw new ArgumentNullException(nameof(game));

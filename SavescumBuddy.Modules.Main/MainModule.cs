@@ -20,6 +20,7 @@ namespace SavescumBuddy.Modules.Main
             _regionManager.RequestNavigate(RegionNames.ContentRegion, "Backups");
             _regionManager.RequestNavigate(RegionNames.Navigation, "Navigation");
             _regionManager.RequestNavigate(RegionNames.Autobackuper, "Autobackups");
+            _regionManager.RequestNavigate(RegionNames.GoogleDrive, "GoogleDrive");
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
@@ -29,6 +30,7 @@ namespace SavescumBuddy.Modules.Main
             containerRegistry.RegisterForNavigation<Games>();
             containerRegistry.RegisterForNavigation<Navigation>();
             containerRegistry.RegisterForNavigation<Autobackups>();
+            containerRegistry.RegisterForNavigation<GoogleDrive>();
         }
     }
 }

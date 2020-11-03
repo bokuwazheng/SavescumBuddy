@@ -20,29 +20,28 @@ namespace SavescumBuddy.Services
         public const string Folder = "mimeType = 'application/vnd.google-apps.folder'";
     }
 
-    public class GoogleDrive : IDisposable, IGoogleDrive
+    public class GoogleDrive : IGoogleDrive
     {
-        private CancellationTokenSource _cts;
         // If modifying these scopes, delete your previously saved credentials.
         private readonly string[] _scopes;
         private readonly string _applicationName;
         private readonly TimeSpan _timeoutDelay;
         private readonly string _timeoutError;
 
-        private static readonly string _credentialsFileName = "sb_credentials.json";
-        private static readonly string _tokenFolderName = "token.json";
+        private readonly string _credentialsFileName = "sb_credentials.json";
+        private readonly string _tokenFolderName = "token.json";
 
 #if DEBUG
-        public static readonly string CredentialsFileName = _credentialsFileName;
-        public static readonly string TokenFolderName = _tokenFolderName;
+        public string CredentialsFileName => _credentialsFileName;
+        public string TokenFolderName => _tokenFolderName;
 #else
-        public static readonly string CredentialsFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "bokuwazheng", _credentialsFileName);
-        public static readonly string TokenFolderName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "bokuwazheng", _tokenFolderName);
+        public string CredentialsFileName => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "bokuwazheng", _credentialsFileName);
+        public string TokenFolderName => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "bokuwazheng", _tokenFolderName);
 #endif
 
-        public UserCredential UserCredential { get; set; }
+        public UserCredential UserCredential { get; private set; }
 
-        private GoogleDrive()
+        public GoogleDrive()
         {
             _scopes = new string[] { DriveService.Scope.DriveFile, DriveService.Scope.DriveAppdata };
             _applicationName = "Savescum Buddy";
@@ -60,10 +59,10 @@ namespace SavescumBuddy.Services
             return service;
         }
 
-        public async Task<UserCredential> AuthorizeAsync(string credentials, string token)
+        public async Task<UserCredential> AuthorizeAsync(CancellationToken ct)
         {
-            _cts = new CancellationTokenSource();
-            _cts.CancelAfter(_timeoutDelay);
+            var credentials = CredentialsFileName;
+            var token = TokenFolderName;
 
             using (var stream = new FileStream(credentials, FileMode.Open, FileAccess.Read))
             {
@@ -73,22 +72,33 @@ namespace SavescumBuddy.Services
                     GoogleClientSecrets.Load(stream).Secrets,
                     _scopes,
                     "user",
-                    _cts.Token,
+                    ct,
                     new FileDataStore(token, true)).ConfigureAwait(false);
+
+                UserCredential = credential;
 
                 return credential;
             }
         }
 
-        public async Task ReauthorizeAsync(UserCredential userCredential)
+        public bool CredentialExists()
+        {
+            var credentials = CredentialsFileName;
+            var token = TokenFolderName;
+
+            var folderExists = Directory.Exists(token);
+            if (folderExists)
+                return Directory.GetFiles(token).Any(x => x.Contains("Google.Apis.Auth.OAuth2.Responses.TokenResponse-user"));
+            else
+                return false;
+        }
+
+        public async Task ReauthorizeAsync(UserCredential userCredential, CancellationToken ct)
         {
             if (userCredential is null)
-                return;
+                throw new ArgumentNullException(nameof(userCredential));
 
-            _cts = new CancellationTokenSource();
-            _cts.CancelAfter(_timeoutDelay);
-
-            await GoogleWebAuthorizationBroker.ReauthorizeAsync(userCredential, _cts.Token).ConfigureAwait(false);
+            await GoogleWebAuthorizationBroker.ReauthorizeAsync(userCredential, ct).ConfigureAwait(false);
         }
 
         public async Task<string> GetAppRootFolderIdAsync(CancellationToken ct = default) =>
@@ -213,21 +223,6 @@ namespace SavescumBuddy.Services
             return (regKey != null && regKey.GetValue("Content Type") != null)
                 ? regKey.GetValue("Content Type").ToString()
                 : mimeType;
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _cts?.Dispose();
-                _cts = null;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }

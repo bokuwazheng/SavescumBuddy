@@ -11,14 +11,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace SavescumBuddy.Modules.List.Views
+namespace SavescumBuddy.Modules.Main.Views
 {
     /// <summary>
-    /// Interaction logic for List.xaml
+    /// Interaction logic for GoogleDrive.xaml
     /// </summary>
-    public partial class List : UserControl
+    public partial class GoogleDrive : UserControl
     {
-        public List()
+        public GoogleDrive()
         {
             InitializeComponent();
         }

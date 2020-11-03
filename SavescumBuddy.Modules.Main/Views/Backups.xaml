@@ -326,7 +326,7 @@
                 <ListView x:Name="ListView" ItemsSource="{Binding Backups}" SelectedItem="{Binding SelectedBackup}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" SelectionMode="Single" 
                           IsSynchronizedWithCurrentItem="True" Grid.RowSpan="2" BorderBrush="{x:Null}" Background="{x:Null}" ScrollViewer.CanContentScroll="False" ItemTemplate="{StaticResource Backup}">
                     <ListView.InputBindings>
-                        <KeyBinding Command="{Binding RemoveCommand}" CommandParameter="{Binding SelectedItem.Backup, ElementName=ListView}" Key="Delete"/>
+                        <KeyBinding Command="{Binding RemoveCommand}" CommandParameter="{Binding SelectedItem, ElementName=ListView}" Key="Delete"/>
                     </ListView.InputBindings>
                 </ListView>
                 <!--Paging panel-->
@@ -506,7 +506,7 @@
                                Grid.Column="1" FontStyle="Italic"/>
                     <!--Delete button-->
                     <Button FontFamily="Segoe MDL2 Assets" Content="&#xE74D;" FontSize="18" Height="25" Width="22" VerticalAlignment="Top" Margin="15,5,10,0"
-                            Command="{Binding RemoveCommand}" CommandParameter="{Binding SelectedItem.Backup, ElementName=ListView}" Grid.Column="2"
+                            Command="{Binding RemoveCommand}" CommandParameter="{Binding SelectedItem, ElementName=ListView}" Grid.Column="2"
                             IsEnabled="{Binding SelectedBackup, Converter={StaticResource ObjectToBoolConverter}}">
                         <Button.Style>
                             <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">

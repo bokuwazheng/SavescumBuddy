@@ -21,4 +21,9 @@
     <ProjectReference Include="..\SavescumBuddy.Core\SavescumBuddy.Core.csproj" />
     <ProjectReference Include="..\SavescumBuddy.Modules.Main\SavescumBuddy.Modules.Main.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="sb_credentials.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

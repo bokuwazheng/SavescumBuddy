@@ -316,9 +316,12 @@
                                     <DataTrigger Binding="{Binding IsCurrent}" Value="1">
                                         <Setter Property="Visibility" Value="Hidden"/>
                                     </DataTrigger>
-                                    <Trigger Property="IsEnabled"  Value="False">
+                                    <DataTrigger Binding="{Binding Id}" Value="0">
+                                        <Setter Property="IsEnabled" Value="False"/>
+                                    </DataTrigger>
+                                    <!--<Trigger Property="IsEnabled"  Value="False">
                                         <Setter Property="Visibility" Value="Hidden"/>
-                                    </Trigger>
+                                    </Trigger>-->
                                     <Trigger Property="Button.IsMouseOver"  Value="True">
                                         <Setter Property="Foreground" Value="{StaticResource SomeGreen}"/>
                                         <Setter Property="BorderBrush" Value="{StaticResource SomeGreen}"/>
