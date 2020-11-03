@@ -197,7 +197,7 @@ namespace SavescumBuddy.Services
 
         public int SaveGame(Game game)
         {
-            return _sqlService.ExecuteScalar<int>("insert into Game (Title, SavefilePath, BackupFolder) values (@Title, @SavefilePath, @BackupFolder); SELECT last_insert_rowid();", game);
+            return _sqlService.ExecuteScalar<int>("insert into Game (Title, SavefilePath, BackupFolder) values (@Title, @SavefilePath, @BackupFolder); select last_insert_rowid();", game);
         }
 
         public void RemoveGame(Game game)
