@@ -4,6 +4,11 @@
              xmlns:local="clr-namespace:SavescumBuddy"
              xmlns:prism="http://prismlibrary.com/" >
     <Application.Resources>
-         
+        <!--<ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.CustomControls;component/DefaultTheme.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.CustomControls;component/DarkTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>-->
     </Application.Resources>
 </prism:PrismApplication>

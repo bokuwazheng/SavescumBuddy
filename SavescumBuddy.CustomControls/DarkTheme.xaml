@@ -8,7 +8,7 @@
     </ResourceDictionary.MergedDictionaries>
 
     <Style x:Key="DefaultButtonStyle2" TargetType="Button">
-        <Setter Property="BorderBrush" Value="Blue"/>
+        <Setter Property="BorderBrush" Value="Red"/>
     </Style>
-
+    
 </ResourceDictionary>

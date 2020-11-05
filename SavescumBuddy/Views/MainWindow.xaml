@@ -11,6 +11,22 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+        <Button x:Name="skinner" Content="SKIN PICKER" Style="{DynamicResource DefaultButtonStyle2}">
+            <Button.ContextMenu>
+                <ContextMenu MenuItem.Click="ContextMenu_Click">
+                    <MenuItem Tag="/SavescumBuddy.CustomControls;component/DefaultTheme.xaml">
+                        <MenuItem.Header>
+                            <Rectangle Width="120" Height="40" Fill="Red" />
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem Tag="/SavescumBuddy.CustomControls;component/DarkTheme.xaml">
+                        <MenuItem.Header>
+                            <Rectangle Width="120" Height="40" Fill="Blue" />
+                        </MenuItem.Header>
+                    </MenuItem>
+                </ContextMenu>
+            </Button.ContextMenu>
+        </Button>
         <DockPanel Grid.Row="0">
             <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Navigation}"/>
             <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.GoogleDrive}"/>

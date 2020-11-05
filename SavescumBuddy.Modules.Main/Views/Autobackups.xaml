@@ -11,19 +11,19 @@
              xmlns:validation="clr-namespace:SavescumBuddy.CustomControls.Validation;assembly=SavescumBuddy.CustomControls"
              prism:ViewModelLocator.AutoWireViewModel="True">
 
-    <UserControl.Resources>
+    <!--<UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.CustomControls;component/DefaultTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-    </UserControl.Resources>
+    </UserControl.Resources>-->
 
     <!--ProgressBar-->
     <Grid Margin="10">
-        <Border Height="1" Background="{StaticResource Grayish}" VerticalAlignment="Bottom"/>
+        <Border Height="1" Background="{DynamicResource Grayish}" VerticalAlignment="Bottom"/>
         <ProgressBar Minimum="0" Maximum="{Binding Interval, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                      Value="{Binding Progress, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=20}" 
-                     Height="2" Foreground="{StaticResource Ash}" BorderBrush="Transparent"/>
+                     Height="2" Foreground="{DynamicResource Ash}" BorderBrush="Transparent"/>
     </Grid>
 </UserControl>

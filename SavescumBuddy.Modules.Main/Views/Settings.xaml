@@ -165,12 +165,10 @@
                             <sys:Int32>50</sys:Int32>
                             <sys:Int32>60</sys:Int32>
                         </ComboBox>
-                        <ComboBox Grid.Column="1" Grid.Row="1" Height="28" Foreground="{StaticResource Ash}"
-                                  ItemsSource="{ext:EnumToCollection EnumType={x:Type enums:SkipOption}}" 
-                                  SelectedItem="{Binding Settings.AutobackupOverwriteType}"/>
-                        <ComboBox Grid.Column="1" Grid.Row="2" Height="28" Foreground="{StaticResource Ash}" 
-                                  ItemsSource="{ext:EnumToCollection EnumType={x:Type enums:OverwriteOption}}"
-                                  SelectedItem="{Binding Settings.AutobackupSkipType}"/>
+                        <ComboBox Grid.Column="1" Grid.Row="1" Height="28" Foreground="{StaticResource Ash}" ItemsSource="{ext:EnumToValueDescriptionPairListExtension EnumType={x:Type enums:SkipOption}}"
+                                  SelectedValuePath="Value" DisplayMemberPath="Description" SelectedValue="{Binding Settings.AutobackupOverwriteType}"/>
+                        <ComboBox Grid.Column="1" Grid.Row="2" Height="28" Foreground="{StaticResource Ash}" ItemsSource="{ext:EnumToValueDescriptionPairListExtension EnumType={x:Type enums:OverwriteOption}}"
+                                  SelectedValuePath="Value" DisplayMemberPath="Description" SelectedValue="{Binding Settings.AutobackupSkipType}"/>
                     </Grid>
                 </Expander>
                 <!--Auto backups region ends here-->
