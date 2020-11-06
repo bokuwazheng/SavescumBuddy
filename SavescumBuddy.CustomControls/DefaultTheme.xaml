@@ -4,7 +4,7 @@
                     xmlns:converters="clr-namespace:SavescumBuddy.CustomControls.Converters;assembly=SavescumBuddy.CustomControls">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="Styles.xaml"/>
+        <ResourceDictionary Source="Styles.xaml" Source="{ThemeDictionary }"/>
     </ResourceDictionary.MergedDictionaries>
 
     <Style x:Key="DefaultButtonStyle2" TargetType="Button">

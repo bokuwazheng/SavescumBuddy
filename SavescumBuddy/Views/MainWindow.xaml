@@ -11,7 +11,7 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Button x:Name="skinner" Content="SKIN PICKER" Style="{DynamicResource DefaultButtonStyle2}">
+        <Button x:Name="SkinButton" Content="SKIN PICKER" Style="{DynamicResource DefaultButtonStyle2}">
             <Button.ContextMenu>
                 <ContextMenu MenuItem.Click="ContextMenu_Click">
                     <MenuItem Tag="/SavescumBuddy.CustomControls;component/DefaultTheme.xaml">
@@ -33,5 +33,14 @@
         </DockPanel>
         <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.ContentRegion}" Grid.Row="1"/>
         <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Autobackuper}" Grid.Row="2"/>
+        <ContentControl>
+            <ContentControl.Resources>
+                <ResourceDictionary>
+                    <ResourceDictionary.MergedDictionaries>
+                        <ResourceDictionary Source=""/>
+                    </ResourceDictionary.MergedDictionaries>
+                </ResourceDictionary>
+            </ContentControl.Resources>
+        </ContentControl>
     </Grid>
 </Window>
