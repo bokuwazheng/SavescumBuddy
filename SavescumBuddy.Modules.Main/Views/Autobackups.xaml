@@ -11,13 +11,13 @@
              xmlns:validation="clr-namespace:SavescumBuddy.CustomControls.Validation;assembly=SavescumBuddy.CustomControls"
              prism:ViewModelLocator.AutoWireViewModel="True">
 
-    <!--<UserControl.Resources>
+    <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.CustomControls;component/DefaultTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-    </UserControl.Resources>-->
+    </UserControl.Resources>
 
     <!--ProgressBar-->
     <Grid Margin="10">

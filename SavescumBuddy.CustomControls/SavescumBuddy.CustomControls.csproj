@@ -14,10 +14,4 @@
     <ProjectReference Include="..\SavescumBuddy.Core\SavescumBuddy.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Resource Include="DefaultTheme.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Resource>
-  </ItemGroup>
-
 </Project>

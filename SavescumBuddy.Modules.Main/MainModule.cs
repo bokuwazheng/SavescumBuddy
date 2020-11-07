@@ -17,20 +17,20 @@ namespace SavescumBuddy.Modules.Main
         
         public void OnInitialized(IContainerProvider containerProvider)
         {
-            //_regionManager.RequestNavigate(RegionNames.ContentRegion, "Backups");
-            //_regionManager.RequestNavigate(RegionNames.Navigation, "Navigation");
+            _regionManager.RequestNavigate(RegionNames.ContentRegion, "Backups");
+            _regionManager.RequestNavigate(RegionNames.Navigation, "Navigation");
             _regionManager.RequestNavigate(RegionNames.Autobackuper, "Autobackups");
-            //_regionManager.RequestNavigate(RegionNames.GoogleDrive, "GoogleDrive");
+            _regionManager.RequestNavigate(RegionNames.GoogleDrive, "GoogleDrive");
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            //containerRegistry.RegisterForNavigation<Backups>();
-            //containerRegistry.RegisterForNavigation<Settings>();
-            //containerRegistry.RegisterForNavigation<Games>();
-            //containerRegistry.RegisterForNavigation<Navigation>();
-            //containerRegistry.RegisterForNavigation<Autobackups>();
-            //containerRegistry.RegisterForNavigation<GoogleDrive>();
+            containerRegistry.RegisterForNavigation<Backups>();
+            containerRegistry.RegisterForNavigation<Settings>();
+            containerRegistry.RegisterForNavigation<Games>();
+            containerRegistry.RegisterForNavigation<Navigation>();
+            containerRegistry.RegisterForNavigation<Autobackups>();
+            containerRegistry.RegisterForNavigation<GoogleDrive>();
         }
     }
 }

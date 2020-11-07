@@ -9,11 +9,13 @@
              prism:ViewModelLocator.AutoWireViewModel="True">
 
     <UserControl.Resources>
-        <!--<ResourceDictionary>
+        <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.CustomControls;component/Style.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.CustomControls;component/DefaultTheme.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.CustomControls;component/Templates.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>-->
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid Background="White" SnapsToDevicePixels="True">
@@ -69,7 +71,7 @@
                 </Grid>
             </Grid>
             <!--Button panel-->
-            <Grid  Grid.Column="1" Grid.Row="3" >
+            <Grid Grid.Column="1" Grid.Row="3" >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="35"/>
                     <ColumnDefinition Width="Auto"/>
@@ -77,13 +79,13 @@
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <!--Add button-->
-                <Button Command="{Binding AddCommand}" FontFamily="Segoe MDL2 Assets" FontSize="18" Grid.Column="0" Height="25" Width="25" 
+                <Button Command="{Binding AddCommand}" FontFamily="Segoe MDL2 Assets" FontSize="18" Grid.Column="0" Height="40" Width="40"
                         RenderTransformOrigin="0.5,0.5" IsEnabled="{Binding CurrentGameIsSet}">
                     <Button.RenderTransform>
                         <RotateTransform/>
                     </Button.RenderTransform>
                     <Button.Style>
-                        <Style TargetType="{x:Type Button}" BasedOn="{DynamicResource DefaultButtonStyle}">
+                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource DefaultButtonStyle}">
                             <Setter Property="Content" Value="&#xE710;"/>
                             <Style.Triggers>
                                 <EventTrigger RoutedEvent="Button.Click">
@@ -101,63 +103,27 @@
                 <!--Sorting buttons-->
                 <StackPanel Orientation="Horizontal" Grid.Column="1">
                     <!--Heart button-->
-                    <ToggleButton FontFamily="Segoe MDL2 Assets" Width="25" Height="25" Margin="5,0,5,0" IsChecked="{Binding Filter.LikedOnly}" >
-                        <ToggleButton.Style>
-                            <Style TargetType="{x:Type ToggleButton}" BasedOn="{DynamicResource FilterToggleButton}">
-                                <Setter Property="Content" Value="&#xEB51;"/>
-                                <Style.Triggers>
-                                    <Trigger Property="IsChecked" Value="True">
-                                        <Setter Property="Foreground" Value="{DynamicResource HeartButtonBrush}"/>
-                                        <Setter Property="Content" Value="&#xEB52;"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ToggleButton.Style>
-                    </ToggleButton>
+                    <ToggleButton IsChecked="{Binding Filter.LikedOnly}" Style="{DynamicResource HeartToggleButton}"/>
                     <!--Autobackups button-->
-                    <ToggleButton FontFamily="Segoe UI" FontSize="12" Width="40"  Margin="5,0,5,0" IsChecked="{Binding Filter.HideAutobackups}">
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="Hide" TextAlignment="Center"/>
-                            <TextBlock Text="Autob.." TextAlignment="Center"/>
-                        </StackPanel>
-                        <ToggleButton.Style>
-                            <Style TargetType="{x:Type ToggleButton}" BasedOn="{DynamicResource FilterToggleButton}">
-                                <Style.Triggers>
-                                    <Trigger Property="IsChecked" Value="True">
-                                        <Setter Property="Foreground" Value="{DynamicResource AutobackupsButtonBrush}"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ToggleButton.Style>
+                    <ToggleButton IsChecked="{Binding Filter.HideAutobackups}" Style="{DynamicResource AutobackupsToggleButton}">
+                        <ToggleButton.Content>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="Hide" TextAlignment="Center"/>
+                                <TextBlock Text="Autob.." TextAlignment="Center"/>
+                            </StackPanel>
+                        </ToggleButton.Content>
                     </ToggleButton>
                     <!--Current button-->
-                    <ToggleButton FontFamily="Segoe UI" FontSize="12" Width="40"  Margin="5,0,5,0" IsChecked="{Binding Filter.CurrentOnly}" >
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="Current" TextAlignment="Center"/>
-                            <TextBlock Text="Only" TextAlignment="Center"/>
-                        </StackPanel>
-                        <ToggleButton.Style>
-                            <Style TargetType="{x:Type ToggleButton}" BasedOn="{DynamicResource FilterToggleButton}">
-                                <Style.Triggers>
-                                    <Trigger Property="IsChecked" Value="True">
-                                        <Setter Property="Foreground" Value="{DynamicResource CurrentButtonBrush}"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ToggleButton.Style>
+                    <ToggleButton IsChecked="{Binding Filter.CurrentOnly}" Style="{DynamicResource CurrentToggleButton}">
+                        <ToggleButton.Content>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="Current" TextAlignment="Center"/>
+                                <TextBlock Text="Only" TextAlignment="Center"/>
+                            </StackPanel>
+                        </ToggleButton.Content>
                     </ToggleButton>
                     <!--Order button-->
-                    <ToggleButton FontFamily="Segoe MDL2 Assets" Content="&#xE8CB;" Width="25" Height="25" Margin="5,0,5,0" IsChecked="{Binding Filter.OrderByDesc}">
-                        <ToggleButton.Style>
-                            <Style TargetType="{x:Type ToggleButton}" BasedOn="{DynamicResource FilterToggleButton}">
-                                <Style.Triggers>
-                                    <Trigger Property="IsChecked" Value="True">
-                                        <Setter Property="Foreground" Value="{DynamicResource GroupByGameButtonBrush}"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ToggleButton.Style>
-                    </ToggleButton>
+                    <ToggleButton IsChecked="{Binding Filter.OrderByDesc}" Style="{DynamicResource OrderToggleButton}"/>
                 </StackPanel>
                 <!--SearchBox-->
                 <TextBox x:Name="SearchBox" Text="{Binding Filter.Note, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch" Margin="5,7" Padding="24,4,4,0"
@@ -221,9 +187,9 @@
                     <!--Delete button-->
                     <Button FontFamily="Segoe MDL2 Assets" Content="&#xE74D;" FontSize="18" Height="25" Width="22" VerticalAlignment="Top" Margin="15,5,10,0"
                             Command="{Binding RemoveCommand}" CommandParameter="{Binding SelectedItem, ElementName=ListView}" Grid.Column="2"
-                            IsEnabled="{Binding SelectedBackup, Converter={DynamicResource ObjectToBoolConverter}}">
+                            IsEnabled="{Binding SelectedBackup, Converter={StaticResource ObjectToBoolConverter}}">
                         <Button.Style>
-                            <Style TargetType="{x:Type Button}" BasedOn="{DynamicResource DefaultButtonStyle}">
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource DefaultButtonStyle}">
                                 <Style.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
                                         <Setter Property="Foreground" Value="#FFFA145C"/>
@@ -235,9 +201,9 @@
                     <!--Restore button-->
                     <Button Height="38" Width="105" FontSize="18" Margin="10,0" Grid.Column="3" VerticalAlignment="Top" 
                             Command="{Binding RestoreCommand}" CommandParameter="{Binding SelectedItem.Backup, ElementName=ListView}"
-                            IsEnabled="{Binding SelectedBackup, Converter={DynamicResource ObjectToBoolConverter}}">
+                            IsEnabled="{Binding SelectedBackup, Converter={StaticResource ObjectToBoolConverter}}">
                         <Button.Style>
-                            <Style TargetType="{x:Type Button}" BasedOn="{DynamicResource DefaultButtonStyle}">
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource DefaultButtonStyle}">
                                 <Setter Property="Template">
                                     <Setter.Value>
                                         <ControlTemplate TargetType="Button">
@@ -257,7 +223,7 @@
                 </Grid>
             </StackPanel>
             <!--Picture-->
-            <Image Source="{Binding SelectedBackup.PicturePath, Converter={DynamicResource UriToImgConverter}}" HorizontalAlignment="Stretch" 
+            <Image Source="{Binding SelectedBackup.PicturePath, Converter={StaticResource UriToImgConverter}}" HorizontalAlignment="Stretch" 
                    VerticalAlignment="Stretch" Margin="15,0,10,0" Grid.Column="0" Grid.Row="0" Stretch="UniformToFill"
                    RenderOptions.BitmapScalingMode="Fant"/>
         </Grid>

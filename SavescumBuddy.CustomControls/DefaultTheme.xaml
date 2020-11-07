@@ -4,8 +4,21 @@
                     xmlns:converters="clr-namespace:SavescumBuddy.CustomControls.Converters;assembly=SavescumBuddy.CustomControls">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="Styles.xaml" Source="{ThemeDictionary }"/>
+        <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.CustomControls;component/Styles.xaml"/>
+        <!--<ResourceDictionary Source="Styles.xaml"/>-->
     </ResourceDictionary.MergedDictionaries>
+
+    <!--Converters-->
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    <converters:IntToBoolConverter x:Key="IntToBoolConverter"/>
+    <converters:UriToCachedImageConverter x:Key="UriToImgConverter"/>
+    <converters:ExistsToVisibilityConverter x:Key="ExistsToVisibilityConverter"/>
+    <converters:ObjectToBoolConverter x:Key="ObjectToBoolConverter"/>
+    <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+    <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
+    <converters:KeysToStringConverter x:Key="KeysToStringConverter"/>
+    <converters:InverseExistsToVisibilityConverter x:Key="InverseExistsToVisibilityConverter"/>
+    <converters:HotkeyActionToBoolConverter x:Key="HotkeyActionToBoolConverter"/>
 
     <Style x:Key="DefaultButtonStyle2" TargetType="Button">
         <Setter Property="BorderBrush" Value="Blue"/>

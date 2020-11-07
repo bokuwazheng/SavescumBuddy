@@ -13,8 +13,6 @@ namespace SavescumBuddy.Views
         public MainWindow()
         {
             InitializeComponent();
-
-            this.
         }
 
         private void ContextMenu_Click(object sender, RoutedEventArgs e)
