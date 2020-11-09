@@ -25,6 +25,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         private DispatcherTimer _progressBarTimer;
 
         public int Progress { get => _progress; private set => SetProperty(ref _progress, value); }
+        public int Interval => _settingsAccess.AutobackupInterval * 60;
 
         public AutobackupsViewModel(IRegionManager regionManager, IDataAccess dataAccess, ISettingsAccess settingsAccess, IEventAggregator eventAggregator, IBackupService backupService, IBackupFactory backupFactory)
         {
@@ -36,7 +37,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             _backupFactory = backupFactory;
 
             _backupTimer = new DispatcherTimer();
-            _backupTimer.Interval = TimeSpan.FromMinutes(_settingsAccess.AutobackupInterval);
+            _backupTimer.Interval = TimeSpan.FromMinutes(Interval);
             _backupTimer.Tick += (s, e) => { Autobackup(); Progress = 0; };
 
             _progressBarTimer = new DispatcherTimer();
@@ -57,7 +58,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
         private void Start()
         {
-            _backupTimer.Interval = TimeSpan.FromMinutes(_settingsAccess.AutobackupInterval);
+            _backupTimer.Interval = TimeSpan.FromMinutes(Interval);
             _backupTimer.Start();
             _progressBarTimer.Start();
         }
@@ -84,6 +85,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 Stop();
                 Start();
             }
+            RaisePropertyChanged(nameof(Interval));
         }
 
         private void Autobackup()

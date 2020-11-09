@@ -7,7 +7,6 @@ namespace SavescumBuddy.Services.Interfaces
     {
         int GetTotalNumberOfBackups(IBackupSearchRequest request);
         List<Backup> SearchBackups(IBackupSearchRequest request);
-        List<Backup> LoadBackups();
         void SaveBackup(Backup backup);
         void RemoveBackup(Backup backup);
         Backup GetBackup(Backup backup);

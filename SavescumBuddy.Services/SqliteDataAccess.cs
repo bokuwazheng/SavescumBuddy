@@ -97,52 +97,6 @@ namespace SavescumBuddy.Services
             return _sqlService.Query<Backup>(sql, args);
         }
 
-        public List<Backup> LoadBackups()
-        {
-            //var queryBuilder = new StringBuilder();
-            //queryBuilder.Append("select * from [Backup] b where ");
-            //if (!string.IsNullOrWhiteSpace(note))
-            //    queryBuilder.Append("(b.Note like @LC or b.Note like @UC) and ");
-            //queryBuilder.Append("b.IsLiked >= @IsLiked and b.IsAutobackup <= @IsAutobackup ");
-            //if (request.CurrentOnly)
-            //    queryBuilder.Append("and b.GameId = (select g.Title from [Game] g where g.IsCurrent = 1) ");
-            //queryBuilder.Append($"order by b.Id { request.Order } limit { request.Limit } offset { request.Offset }");
-
-            //var query = $@"SELECT * 
-            //    FROM 
-            //    [Backup] b
-            //    LEFT JOIN [Game] g ON Backup.GameId = Game.Id
-            //    LEFT JOIN [Filter] f ON Filter.
-            //    WHERE 
-            //    ";
-
-            //var sql = queryBuilder.ToString();
-
-            //object args;
-
-            //if (string.IsNullOrWhiteSpace(request.Note))
-            //{
-            //    args = new
-            //    {
-            //        IsLiked = isLiked,
-            //        IsAutobackup = isAutobackup
-            //    };
-            //}
-            //else
-            //{
-            //    args = new
-            //    {
-            //        LC = "%" + note.ToLower() + "%",
-            //        UC = "%" + note.ToUpper() + "%",
-            //        IsLiked = isLiked,
-            //        IsAutobackup = isAutobackup
-            //    };
-            //}
-
-            //return _sqlService.Query<Backup>(sql, args);
-            return null;
-        }
-
         public void SaveBackup(Backup backup)
         {
             _sqlService.Execute("insert into Backup (GameId, TimeStamp, PicturePath, OriginPath, SavefilePath, IsAutobackup) values (@GameId, @TimeStamp, @PicturePath, @OriginPath, @SavefilePath, @IsAutobackup)", backup);
