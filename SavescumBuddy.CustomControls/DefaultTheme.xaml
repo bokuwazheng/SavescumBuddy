@@ -52,6 +52,7 @@
     <SolidColorBrush x:Key="Foreground.Static" Color="#6e6e6e"/>
     <SolidColorBrush x:Key="Foreground.Selected" Color="#3c3c3c"/>
     <SolidColorBrush x:Key="Foreground.Disabled" Color="#cdcdcd"/>
+    <SolidColorBrush x:Key="Foreground.MouseOver" Color="#2d2d2d"/>
     <SolidColorBrush x:Key="Background.Selected" Color="#f5f5f5"/>
     <SolidColorBrush x:Key="Background.MouseOver" Color="#e6e6e6"/>
 
@@ -331,25 +332,6 @@
         </Style.Triggers>
     </Style>
 
-    <!--Sliding ToggleButton style-->
-    <Style x:Key="SlidingToggleButton" TargetType="ToggleButton">
-        <Setter Property="Foreground" Value="{StaticResource Grayish}"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type ToggleButton}">
-                    <Border Background="{x:Null}">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Foreground" Value="{StaticResource SkyBlue}"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
     <!--TextBox Style Flat-->
     <Style x:Key="TextBoxStyleFlat" TargetType="{x:Type TextBox}">
         <Setter Property="Template">
@@ -470,19 +452,14 @@
     </Style>
 
     <!--Sliding toggle button-->
-    <Style TargetType="ToggleButton" x:Key="slidingToggleButton">
+    <Style x:Key="SlidingToggleButton" TargetType="{x:Type ToggleButton}">
         <Setter Property="Height" Value="22"/>
-        <Setter Property="Margin" Value="4,0"/>
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="ToggleButton">
+                <ControlTemplate TargetType="{x:Type ToggleButton}">
                     <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="5"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <Border CornerRadius="8" Width="34" Height="16" Grid.Column="0" BorderThickness="0">
+                        <!--Track-->
+                        <Border CornerRadius="8" Width="34" Height="16" BorderThickness="0" Margin="4,0">
                             <Border.Style>
                                 <Style TargetType="Border">
                                     <Setter Property="Background" Value="{StaticResource Grayish}"/>
@@ -493,50 +470,50 @@
                                     </Style.Triggers>
                                 </Style>
                             </Border.Style>
-                            <Canvas Width="36" Height="20" Background="Transparent" Margin="-3,-3,0,0">
-                                <Border x:Name="movingPart" Width="22" Height="22" CornerRadius="11" Background="White" BorderThickness="2">
-                                    <Border.Style>
-                                        <Style TargetType="Border">
-                                            <Setter Property="BorderBrush" Value="{StaticResource Grayish}"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True">
-                                                    <Setter Property="BorderBrush" Value="{StaticResource SkyBlue}"/>
-                                                    <DataTrigger.EnterActions>
-                                                        <BeginStoryboard>
-                                                            <Storyboard>
-                                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Canvas.Left)" RepeatBehavior="1x">
-                                                                    <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-                                                                    <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="17">
-                                                                        <EasingDoubleKeyFrame.EasingFunction>
-                                                                            <QuinticEase EasingMode="EaseOut"/>
-                                                                        </EasingDoubleKeyFrame.EasingFunction>
-                                                                    </EasingDoubleKeyFrame>
-                                                                </DoubleAnimationUsingKeyFrames>
-                                                            </Storyboard>
-                                                        </BeginStoryboard>
-                                                    </DataTrigger.EnterActions>
-                                                    <DataTrigger.ExitActions>
-                                                        <BeginStoryboard>
-                                                            <Storyboard>
-                                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Canvas.Left)" RepeatBehavior="1x">
-                                                                    <EasingDoubleKeyFrame KeyTime="0" Value="17"/>
-                                                                    <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="0">
-                                                                        <EasingDoubleKeyFrame.EasingFunction>
-                                                                            <QuinticEase EasingMode="EaseOut"/>
-                                                                        </EasingDoubleKeyFrame.EasingFunction>
-                                                                    </EasingDoubleKeyFrame>
-                                                                </DoubleAnimationUsingKeyFrames>
-                                                            </Storyboard>
-                                                        </BeginStoryboard>
-                                                    </DataTrigger.ExitActions>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-                                </Border>
-                            </Canvas>
                         </Border>
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="2"/>
+                        <Canvas Width="36" Height="22" Background="Transparent">
+                            <!--Thumb-->
+                            <Border Width="22" Height="22" CornerRadius="11" Background="White" BorderThickness="2">
+                                <Border.Style>
+                                    <Style TargetType="{x:Type Border}">
+                                        <Setter Property="BorderBrush" Value="{StaticResource Grayish}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True">
+                                                <Setter Property="BorderBrush" Value="{StaticResource SkyBlue}"/>
+                                                <DataTrigger.EnterActions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Canvas.Left)" RepeatBehavior="1x">
+                                                                <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                                                                <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="17">
+                                                                    <EasingDoubleKeyFrame.EasingFunction>
+                                                                        <QuinticEase EasingMode="EaseOut"/>
+                                                                    </EasingDoubleKeyFrame.EasingFunction>
+                                                                </EasingDoubleKeyFrame>
+                                                            </DoubleAnimationUsingKeyFrames>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </DataTrigger.EnterActions>
+                                                <DataTrigger.ExitActions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Canvas.Left)" RepeatBehavior="1x">
+                                                                <EasingDoubleKeyFrame KeyTime="0" Value="17"/>
+                                                                <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="0">
+                                                                    <EasingDoubleKeyFrame.EasingFunction>
+                                                                        <QuinticEase EasingMode="EaseOut"/>
+                                                                    </EasingDoubleKeyFrame.EasingFunction>
+                                                                </EasingDoubleKeyFrame>
+                                                            </DoubleAnimationUsingKeyFrames>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </DataTrigger.ExitActions>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
+                        </Canvas>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -569,11 +546,12 @@
     </Style>
 
     <!-- Text Button Style-->
-    <Style x:Key="TextButton" TargetType="Button">
+    <Style x:Key="TextButton" TargetType="{x:Type Button}">
         <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource Foreground.Static}"/>
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="Button">
+                <ControlTemplate TargetType="{x:Type Button}">
                     <Border Background="{TemplateBinding Background}" CornerRadius="3">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
@@ -583,6 +561,10 @@
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Background" Value="{StaticResource Background.Selected}"/>
+                <Setter Property="Foreground" Value="{StaticResource Foreground.MouseOver}"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource Foreground.Disabled}"/>
             </Trigger>
         </Style.Triggers>
     </Style>

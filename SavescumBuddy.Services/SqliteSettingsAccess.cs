@@ -18,9 +18,9 @@ namespace SavescumBuddy.Services
             set => _sqlService.Execute($"UPDATE Settings SET { nameof(AutobackupInterval) } = @{ nameof(AutobackupInterval) } WHERE Id = 1;", new { AutobackupInterval = value });
         }
 
-        public string AutobackupOverwriteType
+        public int AutobackupOverwriteType
         {
-            get => _sqlService.ExecuteScalar<string>($"SELECT { nameof(AutobackupOverwriteType) } FROM Settings WHERE Id = 1;");
+            get => _sqlService.ExecuteScalar<int>($"SELECT { nameof(AutobackupOverwriteType) } FROM Settings WHERE Id = 1;");
             set => _sqlService.Execute($"UPDATE Settings SET { nameof(AutobackupOverwriteType) } = @{ nameof(AutobackupOverwriteType) } WHERE Id = 1;", new { AutobackupOverwriteType = value });
         }
 
@@ -30,9 +30,9 @@ namespace SavescumBuddy.Services
             set => _sqlService.Execute($"UPDATE Settings SET { nameof(AutobackupsEnabled) } = @{ nameof(AutobackupsEnabled) } WHERE Id = 1;", new { AutobackupsEnabled = value });
         }
 
-        public string AutobackupSkipType
+        public int AutobackupSkipType
         {
-            get => _sqlService.ExecuteScalar<string>($"SELECT { nameof(AutobackupSkipType) } FROM Settings WHERE Id = 1;");
+            get => _sqlService.ExecuteScalar<int>($"SELECT { nameof(AutobackupSkipType) } FROM Settings WHERE Id = 1;");
             set => _sqlService.Execute($"UPDATE Settings SET { nameof(AutobackupSkipType) } = @{ nameof(AutobackupSkipType) } WHERE Id = 1;", new { AutobackupSkipType = value });
         }
 

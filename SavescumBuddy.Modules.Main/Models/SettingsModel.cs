@@ -19,7 +19,7 @@ namespace SavescumBuddy.Modules.Main.Models
             set { _settingsAccess.AutobackupsEnabled = value; RaisePropertyChanged(nameof(AutobackupsEnabled)); }
         }
 
-        public string AutobackupSkipType
+        public int AutobackupSkipType
         {
             get => _settingsAccess.AutobackupSkipType;
             set { _settingsAccess.AutobackupSkipType = value; RaisePropertyChanged(nameof(AutobackupSkipType)); }
@@ -31,7 +31,7 @@ namespace SavescumBuddy.Modules.Main.Models
             set { _settingsAccess.AutobackupInterval = value; RaisePropertyChanged(nameof(AutobackupInterval)); }
         }
 
-        public string AutobackupOverwriteType
+        public int AutobackupOverwriteType
         {
             get => _settingsAccess.AutobackupOverwriteType;
             set { _settingsAccess.AutobackupOverwriteType = value; RaisePropertyChanged(nameof(AutobackupOverwriteType)); }

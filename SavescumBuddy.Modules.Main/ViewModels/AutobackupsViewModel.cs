@@ -117,11 +117,11 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             {
                 var timeSinceLastBackup = DateTime.Now - DateTime.Parse(lastBackup.TimeStamp);
 
-                if (_settingsAccess.AutobackupSkipType.EqualsEnumDescription(SkipOption.FiveMin))
+                if (_settingsAccess.AutobackupSkipType == (int)SkipOption.FiveMin)
                 {
                     return timeSinceLastBackup > TimeSpan.FromMinutes(5d);
                 }
-                else if (_settingsAccess.AutobackupSkipType.EqualsEnumDescription(SkipOption.TenMin))
+                else if (_settingsAccess.AutobackupSkipType == (int)SkipOption.TenMin)
                 {
                     return timeSinceLastBackup > TimeSpan.FromMinutes(10d);
                 }
@@ -132,11 +132,11 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
         private bool PreviousAutobackupShouldBeDeleted(Backup previous)
         {
-            if (_settingsAccess.AutobackupOverwriteType.EqualsEnumDescription(OverwriteOption.Always))
+            if (_settingsAccess.AutobackupOverwriteType == (int)OverwriteOption.Always)
             {
                 return true;
             }
-            else if (_settingsAccess.AutobackupOverwriteType.EqualsEnumDescription(OverwriteOption.KeepLiked))
+            else if (_settingsAccess.AutobackupOverwriteType == (int)OverwriteOption.KeepLiked)
             {
                 return !previous.IsLiked.Equals(1);
             }

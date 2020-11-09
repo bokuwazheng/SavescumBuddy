@@ -3,9 +3,9 @@
     public interface ISettingsAccess
     {
         int AutobackupInterval { get; set; }
-        string AutobackupOverwriteType { get; set; }
+        int AutobackupOverwriteType { get; set; }
         bool AutobackupsEnabled { get; set; }
-        string AutobackupSkipType { get; set; }
+        int AutobackupSkipType { get; set; }
         int BackupKey { get; set; }
         int BackupModifier { get; set; }
         string CloudAppRootFolderId { get; set; }

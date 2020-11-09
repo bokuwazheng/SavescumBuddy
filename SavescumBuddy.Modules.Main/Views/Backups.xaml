@@ -427,11 +427,11 @@
             <!--Sorting panel (ends here)-->
             
             <!--Paging panel-->
-            <Grid HorizontalAlignment="Right" Grid.Column="1">
+            <Grid HorizontalAlignment="Right" Grid.Column="1" Margin="7">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition Width="30"/>
                 </Grid.ColumnDefinitions>
                 <Button x:Name="PageNavigatorButton" Margin="10,0" Style="{StaticResource TextButton}" Width="100" Height="30">
                     <i:Interaction.Behaviors>
@@ -473,8 +473,8 @@
                         </ContextMenu>
                     </Button.ContextMenu>
                 </Button>
-                <Button Grid.Column="1" Content="&#xE973;" FontFamily="Segoe MDL2 Assets" Command="{Binding NavigateBackwardCommand}" Width="20" Style="{StaticResource TextButton}"/>
-                <Button Grid.Column="2" Content="&#xE974;" FontFamily="Segoe MDL2 Assets" Command="{Binding NavigateForwardCommand}" Width="20" Style="{StaticResource TextButton}"/>
+                <Button Grid.Column="1" Content="&#xE973;" FontFamily="Segoe MDL2 Assets" Command="{Binding NavigateBackwardCommand}" Style="{StaticResource TextButton}"/>
+                <Button Grid.Column="2" Content="&#xE974;" FontFamily="Segoe MDL2 Assets" Command="{Binding NavigateForwardCommand}" Style="{StaticResource TextButton}"/>
             </Grid>
             <!--Paging panel (ends here)-->
         </Grid>
@@ -649,7 +649,7 @@
                                 </Grid.ColumnDefinitions>
                                 <!--NoteTextBox-->
                                 <TextBox x:Name="NoteTextBox" Text="{Binding Note, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MaxLength="180" TextWrapping="Wrap"  
-                                         Margin="5,3,5,5" MaxLines="3" Padding="4,0,0,0" Foreground="{StaticResource Dark}" Style="{StaticResource TextBoxStyleFlat2}"
+                                         Margin="5,3,5,5" MaxLines="3" Padding="3,0,0,0" Foreground="{StaticResource Dark}" Style="{StaticResource TextBoxStyleFlat2}"
                                          Grid.ColumnSpan="2" Tag="&#xE70F;">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="LostFocus">
