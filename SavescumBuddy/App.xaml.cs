@@ -100,37 +100,44 @@ namespace SavescumBuddy
             var data = Container.Resolve<IDataAccess>();
             var backuper = Container.Resolve<IBackupService>();
 
-            if (e.KeyValue == settings.BackupKey && (int)e.Modifiers == settings.BackupModifier)
+            try
             {
-                var backup = factory.CreateBackup();
-                backuper.BackupSavefile(backup);
-                backuper.SaveScreenshot(backup.PicturePath);
-                data.SaveBackup(backup);
-                ea.GetEvent<BackupListUpdateRequestedEvent>().Publish();
-                return;
-            }
-
-            if (e.KeyValue == settings.RestoreKey && (int)e.Modifiers == settings.RestoreModifier)
-            {
-                var backup = data.GetLatestBackup();
-                if (backup is object)
-                    backuper.RestoreBackup(backup);
-                return;
-            }
-
-            if (e.KeyValue == settings.OverwriteKey && (int)e.Modifiers == settings.OverwriteModifier)
-            {
-                var latest = data.GetLatestBackup();
-                if (latest is object)
+                if (e.KeyValue == settings.BackupKey && (int)e.Modifiers == settings.BackupModifier)
                 {
-                    backuper.DeleteFiles(latest);
-                    data.RemoveBackup(latest);
+                    var backup = factory.CreateBackup();
+                    backuper.BackupSavefile(backup);
+                    backuper.SaveScreenshot(backup.PicturePath);
+                    data.SaveBackup(backup);
+                    ea.GetEvent<BackupListUpdateRequestedEvent>().Publish();
+                    return;
                 }
-                var backup = factory.CreateBackup();
-                backuper.BackupSavefile(backup);
-                backuper.SaveScreenshot(backup.PicturePath);
-                data.SaveBackup(backup);
-                ea.GetEvent<BackupListUpdateRequestedEvent>().Publish();
+
+                if (e.KeyValue == settings.RestoreKey && (int)e.Modifiers == settings.RestoreModifier)
+                {
+                    var backup = data.GetLatestBackup();
+                    if (backup is object)
+                        backuper.RestoreBackup(backup);
+                    return;
+                }
+
+                if (e.KeyValue == settings.OverwriteKey && (int)e.Modifiers == settings.OverwriteModifier)
+                {
+                    var latest = data.GetLatestBackup();
+                    if (latest is object)
+                    {
+                        backuper.DeleteFiles(latest);
+                        data.RemoveBackup(latest);
+                    }
+                    var backup = factory.CreateBackup();
+                    backuper.BackupSavefile(backup);
+                    backuper.SaveScreenshot(backup.PicturePath);
+                    data.SaveBackup(backup);
+                    ea.GetEvent<BackupListUpdateRequestedEvent>().Publish();
+                }
+            }
+            catch (Exception ex)
+            {
+                ea.GetEvent<ErrorOccuredEvent>().Publish(ex);
             }
         }
 
