@@ -8,18 +8,11 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
-using Microsoft.Win32;
 using SavescumBuddy.Services.Interfaces;
 using DriveFile = Google.Apis.Drive.v3.Data.File;
 
 namespace SavescumBuddy.Services
 {
-    public class MimeType
-    {
-        public const string File = "mimeType = 'application/unknown'";
-        public const string Folder = "mimeType = 'application/vnd.google-apps.folder'";
-    }
-
     public class GoogleDrive : IGoogleDrive
     {
         // If modifying these scopes, delete your previously saved credentials.
@@ -59,26 +52,28 @@ namespace SavescumBuddy.Services
             return service;
         }
 
-        public async Task<UserCredential> AuthorizeAsync(CancellationToken ct)
+        // The file token.json stores the user's access and refresh tokens, and is created
+        // automatically when the authorization flow completes for the first time.
+        public async Task<bool> AuthorizeAsync(CancellationToken ct)
         {
             var credentials = CredentialsFileName;
             var token = TokenFolderName;
 
-            using (var stream = new FileStream(credentials, FileMode.Open, FileAccess.Read))
+            using var stream = new FileStream(credentials, FileMode.Open, FileAccess.Read);
+            var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+                GoogleClientSecrets.Load(stream).Secrets,
+                _scopes,
+                "user",
+                ct,
+                new FileDataStore(token, true)).ConfigureAwait(false);
+
+            if (credential is object)
             {
-                // The file token.json stores the user's access and refresh tokens, and is created
-                // automatically when the authorization flow completes for the first time.
-                var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.Load(stream).Secrets,
-                    _scopes,
-                    "user",
-                    ct,
-                    new FileDataStore(token, true)).ConfigureAwait(false);
-
                 UserCredential = credential;
-
-                return credential;
+                return true;
             }
+            else
+                return false;
         }
 
         public bool CredentialExists()
@@ -103,7 +98,7 @@ namespace SavescumBuddy.Services
 
         public async Task<string> GetAppRootFolderIdAsync(CancellationToken ct = default) =>
             await GetIdByNameAsync(_applicationName, "root", IGoogleDrive.MimeType.Folder, ct).ConfigureAwait(false)
-            ?? await CreateAppRootFolderAsync();
+            ?? await CreateAppRootFolderAsync().ConfigureAwait(false);
 
         public async Task<string> CreateAppRootFolderAsync(CancellationToken ct = default)
         {
@@ -135,19 +130,15 @@ namespace SavescumBuddy.Services
 
         public async Task UploadFileAsync(string path, string parentId, CancellationToken ct = default)
         {
-            var name = Path.GetFileName(path);
-
             var fileMetadata = new DriveFile()
             {
-                Name = name,
+                Name = Path.GetFileName(path),
                 Parents = new List<string> { parentId }
             };
-            using (var stream = new FileStream(path, FileMode.Open))
-            {
-                var request = GetDriveApiService().Files.Create(fileMetadata, stream, GetMimeType(name));
-                request.Fields = "id";
-                await request.UploadAsync(ct).ConfigureAwait(false);
-            }
+            using var stream = new FileStream(path, FileMode.Open);
+            var request = GetDriveApiService().Files.Create(fileMetadata, stream, IGoogleDrive.MimeType.File);
+            request.Fields = "id";
+            await request.UploadAsync(ct).ConfigureAwait(false);
         }
 
         public async Task DeleteFromCloudAsync(string id, CancellationToken ct = default)
@@ -165,7 +156,7 @@ namespace SavescumBuddy.Services
             return result?.User.EmailAddress;
         }
 
-        public async Task<DriveFile> GetById(string id, bool throwIfFails, CancellationToken ct = default)
+        public async Task<DriveFile> GetFileById(string id, bool throwIfFails, CancellationToken ct = default)
         {
             try
             {
@@ -213,16 +204,6 @@ namespace SavescumBuddy.Services
             var list = await listRequest.ExecuteAsync(ct).ConfigureAwait(false);
             var result = list.Files.FirstOrDefault(x => x.Name == name);
             return result?.Id;
-        }
-
-        private static string GetMimeType(string fileName)
-        {
-            string mimeType = "application/unknown";
-            string ext = Path.GetExtension(fileName).ToLower();
-            var regKey = Registry.ClassesRoot.OpenSubKey(ext);
-            return (regKey != null && regKey.GetValue("Content Type") != null)
-                ? regKey.GetValue("Content Type").ToString()
-                : mimeType;
         }
     }
 }

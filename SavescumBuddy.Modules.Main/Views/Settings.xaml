@@ -99,12 +99,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="50"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="64"/>
-                    <!--<RowDefinition Height="64"/>
-                    <RowDefinition Height="Auto" MinHeight="50"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="50"/>-->
-                    <!--<RowDefinition />-->
+                    <RowDefinition Height="50"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
@@ -119,7 +114,7 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Style="{StaticResource Caption}">
                             <TextBlock.Text>
-                                <Binding StringFormat="A backup will be automatically created every {0}" Path="Settings.AutobackupInterval"/>
+                                <Binding StringFormat="A backup will be automatically created every {0} mins" Path="Settings.AutobackupInterval"/>
                             </TextBlock.Text>
                         </TextBlock>
                         <TextBlock Text=", unless..." TextAlignment="Left">
@@ -137,7 +132,7 @@
                     </StackPanel>
                 </StackPanel>
                 <!--Autobackup ToggleButton-->
-                <ToggleButton Style="{StaticResource SlidingToggleButton}" Grid.Column="1" Grid.Row="0" Margin="10,0,0,0"
+                <ToggleButton Style="{StaticResource SlidingToggleButton}" Grid.Column="1" Grid.Row="0"
                               IsChecked="{Binding Settings.AutobackupsEnabled}"/>
 
                 <!--Auto backups Expander-->
@@ -209,7 +204,7 @@
                     </StackPanel>
                 </StackPanel>
                 <!--Toggle Hotkeys Buttons-->
-                <ToggleButton Style="{StaticResource SlidingToggleButton}" Grid.Column="1" Grid.Row="2" Margin="10,0,0,0"
+                <ToggleButton Style="{StaticResource SlidingToggleButton}" Grid.Column="1" Grid.Row="2"
                               IsChecked="{Binding Settings.HotkeysEnabled}"/>
                 <!--Hotkeys Expander-->
                 <Expander Header="Show more..." ExpandDirection="Down" Grid.ColumnSpan="2" Grid.Row="3" Margin="0,0,0,15" Foreground="{StaticResource Ash}"
@@ -329,7 +324,7 @@
                 </StackPanel>
 
                 <!--Toggle sound cues Button-->
-                <ToggleButton Style="{StaticResource SlidingToggleButton}" Grid.Column="1" Grid.Row="4" Margin="10,0,0,0"
+                <ToggleButton Style="{StaticResource SlidingToggleButton}" Grid.Column="1" Grid.Row="4"
                               IsChecked="{Binding Settings.SoundCuesEnabled}"/>
             </Grid>
         </ScrollViewer>

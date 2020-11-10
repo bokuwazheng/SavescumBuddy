@@ -54,8 +54,8 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         {
             try
             {
-                var userCredential = await _googleDrive.AuthorizeAsync(ct).ConfigureAwait(false);
-                if (userCredential is null)
+                var succeeded = await _googleDrive.AuthorizeAsync(ct).ConfigureAwait(false);
+                if (!succeeded)
                     throw new Exception("Failed to authorize.");
 
                 AuthorizedAs = await _googleDrive.GetUserEmailAsync().ConfigureAwait(false);
@@ -129,7 +129,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             catch (OperationCanceledException)
             {
                 Status = "Checking if cancellation succeeded...";
-                var file = await _googleDrive.GetById(backup.GoogleDriveId, false).ConfigureAwait(false);
+                var file = await _googleDrive.GetFileById(backup.GoogleDriveId, false).ConfigureAwait(false);
                 if (file is null)
                 {
                     backup.GoogleDriveId = null;

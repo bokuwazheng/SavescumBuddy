@@ -472,7 +472,7 @@
                                 </Style>
                             </Border.Style>
                         </Border>
-                        <Canvas Width="36" Height="22" Background="Transparent">
+                        <Canvas Width="38" Height="22" Background="Transparent">
                             <!--Thumb-->
                             <Border Width="22" Height="22" CornerRadius="11" Background="White" BorderThickness="2">
                                 <Border.Style>
@@ -486,7 +486,7 @@
                                                         <Storyboard>
                                                             <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Canvas.Left)" RepeatBehavior="1x">
                                                                 <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-                                                                <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="17">
+                                                                <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="16">
                                                                     <EasingDoubleKeyFrame.EasingFunction>
                                                                         <QuinticEase EasingMode="EaseOut"/>
                                                                     </EasingDoubleKeyFrame.EasingFunction>
@@ -499,7 +499,7 @@
                                                     <BeginStoryboard>
                                                         <Storyboard>
                                                             <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Canvas.Left)" RepeatBehavior="1x">
-                                                                <EasingDoubleKeyFrame KeyTime="0" Value="17"/>
+                                                                <EasingDoubleKeyFrame KeyTime="0" Value="16"/>
                                                                 <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="0">
                                                                     <EasingDoubleKeyFrame.EasingFunction>
                                                                         <QuinticEase EasingMode="EaseOut"/>

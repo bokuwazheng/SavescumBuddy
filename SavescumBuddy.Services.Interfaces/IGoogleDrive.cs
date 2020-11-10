@@ -13,13 +13,13 @@ namespace SavescumBuddy.Services.Interfaces
         string TokenFolderName { get; }
         UserCredential UserCredential { get; }
 
-        Task<UserCredential> AuthorizeAsync(CancellationToken ct);
+        Task<bool> AuthorizeAsync(CancellationToken ct);
         bool CredentialExists();
         Task<string> CreateAppRootFolderAsync(CancellationToken ct = default);
         Task<string> CreateFolderAsync(string folderName, string parentId, CancellationToken ct = default);
         Task DeleteFromCloudAsync(string id, CancellationToken ct = default);
         Task<string> GetAppRootFolderIdAsync(CancellationToken ct = default);
-        Task<DriveFile> GetById(string id, bool throwIfFails, CancellationToken ct = default);
+        Task<DriveFile> GetFileById(string id, bool throwIfFails, CancellationToken ct = default);
         DriveService GetDriveApiService();
         Task<List<DriveFile>> GetFileListAsync(string parentId, string mimeType, CancellationToken ct = default);
         Task<string> GetIdByNameAsync(string name, string parentId, string mimeType, CancellationToken ct = default);
