@@ -59,7 +59,6 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
         // Properties
         public List<Backup> Backups { get; private set; }
-        public DateTime TimeSinceLastBackup { get; private set; }
         public bool CurrentGameIsSet => _dataAccess.GetCurrentGame() is object;
         public int CurrentPageIndex { get => _currentPageIndex; private set => SetProperty(ref _currentPageIndex, value, () => Filter.Offset = value * PageSize); }
         public Backup SelectedBackup { get => _selectedBackup; set => SetProperty(ref _selectedBackup, value); }
@@ -134,16 +133,11 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         {
             try
             {
-                var now = DateTime.Now;
-                if (now - TimeSinceLastBackup > TimeSpan.FromSeconds(1d))
-                {
-                    TimeSinceLastBackup = now;
-                    var backup = _backupFactory.CreateBackup();
-                    _dataAccess.SaveBackup(backup);
-                    _backupService.BackupSavefile(backup);
-                    _backupService.SaveScreenshot(backup.PicturePath);
-                    UpdateBackupList();
-                }
+                var backup = _backupFactory.CreateBackup();
+                _dataAccess.SaveBackup(backup);
+                _backupService.BackupSavefile(backup);
+                _backupService.SaveScreenshot(backup.PicturePath);
+                UpdateBackupList();
             }
             catch (Exception ex)
             {

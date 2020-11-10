@@ -48,12 +48,6 @@ namespace SavescumBuddy.Services
             set => _sqlService.Execute($"UPDATE Settings SET { nameof(BackupModifier) } = @{ nameof(BackupModifier) } WHERE Id = 1;", new { BackupModifier = value });
         }
 
-        public string CloudAppRootFolderId
-        {
-            get => _sqlService.ExecuteScalar<string>($"SELECT { nameof(CloudAppRootFolderId) } FROM Settings WHERE Id = 1;");
-            set => _sqlService.Execute($"UPDATE Settings SET { nameof(CloudAppRootFolderId) } = @{ nameof(CloudAppRootFolderId) } WHERE Id = 1;", new { CloudAppRootFolderId = value });
-        }
-
         public bool HotkeysEnabled
         {
             get => _sqlService.ExecuteScalar<bool>($"SELECT { nameof(HotkeysEnabled) } FROM Settings WHERE Id = 1;");

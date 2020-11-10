@@ -8,7 +8,7 @@
         public string Note { get; set; }
         public int IsLiked { get; set; }
         public int IsAutobackup { get; set; }
-        public string TimeStamp { get; set; }
+        public long TimeStamp { get; set; }
         public string OriginPath { get; set; }
         public string SavefilePath { get; set; }
         public string PicturePath { get; set; }

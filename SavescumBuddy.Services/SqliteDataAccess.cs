@@ -132,14 +132,14 @@ namespace SavescumBuddy.Services
             _sqlService.Execute("update Backup set IsLiked = @IsLiked where Id = @Id;", new { Id = backup.Id, IsLiked = backup.IsLiked });
         }
 
-        public void UpdateDriveId(Backup backup)
+        public void UpdateGoogleDriveId(Backup backup)
         {
-            _sqlService.Execute("update Backup set GoogleDriveId = @GoogleDriveId where Id = @Id;", new { Id = backup.Id, DriveId = backup.GoogleDriveId });
+            _sqlService.Execute("update Backup set GoogleDriveId = @GoogleDriveId where Id = @Id;", new { Id = backup.Id, GoogleDriveId = backup.GoogleDriveId });
         }
 
         public void UpdateFilePaths(Backup backup)
         {
-            _sqlService.Execute("update Backup set FilePath = @FilePath, Picture = @Picture where Id = @Id;", new { FilePath = backup.SavefilePath, Picture = backup.PicturePath, Id = backup.Id });
+            _sqlService.Execute("update Backup set SavefilePath = @SavefilePath, PicturePath = @PicturePath where Id = @Id;", new { SavefilePath = backup.SavefilePath, PicturePath = backup.PicturePath, Id = backup.Id });
         }
         #endregion
 

@@ -3,7 +3,6 @@ using Prism.Events;
 using Prism.Mvvm;
 using SavescumBuddy.Core.Events;
 using SavescumBuddy.Data;
-using SavescumBuddy.Services;
 using SavescumBuddy.Services.Interfaces;
 using System;
 using System.Threading;
@@ -59,13 +58,6 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 if (userCredential is null)
                     throw new Exception("Failed to authorize.");
 
-                var rootId = await _googleDrive.GetAppRootFolderIdAsync().ConfigureAwait(false);
-                if (rootId is null)
-                {
-                    rootId = await _googleDrive.CreateAppRootFolderAsync().ConfigureAwait(false);
-                    _settingsAccess.CloudAppRootFolderId = rootId;
-                }
-
                 AuthorizedAs = await _googleDrive.GetUserEmailAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -80,30 +72,17 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             try
             {
                 Status = "Retrieving app root folder id...";
-                var rootId = _settingsAccess.CloudAppRootFolderId;
-                if (rootId is null)
-                {
-                    rootId = await _googleDrive.GetAppRootFolderIdAsync(ct).ConfigureAwait(false);
-                }
-                if (rootId is null)
-                {
-                    Status = "Creating app root folder...";
-                    rootId = await _googleDrive.CreateAppRootFolderAsync(ct).ConfigureAwait(false);
-                }
-                if (rootId != null)
-                {
-                    _settingsAccess.CloudAppRootFolderId = rootId;
-                }
+                var rootId = await _googleDrive.GetAppRootFolderIdAsync(ct).ConfigureAwait(false);
                 Status = "Retrieving game folder id...";
                 var gameTitle = _dataAccess.GetGame(backup.GameId).Title;
-                var gameFolderId = await _googleDrive.GetIdByNameAsync(gameTitle, rootId, MimeType.Folder, ct).ConfigureAwait(false);
+                var gameFolderId = await _googleDrive.GetIdByNameAsync(gameTitle, rootId, IGoogleDrive.MimeType.Folder, ct).ConfigureAwait(false);
                 if (gameFolderId is null)
                 {
                     Status = "Creating game folder...";
                     gameFolderId = await _googleDrive.CreateFolderAsync(gameTitle, rootId, ct).ConfigureAwait(false);
                 }
                 Status = "Creating backup folder...";
-                backupCloudFolderId = await _googleDrive.CreateFolderAsync(backup.TimeStamp, gameFolderId, ct).ConfigureAwait(false);
+                backupCloudFolderId = await _googleDrive.CreateFolderAsync(backup.TimeStamp.ToString(), gameFolderId, ct).ConfigureAwait(false);
                 Status = "Uploading backup file...";
                 await _googleDrive.UploadFileAsync(backup.SavefilePath, backupCloudFolderId, ct).ConfigureAwait(false);
                 Status = "Uploading image...";
@@ -111,8 +90,8 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
                 if (!ct.IsCancellationRequested)
                 {
-                    //Backup.DriveId = backupCloudFolderId;
-                    //SqliteDataAccess.UpdateDriveId(Backup);
+                    backup.GoogleDriveId = backupCloudFolderId;
+                    _dataAccess.UpdateGoogleDriveId(backup);
                 }
             }
             catch (OperationCanceledException)
@@ -143,8 +122,8 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
                 if (!ct.IsCancellationRequested)
                 {
-                    //Backup.DriveId = null;
-                    //SqliteDataAccess.UpdateDriveId(Backup);
+                    backup.GoogleDriveId = null;
+                    _dataAccess.UpdateGoogleDriveId(backup);
                 }
             }
             catch (OperationCanceledException)
@@ -153,8 +132,8 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 var file = await _googleDrive.GetById(backup.GoogleDriveId, false).ConfigureAwait(false);
                 if (file is null)
                 {
-                    //Backup.DriveId = null;
-                    //SqliteDataAccess.UpdateDriveId(Backup);
+                    backup.GoogleDriveId = null;
+                    _dataAccess.UpdateGoogleDriveId(backup);
                 }
             }
             catch (Exception ex)

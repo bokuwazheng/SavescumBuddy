@@ -483,8 +483,7 @@
         <DataGrid Grid.Row="1" ItemsSource="{Binding Backups}" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False"
                   IsReadOnly="True" AutoGenerateColumns="False" EnableRowVirtualization="True" EnableColumnVirtualization="True"
                   HeadersVisibility="None" SelectionMode="Single" CanUserSortColumns="False" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource Bright}"
-                  BorderThickness="0" SelectionUnit="FullRow" Margin="10" Background="Transparent" ContextMenuService.HorizontalOffset="-16" ContextMenuService.VerticalOffset="-16"
-                  HorizontalScrollBarVisibility="Hidden">
+                  BorderThickness="0" SelectionUnit="FullRow" Margin="10" Background="Transparent" HorizontalScrollBarVisibility="Hidden">
             <DataGrid.CellStyle>
                 <Style TargetType="{x:Type DataGridCell}">
                     <Style.Triggers>
@@ -496,8 +495,9 @@
                     </Style.Triggers>
                 </Style>
             </DataGrid.CellStyle>
+            <!--Data Grid Context Menu-->
             <DataGrid.ContextMenu>
-                <ContextMenu Style="{StaticResource ContextMenuStyle}">
+                <ContextMenu Style="{StaticResource ContextMenuStyle}" HorizontalOffset="-16" VerticalOffset="-16">
                     <MenuItem Header="Restore" Style="{StaticResource MenuItemStyleButton}" Margin="0,10,0,0"
                               Command="{Binding RestoreCommand}"
                               CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}">
@@ -512,7 +512,7 @@
                             <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="16"/>
                         </MenuItem.Icon>
                     </MenuItem>
-                    <MenuItem Header="Show in Explorer" Style="{StaticResource MenuItemStyleButton}" 
+                    <MenuItem Header="Show in Explorer" Style="{StaticResource MenuItemStyleButton}"
                               Command="{Binding ShowInExplorerCommand}"
                               CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}">
                         <MenuItem.Icon>
@@ -529,6 +529,15 @@
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.Columns>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE783;" ToolTip="Savefile not found" 
+                                       Foreground="IndianRed" FontSize="16" VerticalAlignment="Center" Margin="2"
+                                       Visibility="{Binding SavefilePath, Converter={StaticResource ExistsToVisibilityConverter}}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <!--Image-->
                 <DataGridTemplateColumn Header="Image">
                     <DataGridTemplateColumn.CellTemplate>
@@ -559,7 +568,8 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding TimeStamp}">
+                <!--Time Stamp-->
+                <DataGridTextColumn Binding="{Binding TimeStamp, Converter={StaticResource LongToDateTimeConverter}, StringFormat='MMM dd, yyyy h:mm:ss tt'}">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="Margin" Value="10,0"/>

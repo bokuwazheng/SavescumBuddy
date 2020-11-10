@@ -102,7 +102,8 @@ namespace SavescumBuddy.Services
         }
 
         public async Task<string> GetAppRootFolderIdAsync(CancellationToken ct = default) =>
-            await GetIdByNameAsync(_applicationName, "root", MimeType.Folder, ct).ConfigureAwait(false);
+            await GetIdByNameAsync(_applicationName, "root", IGoogleDrive.MimeType.Folder, ct).ConfigureAwait(false)
+            ?? await CreateAppRootFolderAsync();
 
         public async Task<string> CreateAppRootFolderAsync(CancellationToken ct = default)
         {
@@ -190,7 +191,6 @@ namespace SavescumBuddy.Services
             listRequest.Fields = "nextPageToken, files(id, name)";
             listRequest.Spaces = "drive";
             listRequest.Q = mimeType + $" and '{ parentId }' in parents and trashed = false";
-
             var result = await listRequest.ExecuteAsync(ct).ConfigureAwait(false);
             var files = result.Files.ToList();
             while (result.NextPageToken is object)

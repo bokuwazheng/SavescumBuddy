@@ -115,7 +115,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
             if (lastBackup is object)
             {
-                var timeSinceLastBackup = DateTime.Now - DateTime.Parse(lastBackup.TimeStamp);
+                var timeSinceLastBackup = DateTime.Now - new DateTime(lastBackup.TimeStamp);
 
                 if (_settingsAccess.AutobackupSkipType == (int)SkipOption.FiveMin)
                 {

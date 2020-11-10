@@ -26,5 +26,11 @@ namespace SavescumBuddy.Services.Interfaces
         Task<string> GetUserEmailAsync(CancellationToken ct = default);
         Task ReauthorizeAsync(UserCredential userCredential, CancellationToken ct);
         Task UploadFileAsync(string path, string parentId, CancellationToken ct = default);
+
+        class MimeType
+        {
+            public const string File = "mimeType = 'application/unknown'";
+            public const string Folder = "mimeType = 'application/vnd.google-apps.folder'";
+        }
     }
 }

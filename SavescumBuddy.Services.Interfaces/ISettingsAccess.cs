@@ -8,7 +8,6 @@
         int AutobackupSkipType { get; set; }
         int BackupKey { get; set; }
         int BackupModifier { get; set; }
-        string CloudAppRootFolderId { get; set; }
         bool HotkeysEnabled { get; set; }
         int OverwriteKey { get; set; }
         int OverwriteModifier { get; set; }

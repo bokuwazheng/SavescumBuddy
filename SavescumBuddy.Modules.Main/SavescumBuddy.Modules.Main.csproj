@@ -11,6 +11,5 @@
     <ProjectReference Include="..\SavescumBuddy.CustomControls\SavescumBuddy.CustomControls.csproj" />
     <ProjectReference Include="..\SavescumBuddy.Data\SavescumBuddy.Data.csproj" />
     <ProjectReference Include="..\SavescumBuddy.Services.Interfaces\SavescumBuddy.Services.Interfaces.csproj" />
-    <ProjectReference Include="..\SavescumBuddy.Services\SavescumBuddy.Services.csproj" />
   </ItemGroup>
 </Project>

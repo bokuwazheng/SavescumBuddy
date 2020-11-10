@@ -12,7 +12,7 @@ namespace SavescumBuddy.CustomControls.Converters
     public class ExistsToVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-            => File.Exists((string) value) ? Visibility.Visible : Visibility.Collapsed;
+            => !File.Exists(value.ToString()) ? Visibility.Visible : Visibility.Collapsed;
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
             => throw new NotImplementedException();
@@ -30,6 +30,13 @@ namespace SavescumBuddy.CustomControls.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) => value is int val ? val != 0 : (bool?)null;
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => value is bool val ? val ? 1 : 0 : (int?)null;
+    }
+
+    public class LongToDateTimeConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) => new DateTime((long)value);
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 
     public class InverseBooleanConverter : IValueConverter
@@ -113,16 +120,16 @@ namespace SavescumBuddy.CustomControls.Converters
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 
-    //Use:
-    //<Image x:Name="img">
-    //    <Image.Source>
-    //        <MultiBinding Converter = "{StaticResource UriToCachedResizedImageConverter}" >
-    //            <Binding Path="PathToYourImageFile"/>
-    //            <Binding Path="ActualHeight" ElementName="img"/>
-    //            <Binding Path="ActualWidth" ElementName="img"/>
-    //        </MultiBinding>
-    //    </Image.Source>
-    //</Image>
+    ///Use:
+    ///<Image x:Name="img">
+    ///    <Image.Source>
+    ///        <MultiBinding Converter = "{StaticResource UriToCachedResizedImageConverter}" >
+    ///            <Binding Path="PathToYourImageFile"/>
+    ///            <Binding Path="ActualHeight" ElementName="img"/>
+    ///            <Binding Path="ActualWidth" ElementName="img"/>
+    ///        </MultiBinding>
+    ///    </Image.Source>
+    ///</Image>
     public class UriToCachedResizedImageConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)

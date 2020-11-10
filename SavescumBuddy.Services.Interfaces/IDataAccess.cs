@@ -14,7 +14,7 @@ namespace SavescumBuddy.Services.Interfaces
         Backup GetLatestAutobackup();
         void UpdateNote(Backup backup);
         void UpdateIsLiked(Backup backup);
-        void UpdateDriveId(Backup backup);
+        void UpdateGoogleDriveId(Backup backup);
         void UpdateFilePaths(Backup backup);
         List<Game> LoadGames();
         int SaveGame(Game game);

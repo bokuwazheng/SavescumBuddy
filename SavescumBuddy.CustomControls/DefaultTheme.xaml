@@ -40,6 +40,7 @@
     <converters:KeysToStringConverter x:Key="KeysToStringConverter"/>
     <converters:InverseExistsToVisibilityConverter x:Key="InverseExistsToVisibilityConverter"/>
     <converters:HotkeyActionToBoolConverter x:Key="HotkeyActionToBoolConverter"/>
+    <converters:LongToDateTimeConverter x:Key="LongToDateTimeConverter"/>
 
     <!--Main brushes-->
     <SolidColorBrush x:Key="Dark" Color="#FF464646"/>
@@ -245,7 +246,7 @@
     </Style>
     <!--ComboBox Style Flat (end)-->
 
-    <!--ToolTip style-->
+    <!--ToolTip style (GLOBAL)-->
     <Style x:Key="{x:Type ToolTip}" TargetType="ToolTip">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="Foreground" Value="White"/>
@@ -255,8 +256,8 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ToolTip">
                     <Border Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" 
-                                Background="#6a6a6a" BorderThickness="0" CornerRadius="7" SnapsToDevicePixels="True">
-                        <ContentPresenter Margin="8,6" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                            Background="#6a6a6a" BorderThickness="0" CornerRadius="3" SnapsToDevicePixels="True">
+                        <ContentPresenter Margin="12,10" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>

@@ -1,8 +1,6 @@
-﻿using SavescumBuddy.Core.Extensions;
-using SavescumBuddy.Data;
+﻿using SavescumBuddy.Data;
 using SavescumBuddy.Services.Interfaces;
 using System;
-using System.Globalization;
 using System.IO;
 
 namespace SavescumBuddy.Services
@@ -22,17 +20,17 @@ namespace SavescumBuddy.Services
 
         private Backup CreateBackup(int isAutobackup)
         {
-            var dateTimeTag = DateTime.Now;
-            var folderName = dateTimeTag.ToWindowsFriendlyFormat();
             var game = _dataAccess.GetCurrentGame()
                 ?? throw new NullReferenceException("Failed to create a backup: no game is set as current yet.");
+            var timeStamp = DateTime.Now.Ticks;
+            var folderName = timeStamp.ToString();
 
             var backup = new Backup()
             {
                 IsAutobackup = isAutobackup,
                 GameId = game.Id,
                 OriginPath = game.SavefilePath,
-                TimeStamp = dateTimeTag.ToUserFriendlyFormat(CultureInfo.CreateSpecificCulture("en-US")),
+                TimeStamp = timeStamp,
                 PicturePath = Path.Combine(game.BackupFolder, folderName, folderName + ".jpg"),
                 SavefilePath = Path.Combine(game.BackupFolder, folderName, Path.GetFileName(game.SavefilePath))
             };
