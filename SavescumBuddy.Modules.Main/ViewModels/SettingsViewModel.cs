@@ -7,7 +7,6 @@ using SavescumBuddy.Services.Interfaces;
 using SavescumBuddy.Modules.Main.Models;
 using SavescumBuddy.Core.Events;
 using SavescumBuddy.Core;
-using System;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
