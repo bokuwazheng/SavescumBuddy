@@ -8,7 +8,9 @@ using SavescumBuddy.Modules.Main.Models;
 using SavescumBuddy.Services.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
@@ -35,18 +37,18 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             _eventAggregator.GetEvent<BackupListUpdateRequestedEvent>().Subscribe(UpdateBackupList);
 
             AddCommand = new DelegateCommand(Add);
-            RemoveCommand = new DelegateCommand<Backup>(Remove);
-            RestoreCommand = new DelegateCommand<Backup>(_backupService.RestoreBackup);
+            RemoveCommand = new DelegateCommand<BackupModel>(Remove);
+            RestoreCommand = new DelegateCommand<BackupModel>(x => _backupService.RestoreBackup(x.Backup));
 
             NavigateForwardCommand = new DelegateCommand(() => ++CurrentPageIndex, () => To < TotalNumberOfBackups);
             NavigateBackwardCommand = new DelegateCommand(() => --CurrentPageIndex, () => From > 1);
             NavigateToStartCommand = new DelegateCommand(() => CurrentPageIndex = 0, () => From > 1);
             NavigateToEndCommand = new DelegateCommand(() => CurrentPageIndex = TotalNumberOfBackups / PageSize, () => To < TotalNumberOfBackups);
 
-            ShowInExplorerCommand = new DelegateCommand<Backup>(x => _eventAggregator.GetEvent<ExecuteRequestedEvent>().Publish(Path.GetDirectoryName(x.SavefilePath)));
-            UpdateNoteCommand = new DelegateCommand<Backup>(x => _dataAccess.UpdateNote(x));
-            UpdateIsLikedCommand = new DelegateCommand<Backup>(x => _dataAccess.UpdateIsLiked(x));
-            ExecuteDriveActionCommand = new DelegateCommand<Backup>(ExecuteCloudAction, x => _googleDrive.UserCredential is object);
+            ShowInExplorerCommand = new DelegateCommand<BackupModel>(x => _eventAggregator.GetEvent<ExecuteRequestedEvent>().Publish(Path.GetDirectoryName(x.SavefilePath)));
+            UpdateNoteCommand = new DelegateCommand<BackupModel>(x => _dataAccess.UpdateNote(x.Backup));
+            UpdateIsLikedCommand = new DelegateCommand<BackupModel>(x => _dataAccess.UpdateIsLiked(x.Backup));
+            ExecuteDriveActionCommand = new DelegateCommand<BackupModel>(ExecuteCloudAction, x => _googleDrive.UserCredential is object);
 
             Filter.PropertyChanged += (s, e) => OnFilterPropertyChanged(e.PropertyName);
             UpdateBackupList();
@@ -54,14 +56,14 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
         // Backing fields
         private FilterModel _filter;
-        private Backup _selectedBackup;
+        private BackupModel _selectedBackup;
         private int _currentPageIndex;
 
         // Properties
-        public List<Backup> Backups { get; private set; }
+        public ObservableCollection<BackupModel> Backups { get; private set; }
         public bool CurrentGameIsSet => _dataAccess.GetCurrentGame() is object;
         public int CurrentPageIndex { get => _currentPageIndex; private set => SetProperty(ref _currentPageIndex, value, () => Filter.Offset = value * PageSize); }
-        public Backup SelectedBackup { get => _selectedBackup; set => SetProperty(ref _selectedBackup, value); }
+        public BackupModel SelectedBackup { get => _selectedBackup; set => SetProperty(ref _selectedBackup, value); }
         public FilterModel Filter { get => _filter ??= new FilterModel(); private set => SetProperty(ref _filter, value); }
         public int TotalNumberOfBackups => _dataAccess.GetTotalNumberOfBackups(Filter);
         public int PageSize => 10; // _settingsAccess.BackupsPerPage
@@ -145,14 +147,14 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             }
         }
 
-        private void Remove(Backup backup)
+        private void Remove(BackupModel backup)
         {
             try
             {
                 if (backup is null)
                     return;
-                _dataAccess.RemoveBackup(backup);
-                _backupService.DeleteFiles(backup);
+                _dataAccess.RemoveBackup(backup.Backup);
+                _backupService.DeleteFiles(backup.Backup);
                 UpdateBackupList();
             }
             catch (Exception ex)
@@ -165,7 +167,9 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         {
             try
             {
-                Backups = _dataAccess.SearchBackups(Filter);
+                var backups = _dataAccess.SearchBackups(Filter);
+                var backupModels = backups.Select(x => new BackupModel(x)).ToList();
+                Backups = new ObservableCollection<BackupModel>(backupModels);
                 RaisePropertyChanged(nameof(Backups));
                 RaisePropertyChanged(nameof(TotalNumberOfBackups));
                 RaisePropertyChanged(nameof(From));
@@ -178,24 +182,29 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             }
         }
 
-        private void ExecuteCloudAction(Backup backup)
+        private void ExecuteCloudAction(BackupModel backup)
         {
+            var b = backup.Backup;
+
+            //backup.GoogleDriveId = "HUSDF";
             if (backup.GoogleDriveId is null)
-                _eventAggregator.GetEvent<GoogleDriveUploadRequestedEvent>().Publish(backup);
+                _eventAggregator.GetEvent<GoogleDriveUploadRequestedEvent>().Publish(b);
             else
-                _eventAggregator.GetEvent<GoogleDriveDeletionRequestedEvent>().Publish(backup);
+                _eventAggregator.GetEvent<GoogleDriveDeletionRequestedEvent>().Publish(b);
+
+            backup.GoogleDriveId = b.GoogleDriveId;
         }
 
-        public DelegateCommand<Backup> RemoveCommand { get; }
+        public DelegateCommand<BackupModel> RemoveCommand { get; }
         public DelegateCommand AddCommand { get; }
-        public DelegateCommand<Backup> RestoreCommand { get; }
+        public DelegateCommand<BackupModel> RestoreCommand { get; }
         public DelegateCommand NavigateForwardCommand { get; }
         public DelegateCommand NavigateBackwardCommand { get; }
         public DelegateCommand NavigateToEndCommand { get; }
         public DelegateCommand NavigateToStartCommand { get; }
-        public DelegateCommand<Backup> ShowInExplorerCommand { get; }
-        public DelegateCommand<Backup> UpdateNoteCommand { get; }
-        public DelegateCommand<Backup> UpdateIsLikedCommand { get; }
-        public DelegateCommand<Backup> ExecuteDriveActionCommand { get; }
+        public DelegateCommand<BackupModel> ShowInExplorerCommand { get; }
+        public DelegateCommand<BackupModel> UpdateNoteCommand { get; }
+        public DelegateCommand<BackupModel> UpdateIsLikedCommand { get; }
+        public DelegateCommand<BackupModel> ExecuteDriveActionCommand { get; }
     }
 }

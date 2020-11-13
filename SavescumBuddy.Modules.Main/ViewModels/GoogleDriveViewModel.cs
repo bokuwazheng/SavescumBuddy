@@ -28,8 +28,8 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             _eventAggregator = eventAggregator;
             _dataAccess = dataAccess;
 
-            _eventAggregator.GetEvent<GoogleDriveUploadRequestedEvent>().Subscribe(async x => await SaveInDriveAsync(x, Ct));
-            _eventAggregator.GetEvent<GoogleDriveDeletionRequestedEvent>().Subscribe(async x => await DeleteFromDriveAsync(x, Ct));
+            _eventAggregator.GetEvent<GoogleDriveUploadRequestedEvent>().Subscribe(async x => await SaveInDriveAsync(x, Ct), ThreadOption.UIThread);
+            _eventAggregator.GetEvent<GoogleDriveDeletionRequestedEvent>().Subscribe(async x => await DeleteFromDriveAsync(x, Ct), ThreadOption.UIThread);
 
             AuthorizeCommand = new DelegateCommand(async () => await AuthorizeAsync(Ct).ConfigureAwait(false));
             CancelCommand = new DelegateCommand(() => _cts?.Cancel());

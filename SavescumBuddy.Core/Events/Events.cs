@@ -29,7 +29,7 @@ namespace SavescumBuddy.Core.Events
     public class HookKeyDownEvent : PubSubEvent<(int Key, int Modifier)> { }
     public class HookEnabledChangedEvent : PubSubEvent<bool> { }
     public class ExecuteRequestedEvent : PubSubEvent<string> { }
-    public class GoogleDriveUploadRequestedEvent : PubSubEvent<Backup> { }
-    public class GoogleDriveDeletionRequestedEvent : PubSubEvent<Backup> { }
+    public class GoogleDriveUploadRequestedEvent : PubSubEvent<CallbackArgs> { }
+    public class GoogleDriveDeletionRequestedEvent : PubSubEvent<CallbackArgs> { }
     public class GoogleDriveCancellationRequestedEvent : PubSubEvent { }
 }
