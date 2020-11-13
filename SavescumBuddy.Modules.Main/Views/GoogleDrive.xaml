@@ -7,6 +7,7 @@
              xmlns:controls="clr-namespace:SavescumBuddy.CustomControls;assembly=SavescumBuddy.CustomControls"
              xmlns:models="clr-namespace:SavescumBuddy.Modules.Main.Models"
              xmlns:validation="clr-namespace:SavescumBuddy.CustomControls.Validation;assembly=SavescumBuddy.CustomControls"
+             SnapsToDevicePixels="True"
              prism:ViewModelLocator.AutoWireViewModel="True">
     <UserControl.Resources>
         <ResourceDictionary>

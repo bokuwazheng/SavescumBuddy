@@ -5,6 +5,7 @@
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:core="clr-namespace:SavescumBuddy.Core;assembly=SavescumBuddy.Core"
              xmlns:controls="clr-namespace:SavescumBuddy.CustomControls;assembly=SavescumBuddy.CustomControls"
+             SnapsToDevicePixels="True"
              prism:ViewModelLocator.AutoWireViewModel="True">
 
     <UserControl.Resources>

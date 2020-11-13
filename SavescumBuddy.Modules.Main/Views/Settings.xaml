@@ -9,6 +9,7 @@
              xmlns:ext="clr-namespace:SavescumBuddy.Core.Extensions;assembly=SavescumBuddy.Core"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:controls="clr-namespace:SavescumBuddy.CustomControls;assembly=SavescumBuddy.CustomControls"
+             SnapsToDevicePixels="True"
              prism:ViewModelLocator.AutoWireViewModel="True">
     
     <UserControl.Resources>
@@ -84,7 +85,7 @@
     </UserControl.Resources>
 
     <!--MAIN GRID-->
-    <Grid Background="White" SnapsToDevicePixels="True">
+    <Grid Background="White">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
