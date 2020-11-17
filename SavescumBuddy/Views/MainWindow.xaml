@@ -6,16 +6,19 @@
         xmlns:core="clr-namespace:SavescumBuddy.Core;assembly=SavescumBuddy.Core"
         Title="{Binding Title}" Height="350" Width="525">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <DockPanel Grid.Row="0">
-            <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Navigation}"/>
-            <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.GoogleDrive}"/>
-        </DockPanel>
-        <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.ContentRegion}" Grid.Row="1"/>
-        <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Autobackuper}" Grid.Row="2"/>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <DockPanel Grid.Row="0">
+                <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Navigation}"/>
+                <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.GoogleDrive}"/>
+            </DockPanel>
+            <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.ContentRegion}" Grid.Row="1"/>
+            <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Autobackuper}" Grid.Row="2"/>
+        </Grid>
+        <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Overlay}"/>
     </Grid>
 </Window>

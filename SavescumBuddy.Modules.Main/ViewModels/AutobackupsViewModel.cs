@@ -3,7 +3,6 @@ using Prism.Mvvm;
 using Prism.Regions;
 using SavescumBuddy.Core.Enums;
 using SavescumBuddy.Core.Events;
-using SavescumBuddy.Core.Extensions;
 using SavescumBuddy.Data;
 using SavescumBuddy.Services.Interfaces;
 using System;

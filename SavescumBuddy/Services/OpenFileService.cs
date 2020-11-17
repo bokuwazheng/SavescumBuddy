@@ -1,6 +1,7 @@
 ﻿using SavescumBuddy.Services.Interfaces;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using DialogResult = System.Windows.Forms.DialogResult;
 
 namespace SavescumBuddy.Services
 {

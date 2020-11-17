@@ -24,9 +24,6 @@ namespace SavescumBuddy.Core.Extensions
                     return false;
             }
         }
-
-        public static bool EqualsEnumDescription(this string description, Enum value)
-            => description == value.ToDescriptionOrString();
     }
 
     public static class EnumExtensions
@@ -36,15 +33,6 @@ namespace SavescumBuddy.Core.Extensions
                         .GetCustomAttributes(typeof(DescriptionAttribute), false)
                         .Cast<DescriptionAttribute>()
                         .FirstOrDefault()?.Description ?? value.ToString();
-    }
-
-    public static class DateTimeExtensions
-    {
-        public static string ToWindowsFriendlyFormat(this DateTime dateTime)
-            => dateTime.ToString("dd.MM.yyyy--HH.mm.ss");
-
-        public static string ToUserFriendlyFormat(this DateTime dateTime, IFormatProvider formatProvider)
-            => dateTime.ToString("MMM dd, yyyy h:mm:ss tt", formatProvider);
     }
 
     public class EnumToCollectionExtension : MarkupExtension
@@ -76,17 +64,17 @@ namespace SavescumBuddy.Core.Extensions
 
             return result;
         }
-    }
 
-    public class ValueDescriptionPair
-    {
-        public ValueDescriptionPair(int value, string description)
+        public class ValueDescriptionPair
         {
-            Value = value;
-            Description = description;
-        }
+            public ValueDescriptionPair(int value, string description)
+            {
+                Value = value;
+                Description = description;
+            }
 
-        public int Value { get; set; }
-        public string Description { get; set; }
+            public int Value { get; set; }
+            public string Description { get; set; }
+        }
     }
 }

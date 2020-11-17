@@ -5,6 +5,7 @@ using Prism.Modularity;
 using SavescumBuddy.Services.Interfaces;
 using SavescumBuddy.Services;
 using SavescumBuddy.Modules.Main;
+using SavescumBuddy.Modules.Overlay;
 using System;
 using DryIoc;
 using Prism.Events;
@@ -12,6 +13,10 @@ using SavescumBuddy.Core.Events;
 using System.Windows.Forms;
 using MessageBox = System.Windows.MessageBox;
 using System.Diagnostics;
+using Prism.Regions;
+using SavescumBuddy.Core;
+using System.Linq;
+using DialogResult = SavescumBuddy.Core.Enums.DialogResult;
 
 namespace SavescumBuddy
 {
@@ -25,7 +30,28 @@ namespace SavescumBuddy
             base.OnInitialized();
 
             var ea = Container.Resolve<IEventAggregator>();
-            ea.GetEvent<ErrorOccuredEvent>().Subscribe(ex => MessageBox.Show(Current.MainWindow, ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+            ea.GetEvent<ErrorOccuredEvent>().Subscribe(ex =>
+            {
+                var regionManager = Container.Resolve<IRegionManager>();
+                var pars = new NavigationParameters
+                {
+                    { "title", "Error" },
+                    { "message", ex.Message },
+                    {
+                        "callback", new Action<DialogResult>(r =>
+                        {
+                            if (r == DialogResult.OK)
+                            {
+                                var activeRegion = regionManager.Regions[RegionNames.Overlay].ActiveViews.FirstOrDefault();
+
+                                if (activeRegion is object)
+                                    regionManager.Regions[RegionNames.Overlay].Deactivate(activeRegion);
+                            }
+                        })
+                    }
+                };
+                regionManager.RequestNavigate(RegionNames.Overlay, "NotificationDialog", pars);
+            });
             ea.GetEvent<HookChangedEvent>().Subscribe(OnHookChanged);
             ea.GetEvent<HookEnabledChangedEvent>().Subscribe(OnHookEnabledChanged);
             ea.GetEvent<ExecuteRequestedEvent>().Subscribe(OnExecuteRequested);
@@ -56,11 +82,15 @@ namespace SavescumBuddy
                 .RegisterInstance(new GlobalKeyboardHook(), "Settings")
                 .RegisterInstance(new GlobalKeyboardHook(), "Application")
                 .RegisterSingleton<IGoogleDrive, GoogleDrive>();
+
+            //containerRegistry
+            //    .RegisterDialog<NotificationDialog, NotificationDialogViewModel>();
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
         {
             moduleCatalog.AddModule<MainModule>();
+            moduleCatalog.AddModule<OverlayModule>();
         }
 
         private string LoadConnectionString()

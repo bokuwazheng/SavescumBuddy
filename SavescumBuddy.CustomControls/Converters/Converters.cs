@@ -1,5 +1,4 @@
-﻿using SavescumBuddy.Core.Enums;
-using System;
+﻿using System;
 using System.Globalization;
 using System.IO;
 using System.Windows;
@@ -18,11 +17,11 @@ namespace SavescumBuddy.CustomControls.Converters
             => throw new NotImplementedException();
     }
 
-    public class HotkeyActionToBoolConverter : IValueConverter
+    public class EnumEqualityConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) => parameter is Enum enumVal && enumVal.Equals(value);
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) => parameter is Enum enumValue && enumValue.Equals(value);
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => (HotkeyAction)parameter;
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => value?.Equals(true) == true ? parameter : DependencyProperty.UnsetValue;
     }
 
     public class IntToBoolConverter : IValueConverter
@@ -169,5 +168,16 @@ namespace SavescumBuddy.CustomControls.Converters
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) => throw new NotImplementedException();
+    }
+
+    public class StringIsNullOrEmptyConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+            => value is string stringVal
+            ? string.IsNullOrWhiteSpace(stringVal)
+            : throw new ArgumentException();
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            => throw new NotImplementedException();
     }
 }

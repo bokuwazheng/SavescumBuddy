@@ -31,6 +31,7 @@
     <sys:Double x:Key="СommonFontSize">12</sys:Double>
 
     <!--Converters-->
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     <converters:IntToBoolConverter x:Key="IntToBoolConverter"/>
     <converters:UriToCachedImageConverter x:Key="UriToImgConverter"/>
     <converters:ExistsToVisibilityConverter x:Key="ExistsToVisibilityConverter"/>
@@ -39,8 +40,9 @@
     <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
     <converters:KeysToStringConverter x:Key="KeysToStringConverter"/>
     <converters:InverseExistsToVisibilityConverter x:Key="InverseExistsToVisibilityConverter"/>
-    <converters:HotkeyActionToBoolConverter x:Key="HotkeyActionToBoolConverter"/>
     <converters:LongToDateTimeConverter x:Key="LongToDateTimeConverter"/>
+    <converters:EnumEqualityConverter x:Key="EnumEqualityConverter"/>
+    <converters:StringIsNullOrEmptyConverter x:Key="StringIsNullOrEmptyConverter"/>
 
     <!--Main brushes-->
     <SolidColorBrush x:Key="Dark" Color="#FF464646"/>
@@ -573,10 +575,10 @@
     <!--Validation-->
     <ControlTemplate x:Key="ValidationTemplate">
         <StackPanel Orientation="Vertical">
-            <AdornedElementPlaceholder/>
-            <TextBlock Foreground="#FFE20944" FontSize="12" Margin="5,0,0,0">
-                    <Run Text="&#xEB90;" FontFamily="Segoe MDL2 Assets" FontSize="10"/>
-                    <Run Text="Selected path either doesn't exist or isn't writable..."/>
+            <AdornedElementPlaceholder x:Name="placeholder"/>
+            <TextBlock Foreground="#E20944" FontSize="12" Margin="5,0,0,0">
+                <Run Text="&#xEB90;" FontFamily="Segoe MDL2 Assets" FontSize="10"/>
+                <Run Text="{Binding ElementName=placeholder, Path=AdornedElement.(Validation.Errors)[0].ErrorContent}"/>
             </TextBlock>
         </StackPanel>
     </ControlTemplate>

@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SavescumBuddy.Core\SavescumBuddy.Core.csproj" />
     <ProjectReference Include="..\SavescumBuddy.Modules.Main\SavescumBuddy.Modules.Main.csproj" />
+    <ProjectReference Include="..\SavescumBuddy.Modules.Overlay\SavescumBuddy.Modules.Overlay.csproj" />
     <ProjectReference Include="..\SavescumBuddy.Services\SavescumBuddy.Services.csproj" />
   </ItemGroup>
   <ItemGroup>

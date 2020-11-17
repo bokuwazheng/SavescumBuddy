@@ -28,4 +28,16 @@ namespace SavescumBuddy.Core.Enums
         [Description("If any backup was created <10 min ago")]
         TenMin
     }
+
+    public enum DialogResult
+    {
+        None,
+        OK,
+        Cancel,
+        Abort,
+        Retry,
+        Ignore,
+        Yes,
+        No
+    }
 }

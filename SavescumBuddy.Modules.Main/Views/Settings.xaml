@@ -223,7 +223,7 @@
                                         <Style TargetType="Border">
                                             <Setter Property="BorderBrush" Value="Transparent"/>
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding SelectedHotkeyAction, Converter={StaticResource HotkeyActionToBoolConverter}, ConverterParameter={x:Static enums:HotkeyAction.Backup}}" Value="True">
+                                                <DataTrigger Binding="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Backup}}" Value="True">
                                                     <Setter Property="BorderBrush" Value="White"/>
                                                     <DataTrigger.EnterActions>
                                                         <BeginStoryboard Storyboard="{StaticResource Pulse}"/>
@@ -241,7 +241,7 @@
                                         </TextBlock.Text>
                                     </TextBlock>
                                 </Border>
-                                <ToggleButton Grid.Column="1" IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource HotkeyActionToBoolConverter}, ConverterParameter={x:Static enums:HotkeyAction.Backup}, Mode=OneWay}" 
+                                <ToggleButton Grid.Column="1" IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Backup}, Mode=OneWay}" 
                                               Style="{StaticResource RecordHotkeyToggleButton}" Command="{Binding RegisterHotkeyCommand}" CommandParameter="{x:Static enums:HotkeyAction.Backup}"/>
                             </Grid>
                         </GroupBox>
@@ -257,7 +257,7 @@
                                         <Style TargetType="Border">
                                             <Setter Property="BorderBrush" Value="Transparent"/>
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding SelectedHotkeyAction, Converter={StaticResource HotkeyActionToBoolConverter}, ConverterParameter={x:Static enums:HotkeyAction.Restore}}" Value="True">
+                                                <DataTrigger Binding="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Restore}}" Value="True">
                                                     <Setter Property="BorderBrush" Value="White"/>
                                                     <DataTrigger.EnterActions>
                                                         <BeginStoryboard Storyboard="{StaticResource Pulse}"/>
@@ -275,7 +275,7 @@
                                         </TextBlock.Text>
                                     </TextBlock>
                                 </Border>
-                                <ToggleButton Grid.Column="1" IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource HotkeyActionToBoolConverter}, ConverterParameter={x:Static enums:HotkeyAction.Restore}, Mode=OneWay}" 
+                                <ToggleButton Grid.Column="1" IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Restore}, Mode=OneWay}" 
                                               Style="{StaticResource RecordHotkeyToggleButton}" Command="{Binding RegisterHotkeyCommand}" CommandParameter="{x:Static enums:HotkeyAction.Restore}"/>
                             </Grid>
                         </GroupBox>
@@ -291,7 +291,7 @@
                                         <Style TargetType="Border">
                                             <Setter Property="BorderBrush" Value="Transparent"/>
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding SelectedHotkeyAction, Converter={StaticResource HotkeyActionToBoolConverter}, ConverterParameter={x:Static enums:HotkeyAction.Overwrite}}" Value="True">
+                                                <DataTrigger Binding="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Overwrite}}" Value="True">
                                                     <Setter Property="BorderBrush" Value="White"/>
                                                     <DataTrigger.EnterActions>
                                                         <BeginStoryboard Storyboard="{StaticResource Pulse}"/>
@@ -309,7 +309,7 @@
                                         </TextBlock.Text>
                                     </TextBlock>
                                 </Border>
-                                <ToggleButton Grid.Column="1" IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource HotkeyActionToBoolConverter}, ConverterParameter={x:Static enums:HotkeyAction.Overwrite}, Mode=OneWay}" 
+                                <ToggleButton Grid.Column="1" IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Overwrite}, Mode=OneWay}" 
                                               Style="{StaticResource RecordHotkeyToggleButton}" Command="{Binding RegisterHotkeyCommand}" CommandParameter="{x:Static enums:HotkeyAction.Overwrite}"/>
                             </Grid>
                         </GroupBox>

@@ -13,15 +13,38 @@ namespace SavescumBuddy.CustomControls.Validation
         {
             var input = value as string;
 
-            if (input is null)
-                return new ValidationResult(false, null);
+            if (string.IsNullOrWhiteSpace(input))
+                return ValidationResult.ValidResult;
 
-            var exists = (File.Exists(input) && Path.GetDirectoryName(input).IsDirectoryWritable()) 
-                || (Directory.Exists(input) && input.IsDirectoryWritable());
+            string errorMessage;
 
-            return exists 
-                ? new ValidationResult(true, null)
-                : new ValidationResult(false, null);
+            var exists = File.Exists(input) || Directory.Exists(input);
+
+            if (!exists)
+            {
+                errorMessage = IsFilePath
+                    ? "File doesn't exist"
+                    : "Directory doesn't exists";
+
+                return exists
+                    ? new ValidationResult(true, null)
+                    : new ValidationResult(false, errorMessage);
+            }
+
+            var isWritable = Path.GetDirectoryName(input).IsDirectoryWritable() || input.IsDirectoryWritable();
+
+            if (!isWritable)
+            {
+                errorMessage = IsFilePath
+                    ? "File directory is not writable"
+                    : "Directory is not writable";
+
+                return exists
+                    ? new ValidationResult(true, null)
+                    : new ValidationResult(false, errorMessage);
+            }
+
+            return ValidationResult.ValidResult;
         }
     }
 }

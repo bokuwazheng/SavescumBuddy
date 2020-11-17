@@ -3,11 +3,9 @@ using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
 using SavescumBuddy.Core.Events;
-using SavescumBuddy.Data;
 using SavescumBuddy.Modules.Main.Models;
 using SavescumBuddy.Services.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -24,7 +22,8 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         private readonly IBackupFactory _backupFactory;
         private readonly IGoogleDrive _googleDrive;
 
-        public BackupsViewModel(IRegionManager regionManager, IDataAccess dataAccess, ISettingsAccess settingsAccess, IEventAggregator eventAggregator, IBackupService backupService, IBackupFactory backupFactory, IGoogleDrive googleDrive)
+        public BackupsViewModel(IRegionManager regionManager, IDataAccess dataAccess, ISettingsAccess settingsAccess, IEventAggregator eventAggregator, 
+            IBackupService backupService, IBackupFactory backupFactory, IGoogleDrive googleDrive)
         {
             _regionManager = regionManager;
             _dataAccess = dataAccess;
@@ -186,7 +185,6 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         {
             var b = backup.Backup;
 
-            //backup.GoogleDriveId = "HUSDF";
             if (backup.GoogleDriveId is null)
                 _eventAggregator.GetEvent<GoogleDriveUploadRequestedEvent>().Publish(b);
             else

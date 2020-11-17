@@ -308,7 +308,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid Background="White" SnapsToDevicePixels="True">
+    <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
