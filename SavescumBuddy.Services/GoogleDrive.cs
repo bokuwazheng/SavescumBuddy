@@ -8,6 +8,7 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
+using SavescumBuddy.Data;
 using SavescumBuddy.Services.Interfaces;
 using DriveFile = Google.Apis.Drive.v3.Data.File;
 
@@ -110,8 +111,7 @@ namespace SavescumBuddy.Services
             var request = GetDriveApiService().Files.Create(fileMetadata);
             request.Fields = "id";
             var folder = await request.ExecuteAsync(ct).ConfigureAwait(false);
-            var rootId = folder.Id;
-            return rootId;
+            return folder.Id;
         }
 
         public async Task<string> CreateFolderAsync(string folderName, string parentId, CancellationToken ct = default)
@@ -137,14 +137,25 @@ namespace SavescumBuddy.Services
             };
             using var stream = new FileStream(path, FileMode.Open);
             var request = GetDriveApiService().Files.Create(fileMetadata, stream, IGoogleDrive.MimeType.File);
-            request.Fields = "id";
             await request.UploadAsync(ct).ConfigureAwait(false);
         }
 
-        public async Task DeleteFromCloudAsync(string id, CancellationToken ct = default)
+        public async Task UplodaFilesAsync(string[] paths, string parentId, CancellationToken ct = default)
+        {
+            var tasks = new List<Task>();
+
+            foreach (var path in paths)
+            {
+                tasks.Add(UploadFileAsync(path, parentId, ct));
+            }
+
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+        }
+
+        public async Task<string> DeleteFromCloudAsync(string id, CancellationToken ct = default)
         {
             var service = GetDriveApiService();
-            await service.Files.Delete(id).ExecuteAsync(ct).ConfigureAwait(false);
+            return await service.Files.Delete(id).ExecuteAsync(ct).ConfigureAwait(false);
         }
 
         public async Task<string> GetUserEmailAsync(CancellationToken ct = default)
@@ -204,6 +215,24 @@ namespace SavescumBuddy.Services
             var list = await listRequest.ExecuteAsync(ct).ConfigureAwait(false);
             var result = list.Files.FirstOrDefault(x => x.Name == name);
             return result?.Id;
+        }
+
+        public async Task<string> UploadBackupAsync(Backup backup, string gameTitle, CancellationToken ct = default)
+        {
+            var rootId = await GetAppRootFolderIdAsync(ct).ConfigureAwait(false);
+            var gameFolderId = await GetIdByNameAsync(gameTitle, rootId, IGoogleDrive.MimeType.Folder, ct).ConfigureAwait(false);
+            if (gameFolderId is null)
+                gameFolderId = await CreateFolderAsync(gameTitle, rootId, ct).ConfigureAwait(false);
+            var backupCloudFolderId = await CreateFolderAsync(backup.TimeStamp.ToString(), gameFolderId, ct).ConfigureAwait(false);
+            await UploadFileAsync(backup.SavefilePath, backupCloudFolderId, ct).ConfigureAwait(false);
+            await UploadFileAsync(backup.PicturePath, backupCloudFolderId, ct).ConfigureAwait(false);
+            return backupCloudFolderId;
+        }
+
+        public async Task<bool> DeleteBackupAsync(Backup backup, CancellationToken ct = default)
+        {
+            await DeleteFromCloudAsync(backup.GoogleDriveId, ct).ConfigureAwait(false);
+            return true;
         }
     }
 }

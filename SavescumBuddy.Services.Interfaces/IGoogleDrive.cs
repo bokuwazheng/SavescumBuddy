@@ -1,5 +1,6 @@
 ﻿using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
+using SavescumBuddy.Data;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using DriveFile = Google.Apis.Drive.v3.Data.File;
 
 namespace SavescumBuddy.Services.Interfaces
 {
+    // TODO: separate methods? base and backup?
     public interface IGoogleDrive
     {
         string CredentialsFileName { get; }
@@ -17,7 +19,7 @@ namespace SavescumBuddy.Services.Interfaces
         bool CredentialExists();
         Task<string> CreateAppRootFolderAsync(CancellationToken ct = default);
         Task<string> CreateFolderAsync(string folderName, string parentId, CancellationToken ct = default);
-        Task DeleteFromCloudAsync(string id, CancellationToken ct = default);
+        Task<string> DeleteFromCloudAsync(string id, CancellationToken ct = default);
         Task<string> GetAppRootFolderIdAsync(CancellationToken ct = default);
         Task<DriveFile> GetFileById(string id, bool throwIfFails, CancellationToken ct = default);
         DriveService GetDriveApiService();
@@ -26,6 +28,9 @@ namespace SavescumBuddy.Services.Interfaces
         Task<string> GetUserEmailAsync(CancellationToken ct = default);
         Task ReauthorizeAsync(UserCredential userCredential, CancellationToken ct);
         Task UploadFileAsync(string path, string parentId, CancellationToken ct = default);
+        Task UplodaFilesAsync(string[] paths, string parentId, CancellationToken ct = default);
+        Task<string> UploadBackupAsync(Backup backup, string gameTitle, CancellationToken ct = default);
+        Task<bool> DeleteBackupAsync(Backup backup, CancellationToken ct = default);
 
         class MimeType
         {

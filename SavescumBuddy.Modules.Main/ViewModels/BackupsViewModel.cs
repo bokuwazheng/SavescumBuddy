@@ -9,6 +9,8 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
@@ -47,18 +49,28 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             ShowInExplorerCommand = new DelegateCommand<BackupModel>(x => _eventAggregator.GetEvent<ExecuteRequestedEvent>().Publish(Path.GetDirectoryName(x.SavefilePath)));
             UpdateNoteCommand = new DelegateCommand<BackupModel>(x => _dataAccess.UpdateNote(x.Backup));
             UpdateIsLikedCommand = new DelegateCommand<BackupModel>(x => _dataAccess.UpdateIsLiked(x.Backup));
-            ExecuteDriveActionCommand = new DelegateCommand<BackupModel>(ExecuteCloudAction, x => _googleDrive.UserCredential is object);
+            ExecuteDriveActionCommand = new DelegateCommand<BackupModel>(async x => await ExecuteCloudAction(x, Ct).ConfigureAwait(false), x => _googleDrive.UserCredential is object);
 
             Filter.PropertyChanged += (s, e) => OnFilterPropertyChanged(e.PropertyName);
             UpdateBackupList();
         }
 
         // Backing fields
+        private CancellationTokenSource _cts;
         private FilterModel _filter;
         private BackupModel _selectedBackup;
         private int _currentPageIndex;
 
         // Properties
+        public CancellationToken Ct
+        {
+            get
+            {
+                if (_cts is null || _cts.IsCancellationRequested)
+                    _cts = new CancellationTokenSource();
+                return _cts.Token;
+            }
+        }
         public ObservableCollection<BackupModel> Backups { get; private set; }
         public bool CurrentGameIsSet => _dataAccess.GetCurrentGame() is object;
         public int CurrentPageIndex { get => _currentPageIndex; private set => SetProperty(ref _currentPageIndex, value, () => Filter.Offset = value * PageSize); }
@@ -68,52 +80,6 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         public int PageSize => 10; // _settingsAccess.BackupsPerPage
         public int From => Backups.Count > 0 ? Filter.Offset.Value + 1 : 0;
         public int To => Filter.Offset.Value + Backups.Count;
-
-        #region Sorting options
-        //public bool LikedOnly
-        //{
-        //    get => Settings.Default.LikedOnly;
-        //    set
-        //    {
-        //        Settings.Default.LikedOnly = value;
-        //        Filter.LikedOnly = value;
-        //        RaisePropertyChanged(nameof(LikedOnly));
-        //    }
-        //}
-
-        //public bool HideAutobackups
-        //{
-        //    get => Settings.Default.HideAutobackups;
-        //    set
-        //    {
-        //        Settings.Default.HideAutobackups = value;
-        //        Filter.HideAutobackups = value;
-        //        RaisePropertyChanged(nameof(HideAutobackups));
-        //    }
-        //}
-
-        //public bool CurrentOnly
-        //{
-        //    get => Settings.Default.CurrentOnly;
-        //    set
-        //    {
-        //        Settings.Default.CurrentOnly = value;
-        //        Filter.CurrentOnly = value;
-        //        RaisePropertyChanged(nameof(CurrentOnly));
-        //    }
-        //}
-
-        //public bool OrderByDesc
-        //{
-        //    get => Settings.Default.OrderByDesc;
-        //    set
-        //    {
-        //        Settings.Default.OrderByDesc = value;
-        //        Filter.Order = value ? "desc" : "asc";
-        //        RaisePropertyChanged(nameof(OrderByDesc));
-        //    }
-        //}
-        #endregion
 
         private void OnFilterPropertyChanged(string propName)
         {
@@ -181,16 +147,36 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             }
         }
 
-        private void ExecuteCloudAction(BackupModel backup)
+        // TODO: lock?
+        // TODO: check if succeeded in finally?
+        private async Task ExecuteCloudAction(BackupModel backupModel, CancellationToken ct = default)
         {
-            var b = backup.Backup;
+            var backup = backupModel.Backup;
+            try
+            {
+                if (backup.GoogleDriveId is null)
+                {
+                    var gameTitle = _dataAccess.GetGame(backup.GameId).Title;
+                    var backupCloudFolderId = await _googleDrive.UploadBackupAsync(backup, gameTitle, ct).ConfigureAwait(false);
 
-            if (backup.GoogleDriveId is null)
-                _eventAggregator.GetEvent<GoogleDriveUploadRequestedEvent>().Publish(b);
-            else
-                _eventAggregator.GetEvent<GoogleDriveDeletionRequestedEvent>().Publish(b);
+                    if (backupCloudFolderId is object)
+                    {
+                        backupModel.GoogleDriveId = backupCloudFolderId;
+                        _dataAccess.UpdateGoogleDriveId(backup);
+                    }
+                }
+                else
+                {
+                    var result = await _googleDrive.DeleteBackupAsync(backup, ct).ConfigureAwait(false);
 
-            backup.GoogleDriveId = b.GoogleDriveId;
+                    backupModel.GoogleDriveId = null;
+                    _dataAccess.UpdateGoogleDriveId(backup);
+                }
+            }
+            catch (Exception ex)
+            {
+                _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
+            }
         }
 
         public DelegateCommand<BackupModel> RemoveCommand { get; }
