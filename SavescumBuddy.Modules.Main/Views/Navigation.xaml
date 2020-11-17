@@ -16,19 +16,39 @@
             
             <!--Button style-->
             <Style x:Key="NavigateButton" TargetType="Button" BasedOn="{StaticResource TextButton}">
-                <Setter Property="Margin" Value="8,2"/>
-                <Setter Property="FontSize" Value="16"/>
+                <Setter Property="Margin" Value="8"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Width" Value="50"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border Background="{TemplateBinding Background}" CornerRadius="3">
+                                <StackPanel>
+                                    <TextBlock Text="{TemplateBinding Tag}" FontSize="24" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Center"/>
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </Style>
         </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid>
-        <StackPanel Orientation="Horizontal">
-            <Button Content="Backups" Command="{Binding NavigateToBackupsCommand}" Style="{StaticResource NavigateButton}"/>
-            <Button Content="Games" Command="{Binding NavigateToGamesCommand}" Style="{StaticResource NavigateButton}"/>
-            <Button Content="Settings" Command="{Binding NavigateToSettingsCommand}" Style="{StaticResource NavigateButton}"/>
-            <Button Content="GoogleDrive" Command="{Binding NavigateToGoogleDriveCommand}" Style="{StaticResource NavigateButton}"/>
-            <Button Content="About" Command="{Binding NavigateToAboutCommand}" Style="{StaticResource NavigateButton}"/>
+        <StackPanel Orientation="Vertical">
+            <Button Content="Backups" Tag="&#xEA37;" Command="{Binding NavigateToBackupsCommand}" Style="{StaticResource NavigateButton}"/>
+            <Button Content="Games" Tag="&#xE7FC;" Command="{Binding NavigateToGamesCommand}" Style="{StaticResource NavigateButton}"/>
+            <Button Tag="&#xE753;" Command="{Binding NavigateToGoogleDriveCommand}" Style="{StaticResource NavigateButton}">
+                <Button.Content>
+                    <StackPanel>
+                        <TextBlock Text="Google" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Drive" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button Content="Settings" Tag="&#xE713;" Command="{Binding NavigateToSettingsCommand}" Style="{StaticResource NavigateButton}"/>
+            <Button Content="About" Tag="&#xE946;" Command="{Binding NavigateToAboutCommand}" Style="{StaticResource NavigateButton}"/>
         </StackPanel>
     </Grid>
 </UserControl>

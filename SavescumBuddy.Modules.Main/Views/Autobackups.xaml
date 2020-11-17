@@ -21,7 +21,7 @@
     </UserControl.Resources>
 
     <!--ProgressBar-->
-    <Grid Margin="10">
+    <Grid>
         <Border Height="1" Background="{StaticResource Grayish}" VerticalAlignment="Bottom"/>
         <ProgressBar Minimum="0" Maximum="{Binding Interval, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                      Value="{Binding Progress, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=20}" 

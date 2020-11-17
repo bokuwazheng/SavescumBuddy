@@ -11,7 +11,6 @@ using DryIoc;
 using Prism.Events;
 using SavescumBuddy.Core.Events;
 using System.Windows.Forms;
-using MessageBox = System.Windows.MessageBox;
 using System.Diagnostics;
 using Prism.Regions;
 using SavescumBuddy.Core;
@@ -30,28 +29,7 @@ namespace SavescumBuddy
             base.OnInitialized();
 
             var ea = Container.Resolve<IEventAggregator>();
-            ea.GetEvent<ErrorOccuredEvent>().Subscribe(ex =>
-            {
-                var regionManager = Container.Resolve<IRegionManager>();
-                var pars = new NavigationParameters
-                {
-                    { "title", "Error" },
-                    { "message", ex.Message },
-                    {
-                        "callback", new Action<DialogResult>(r =>
-                        {
-                            if (r == DialogResult.OK)
-                            {
-                                var activeRegion = regionManager.Regions[RegionNames.Overlay].ActiveViews.FirstOrDefault();
-
-                                if (activeRegion is object)
-                                    regionManager.Regions[RegionNames.Overlay].Deactivate(activeRegion);
-                            }
-                        })
-                    }
-                };
-                regionManager.RequestNavigate(RegionNames.Overlay, "NotificationDialog", pars);
-            });
+            ea.GetEvent<ErrorOccuredEvent>().Subscribe(OnErrorOccured);
             ea.GetEvent<HookChangedEvent>().Subscribe(OnHookChanged);
             ea.GetEvent<HookEnabledChangedEvent>().Subscribe(OnHookEnabledChanged);
             ea.GetEvent<ExecuteRequestedEvent>().Subscribe(OnExecuteRequested);
@@ -82,9 +60,6 @@ namespace SavescumBuddy
                 .RegisterInstance(new GlobalKeyboardHook(), "Settings")
                 .RegisterInstance(new GlobalKeyboardHook(), "Application")
                 .RegisterSingleton<IGoogleDrive, GoogleDrive>();
-
-            //containerRegistry
-            //    .RegisterDialog<NotificationDialog, NotificationDialogViewModel>();
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
@@ -103,6 +78,29 @@ namespace SavescumBuddy
             return id.Replace("%APPDATA%", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
         }
 
+        private void OnErrorOccured(Exception ex)
+        {
+            var regionManager = Container.Resolve<IRegionManager>();
+            var parameters = new NavigationParameters
+            {
+                { "title", "Error" },
+                { "message", ex.Message },
+                {
+                    "callback", new Action<DialogResult>(r =>
+                    {
+                        if (r == DialogResult.OK)
+                        {
+                            var activeRegion = regionManager.Regions[RegionNames.Overlay].ActiveViews.FirstOrDefault();
+
+                            if (activeRegion is object)
+                                regionManager.Regions[RegionNames.Overlay].Deactivate(activeRegion);
+                        }
+                    })
+                }
+            };
+            regionManager.RequestNavigate(RegionNames.Overlay, "NotificationDialog", parameters);
+        }
+
         private void OnExecuteRequested(string path)
         {
             try
@@ -118,7 +116,7 @@ namespace SavescumBuddy
             }
             catch (Exception ex)
             {
-                MessageBox.Show(Current.MainWindow, ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                OnErrorOccured(ex);
             }
         }
 
