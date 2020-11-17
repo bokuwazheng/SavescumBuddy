@@ -35,7 +35,11 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid>
+    <Grid Background="{StaticResource Bright}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
         <StackPanel Orientation="Vertical">
             <Button Content="Backups" Tag="&#xEA37;" Command="{Binding NavigateToBackupsCommand}" Style="{StaticResource NavigateButton}"/>
             <Button Content="Games" Tag="&#xE7FC;" Command="{Binding NavigateToGamesCommand}" Style="{StaticResource NavigateButton}"/>
@@ -48,7 +52,8 @@
                 </Button.Content>
             </Button>
             <Button Content="Settings" Tag="&#xE713;" Command="{Binding NavigateToSettingsCommand}" Style="{StaticResource NavigateButton}"/>
-            <Button Content="About" Tag="&#xE946;" Command="{Binding NavigateToAboutCommand}" Style="{StaticResource NavigateButton}"/>
         </StackPanel>
+        <Button Content="About" Tag="&#xE946;" Command="{Binding NavigateToAboutCommand}" Style="{StaticResource NavigateButton}"
+                Grid.Row="1" VerticalAlignment="Bottom"/>
     </Grid>
 </UserControl>

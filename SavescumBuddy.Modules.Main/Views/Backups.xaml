@@ -322,7 +322,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <!--Divider-->
-            <Border Grid.ColumnSpan="2" BorderThickness="0,1" BorderBrush="{StaticResource Bright}" Height="40"/>
+            <Border Grid.ColumnSpan="2" BorderThickness="0,1" BorderBrush="{StaticResource Bright}"/>
             <!--Sorting panel-->
             <StackPanel Orientation="Horizontal" Grid.Column="0">
                 <!--Add button-->
@@ -345,7 +345,7 @@
                     </ToggleButton.Style>
                 </ToggleButton>
                 <!--Autobackups button-->
-                <ToggleButton FontFamily="Segoe UI" FontSize="12" Width="40"  Margin="5,0" IsChecked="{Binding Filter.HideAutobackups}">
+                <ToggleButton FontFamily="Segoe UI" FontSize="12" Width="40" Margin="5,0" IsChecked="{Binding Filter.HideAutobackups}">
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="Hide" TextAlignment="Center"/>
                         <TextBlock Text="Autob.." TextAlignment="Center"/>
@@ -361,7 +361,7 @@
                     </ToggleButton.Style>
                 </ToggleButton>
                 <!--Current button-->
-                <ToggleButton FontFamily="Segoe UI" FontSize="12" Width="40"  Margin="5,0" IsChecked="{Binding Filter.CurrentOnly}" >
+                <ToggleButton FontFamily="Segoe UI" FontSize="12" Width="40" Margin="5,0" IsChecked="{Binding Filter.CurrentOnly}" >
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="Current" TextAlignment="Center"/>
                         <TextBlock Text="Only" TextAlignment="Center"/>
@@ -428,7 +428,7 @@
             <!--Sorting panel (ends here)-->
             
             <!--Paging panel-->
-            <Grid HorizontalAlignment="Right" Grid.Column="1" Margin="7">
+            <Grid HorizontalAlignment="Right" Grid.Column="1" Margin="7,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="30"/>

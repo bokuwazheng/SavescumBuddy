@@ -27,7 +27,6 @@
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <TextBlock Text="{Binding AuthorizedAs}" HorizontalAlignment="Right" Grid.Column="0"/>
-        <TextBlock Text="{Binding Status}" HorizontalAlignment="Right" Grid.Column="1"/>
         <Button Style="{StaticResource TextButton}" Content="Cancel" Command="{Binding CancelCommand}" Grid.Column="2"/>
         <Button Style="{StaticResource TextButton}" Content="Authorize" Command="{Binding AuthorizeCommand}" Grid.Column="3"/>
     </Grid>
