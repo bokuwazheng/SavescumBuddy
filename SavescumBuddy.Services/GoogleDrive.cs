@@ -89,12 +89,10 @@ namespace SavescumBuddy.Services
                 return false;
         }
 
-        public async Task ReauthorizeAsync(UserCredential userCredential, CancellationToken ct)
+        public async Task<bool> ReauthorizeAsync(CancellationToken ct)
         {
-            if (userCredential is null)
-                throw new ArgumentNullException(nameof(userCredential));
-
-            await GoogleWebAuthorizationBroker.ReauthorizeAsync(userCredential, ct).ConfigureAwait(false);
+            await GoogleWebAuthorizationBroker.ReauthorizeAsync(UserCredential, ct).ConfigureAwait(false);
+            return true;
         }
 
         public async Task<string> GetAppRootFolderIdAsync(CancellationToken ct = default) =>

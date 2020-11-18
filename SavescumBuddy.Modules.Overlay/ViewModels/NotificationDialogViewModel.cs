@@ -8,8 +8,9 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
 {
     public class NotificationDialogViewModel : BindableBase, INavigationAware
     {
-        public string _title;
-        public string _message;
+        private string _title;
+        private string _message;
+        private event Action<DialogResult> _requestClose;
 
         public NotificationDialogViewModel()
         {
@@ -18,15 +19,12 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
 
         public string Title { get => _title; set => SetProperty(ref _title, value); }
         public string Message { get => _message; set => SetProperty(ref _message, value); }
-
-        public event Action<DialogResult> RequestClose;
-
-        protected virtual void CloseDialog(DialogResult? result)
+        
+        private void CloseDialog(DialogResult? result)
         {
-            RaiseRequestClose(result.Value);
+            if (result.HasValue)
+                _requestClose?.Invoke(result.Value);
         }
-
-        public virtual void RaiseRequestClose(DialogResult dialogResult) => RequestClose?.Invoke(dialogResult);
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
@@ -34,7 +32,7 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
                 return;
             Message = navigationContext.Parameters["message"].ToString();
             Title = navigationContext.Parameters["title"].ToString();
-            RequestClose = (Action<DialogResult>)navigationContext.Parameters["callback"];
+            _requestClose = (Action<DialogResult>)navigationContext.Parameters["callback"];
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)
@@ -44,7 +42,7 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
 
         public void OnNavigatedFrom(NavigationContext navigationContext)
         {
-            RequestClose = null;
+            _requestClose = null;
         }
 
         public DelegateCommand<DialogResult?> CloseDialogCommand { get; }

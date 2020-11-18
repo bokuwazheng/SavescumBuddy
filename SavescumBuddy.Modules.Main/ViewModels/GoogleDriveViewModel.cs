@@ -28,6 +28,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             _dataAccess = dataAccess;
 
             AuthorizeCommand = new DelegateCommand(async () => await AuthorizeAsync(Ct).ConfigureAwait(false));
+            ReauthorizeCommand = new DelegateCommand(async () => await ReauthorizeAsync(Ct).ConfigureAwait(false));
             CancelCommand = new DelegateCommand(() => _cts?.Cancel());
 
             if (_googleDrive.CredentialExists())
@@ -61,7 +62,24 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             }
         }
 
+        private async Task ReauthorizeAsync(CancellationToken ct)
+        {
+            try
+            {
+                var succeeded = await _googleDrive.ReauthorizeAsync(ct).ConfigureAwait(false);
+                if (!succeeded)
+                    throw new Exception("Failed to reauthorize.");
+
+                AuthorizedAs = await _googleDrive.GetUserEmailAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
+            }
+        }
+
         public DelegateCommand AuthorizeCommand { get; }
+        public DelegateCommand ReauthorizeCommand { get; }
         public DelegateCommand CancelCommand { get; }
     }
 }

@@ -180,4 +180,18 @@ namespace SavescumBuddy.CustomControls.Converters
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
             => throw new NotImplementedException();
     }
+
+    public class NullToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var valIsNull = value is null;
+
+            var result = bool.Parse(parameter.ToString()) ? valIsNull : !valIsNull;
+
+            return result ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+    }
 }

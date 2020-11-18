@@ -43,6 +43,7 @@
     <converters:LongToDateTimeConverter x:Key="LongToDateTimeConverter"/>
     <converters:EnumEqualityConverter x:Key="EnumEqualityConverter"/>
     <converters:StringIsNullOrEmptyConverter x:Key="StringIsNullOrEmptyConverter"/>
+    <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
 
     <!--Main brushes-->
     <SolidColorBrush x:Key="Dark" Color="#FF464646"/>
