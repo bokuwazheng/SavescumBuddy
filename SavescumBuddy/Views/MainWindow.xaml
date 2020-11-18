@@ -4,7 +4,7 @@
         xmlns:prism="http://prismlibrary.com/"
         prism:ViewModelLocator.AutoWireViewModel="True"
         xmlns:core="clr-namespace:SavescumBuddy.Core;assembly=SavescumBuddy.Core"
-        Title="{Binding Title}" Height="350" Width="525">
+        Title="{Binding Title}" Height="600" Width="1000">
     <Grid>
         <DockPanel>
             <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Navigation}"/>

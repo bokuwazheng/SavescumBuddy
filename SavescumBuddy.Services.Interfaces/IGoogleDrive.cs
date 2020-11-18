@@ -26,7 +26,7 @@ namespace SavescumBuddy.Services.Interfaces
         Task<List<DriveFile>> GetFileListAsync(string parentId, string mimeType, CancellationToken ct = default);
         Task<string> GetIdByNameAsync(string name, string parentId, string mimeType, CancellationToken ct = default);
         Task<string> GetUserEmailAsync(CancellationToken ct = default);
-        Task ReauthorizeAsync(UserCredential userCredential, CancellationToken ct);
+        Task<bool> ReauthorizeAsync(CancellationToken ct);
         Task UploadFileAsync(string path, string parentId, CancellationToken ct = default);
         Task UplodaFilesAsync(string[] paths, string parentId, CancellationToken ct = default);
         Task<string> UploadBackupAsync(Backup backup, string gameTitle, CancellationToken ct = default);
