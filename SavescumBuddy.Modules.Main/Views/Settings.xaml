@@ -18,69 +18,6 @@
                 <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.CustomControls;component/DefaultTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <!--ListView default (no ScrollView)-->
-            <SolidColorBrush x:Key="ListBox.Static.Background" Color="#FFFFFFFF"/>
-            <SolidColorBrush x:Key="ListBox.Static.Border" Color="#FFABADB3"/>
-            <SolidColorBrush x:Key="ListBox.Disabled.Background" Color="#FFFFFFFF"/>
-            <SolidColorBrush x:Key="ListBox.Disabled.Border" Color="#FFD9D9D9"/>
-            <Style x:Key="ListViewNoScrollView" TargetType="{x:Type ListView}">
-                <Setter Property="Background" Value="{StaticResource ListBox.Static.Background}"/>
-                <Setter Property="BorderBrush" Value="{StaticResource ListBox.Static.Border}"/>
-                <Setter Property="BorderThickness" Value="1"/>
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
-                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
-                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
-                <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
-                <Setter Property="ScrollViewer.PanningMode" Value="Both"/>
-                <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
-                <Setter Property="VerticalContentAlignment" Value="Center"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type ListView}">
-                            <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="1" SnapsToDevicePixels="true">
-                                <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsEnabled" Value="false">
-                                    <Setter Property="Background" TargetName="Bd" Value="{StaticResource ListBox.Disabled.Background}"/>
-                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource ListBox.Disabled.Border}"/>
-                                </Trigger>
-                                <MultiTrigger>
-                                    <MultiTrigger.Conditions>
-                                        <Condition Property="IsGrouping" Value="true"/>
-                                        <Condition Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="false"/>
-                                    </MultiTrigger.Conditions>
-                                    <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
-                                </MultiTrigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-            <SolidColorBrush x:Key="SelectedBackgroundBrush" Color="#FFF0F0F0"/>
-            <SolidColorBrush x:Key="DisabledForegroundBrush" Color="#888"/>
-            <SolidColorBrush x:Key="SelectedItemBrush" Color="Transparent"/>
-            <Style x:Key="{x:Type ListViewItem}" TargetType="ListViewItem">
-                <Setter Property="SnapsToDevicePixels" Value="true"/>
-                <Setter Property="OverridesDefaultStyle" Value="true"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="ListBoxItem">
-                            <Border Name="Border" Padding="2" SnapsToDevicePixels="true" Background="Transparent">
-                                <ContentPresenter HorizontalAlignment="Left"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsSelected" Value="true">
-                                    <Setter TargetName="Border" Property="Background" Value="{StaticResource SelectedItemBrush}"/>
-                                </Trigger>
-                                <Trigger Property="IsEnabled" Value="false">
-                                    <Setter Property="Foreground" Value="{StaticResource DisabledForegroundBrush}"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -102,219 +39,141 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="50"/>
                 </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+
 
                 <!--Auto backups-->
-                <StackPanel Orientation="Vertical" Grid.Row="0">
-                    <!--Header-->
-                    <TextBlock Text="Auto Backups" Style="{StaticResource Header}" />
-                    <!--Caption-->
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Style="{StaticResource Caption}">
-                            <TextBlock.Text>
-                                <Binding StringFormat="A backup will be automatically created every {0} mins" Path="Settings.AutobackupInterval"/>
-                            </TextBlock.Text>
-                        </TextBlock>
-                        <TextBlock Text=", unless..." TextAlignment="Left">
-                            <TextBlock.Style>
-                                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource Caption}">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Settings.AutobackupSkipType}" Value="0">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                    </StackPanel>
-                </StackPanel>
+                <TextBlock Text="Auto Backups" Style="{StaticResource Header}" />
                 <!--Autobackup ToggleButton-->
-                <ToggleButton Style="{StaticResource SlidingToggleButton}" Grid.Column="1" Grid.Row="0"
+                <ToggleButton Style="{StaticResource SlidingToggleButton}" HorizontalAlignment="Right"
                               IsChecked="{Binding Settings.AutobackupsEnabled}"/>
-
-                <!--Auto backups Expander-->
-                <Expander Header="Advanced..." ExpandDirection="Down" Grid.ColumnSpan="2" Margin="0,0,0,15" FontSize="{StaticResource CaptionFontSize}" Grid.Row="1" Foreground="{StaticResource Ash}">
-                    <Grid Margin="5">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="44"/>
-                            <RowDefinition Height="44"/>
-                            <RowDefinition Height="44"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Interval:" Grid.Column="0" Margin="0,0,10,0" VerticalAlignment="Center" HorizontalAlignment="Right" Grid.Row="0"/>
-                        <TextBlock Text="Skip:" Grid.Column="0" Margin="0,0,10,0" VerticalAlignment="Center" HorizontalAlignment="Right" Grid.Row="1"/>
-                        <TextBlock Text="Overwrite:" Grid.Column="0"  Margin="0,0,10,0" VerticalAlignment="Center" Grid.Row="2"/>
-                        <ComboBox Grid.Column="1" Grid.Row="0" Height="28" Foreground="{StaticResource Ash}" SelectedItem="{Binding Settings.AutobackupInterval}" ItemStringFormat='{}{0} min'>
-                            <sys:Int32>5</sys:Int32>
-                            <sys:Int32>10</sys:Int32>
-                            <sys:Int32>15</sys:Int32>
-                            <sys:Int32>20</sys:Int32>
-                            <sys:Int32>30</sys:Int32>
-                            <sys:Int32>40</sys:Int32>
-                            <sys:Int32>50</sys:Int32>
-                            <sys:Int32>60</sys:Int32>
-                        </ComboBox>
-                        <ComboBox Grid.Column="1" Grid.Row="1" Height="28" Foreground="{StaticResource Ash}" ItemsSource="{ext:EnumToValueDescriptionPairListExtension EnumType={x:Type enums:SkipOption}}"
-                                  SelectedValuePath="Value" DisplayMemberPath="Description" SelectedValue="{Binding Settings.AutobackupSkipType}"/>
-                        <ComboBox Grid.Column="1" Grid.Row="2" Height="28" Foreground="{StaticResource Ash}" ItemsSource="{ext:EnumToValueDescriptionPairListExtension EnumType={x:Type enums:OverwriteOption}}"
-                                  SelectedValuePath="Value" DisplayMemberPath="Description" SelectedValue="{Binding Settings.AutobackupOverwriteType}"/>
-                    </Grid>
-                </Expander>
+                <StackPanel Grid.Row="1">
+                    <ComboBox Style="{StaticResource ComboBoxStyleWithPlaceholder}" Tag="Interval" SelectedItem="{Binding Settings.AutobackupInterval}" ItemStringFormat='{}{0} min'>
+                        <sys:Int32>5</sys:Int32>
+                        <sys:Int32>10</sys:Int32>
+                        <sys:Int32>15</sys:Int32>
+                        <sys:Int32>20</sys:Int32>
+                        <sys:Int32>30</sys:Int32>
+                        <sys:Int32>40</sys:Int32>
+                        <sys:Int32>50</sys:Int32>
+                        <sys:Int32>60</sys:Int32>
+                    </ComboBox>
+                    <ComboBox Tag="Skip" Style="{StaticResource ComboBoxStyleWithPlaceholder}" ItemsSource="{ext:EnumToValueDescriptionPairListExtension EnumType={x:Type enums:SkipOption}}"
+                              SelectedValuePath="Value" DisplayMemberPath="Description" SelectedValue="{Binding Settings.AutobackupSkipType}"/>
+                    <ComboBox Tag="Overwrite" Style="{StaticResource ComboBoxStyleWithPlaceholder}" ItemsSource="{ext:EnumToValueDescriptionPairListExtension EnumType={x:Type enums:OverwriteOption}}"
+                              SelectedValuePath="Value" DisplayMemberPath="Description" SelectedValue="{Binding Settings.AutobackupOverwriteType}"/>
+                </StackPanel>
                 <!--Auto backups region ends here-->
 
                 <!--Hotkeys-->
-                <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="2">
-                    <!--Header-->
-                    <TextBlock Text="Hotkeys" Style="{StaticResource Header}"/>
-                    <!--Caption-->
-                    <StackPanel Orientation="Horizontal" Width="435">
-                        <!--Backup caption-->
-                        <TextBlock Style="{StaticResource Caption}">
-                            <TextBlock.Text>
-                                <MultiBinding StringFormat="Save: {0}. " Converter="{StaticResource KeysToStringConverter}">
-                                    <Binding Path="Settings.BackupKey"/>
-                                    <Binding Path="Settings.BackupModifier"/>
-                                </MultiBinding>
-                            </TextBlock.Text>
-                        </TextBlock>
-                        <!--Restore caption-->
-                        <TextBlock Style="{StaticResource Caption}">
-                            <TextBlock.Text>
-                                <MultiBinding StringFormat="Load: {0}. " Converter="{StaticResource KeysToStringConverter}">
-                                    <Binding Path="Settings.RestoreKey"/>
-                                    <Binding Path="Settings.RestoreModifier"/>
-                                </MultiBinding>
-                            </TextBlock.Text>
-                        </TextBlock>
-                        <!--Overwrite caption-->
-                        <TextBlock Style="{StaticResource Caption}">
-                            <TextBlock.Text>
-                                <MultiBinding StringFormat="Overwrite: {0}. " Converter="{StaticResource KeysToStringConverter}">
-                                    <Binding Path="Settings.OverwriteKey"/>
-                                    <Binding Path="Settings.OverwriteModifier"/>
-                                </MultiBinding>
-                            </TextBlock.Text>
-                        </TextBlock>
-                    </StackPanel>
-                </StackPanel>
+                <TextBlock Grid.Row="2" Text="Hotkeys" Style="{StaticResource Header}"/>
                 <!--Toggle Hotkeys Buttons-->
-                <ToggleButton Style="{StaticResource SlidingToggleButton}" Grid.Column="1" Grid.Row="2"
+                <ToggleButton Grid.Row="2" Style="{StaticResource SlidingToggleButton}" HorizontalAlignment="Right"
                               IsChecked="{Binding Settings.HotkeysEnabled}"/>
-                <!--Hotkeys Expander-->
-                <Expander Header="Show more..." ExpandDirection="Down" Grid.ColumnSpan="2" Grid.Row="3" Margin="0,0,0,15" Foreground="{StaticResource Ash}"
-                          FontSize="{StaticResource CaptionFontSize}" >
-                    <StackPanel Orientation="Vertical" Margin="5">
-                        <!--Backup box-->
-                        <GroupBox Header="Backup" Padding="3" BorderBrush="{StaticResource Ash}" FontSize="{StaticResource СommonFontSize}" >
-                            <Grid Margin="-2">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="120"/>
-                                </Grid.ColumnDefinitions>
-                                <Border CornerRadius="3" BorderThickness="1" Height="30">
-                                    <Border.Style>
-                                        <Style TargetType="Border">
-                                            <Setter Property="BorderBrush" Value="Transparent"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Backup}}" Value="True">
-                                                    <Setter Property="BorderBrush" Value="White"/>
-                                                    <DataTrigger.EnterActions>
-                                                        <BeginStoryboard Storyboard="{StaticResource Pulse}"/>
-                                                    </DataTrigger.EnterActions>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-                                    <TextBlock VerticalAlignment="Center" Margin="10,0" FontWeight="Medium">
-                                        <TextBlock.Text>
-                                            <MultiBinding Converter="{StaticResource KeysToStringConverter}">
-                                                <Binding Path="Settings.BackupKey"/>
-                                                <Binding Path="Settings.BackupModifier"/>
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
-                                </Border>
-                                <ToggleButton Grid.Column="1" IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Backup}, Mode=OneWay}" 
+                <!--Hotkeys panel-->
+                <StackPanel Grid.Row="3" Orientation="Vertical" Margin="5">
+                    <!--Backup box-->
+                    <GroupBox Header="Backup" Padding="3" BorderBrush="{StaticResource Ash}" FontSize="{StaticResource СommonFontSize}" >
+                        <Grid Margin="-2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="120"/>
+                            </Grid.ColumnDefinitions>
+                            <Border CornerRadius="3" BorderThickness="1" Height="30">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="BorderBrush" Value="Transparent"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Backup}}" Value="True">
+                                                <Setter Property="BorderBrush" Value="White"/>
+                                                <DataTrigger.EnterActions>
+                                                    <BeginStoryboard Storyboard="{StaticResource Pulse}"/>
+                                                </DataTrigger.EnterActions>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock VerticalAlignment="Center" Margin="10,0" FontWeight="Medium">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource KeysToStringConverter}">
+                                            <Binding Path="Settings.BackupKey"/>
+                                            <Binding Path="Settings.BackupModifier"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </Border>
+                            <ToggleButton Grid.Column="1" IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Backup}, Mode=OneWay}" 
                                               Style="{StaticResource RecordHotkeyToggleButton}" Command="{Binding RegisterHotkeyCommand}" CommandParameter="{x:Static enums:HotkeyAction.Backup}"/>
-                            </Grid>
-                        </GroupBox>
-                        <!--Restore box-->
-                        <GroupBox Header="Restore previous" Padding="3" BorderBrush="{StaticResource Ash}" FontSize="{StaticResource СommonFontSize}">
-                            <Grid Margin="-2">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="120"/>
-                                </Grid.ColumnDefinitions>
-                                <Border CornerRadius="3" BorderThickness="1" Height="30">
-                                    <Border.Style>
-                                        <Style TargetType="Border">
-                                            <Setter Property="BorderBrush" Value="Transparent"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Restore}}" Value="True">
-                                                    <Setter Property="BorderBrush" Value="White"/>
-                                                    <DataTrigger.EnterActions>
-                                                        <BeginStoryboard Storyboard="{StaticResource Pulse}"/>
-                                                    </DataTrigger.EnterActions>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-                                    <TextBlock VerticalAlignment="Center" Margin="10,0" FontWeight="Medium">
-                                        <TextBlock.Text>
-                                            <MultiBinding Converter="{StaticResource KeysToStringConverter}">
-                                                <Binding Path="Settings.RestoreKey"/>
-                                                <Binding Path="Settings.RestoreModifier"/>
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
-                                </Border>
-                                <ToggleButton Grid.Column="1" IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Restore}, Mode=OneWay}" 
+                        </Grid>
+                    </GroupBox>
+                    <!--Restore box-->
+                    <GroupBox Header="Restore previous" Padding="3" BorderBrush="{StaticResource Ash}" FontSize="{StaticResource СommonFontSize}">
+                        <Grid Margin="-2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="120"/>
+                            </Grid.ColumnDefinitions>
+                            <Border CornerRadius="3" BorderThickness="1" Height="30">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="BorderBrush" Value="Transparent"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Restore}}" Value="True">
+                                                <Setter Property="BorderBrush" Value="White"/>
+                                                <DataTrigger.EnterActions>
+                                                    <BeginStoryboard Storyboard="{StaticResource Pulse}"/>
+                                                </DataTrigger.EnterActions>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock VerticalAlignment="Center" Margin="10,0" FontWeight="Medium">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource KeysToStringConverter}">
+                                            <Binding Path="Settings.RestoreKey"/>
+                                            <Binding Path="Settings.RestoreModifier"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </Border>
+                            <ToggleButton Grid.Column="1" IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Restore}, Mode=OneWay}" 
                                               Style="{StaticResource RecordHotkeyToggleButton}" Command="{Binding RegisterHotkeyCommand}" CommandParameter="{x:Static enums:HotkeyAction.Restore}"/>
-                            </Grid>
-                        </GroupBox>
-                        <!--Overwrite box-->
-                        <GroupBox Header="Backup and overwrite previous" Padding="3" BorderBrush="{StaticResource Ash}" FontSize="{StaticResource СommonFontSize}">
-                            <Grid Margin="-2">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="120"/>
-                                </Grid.ColumnDefinitions>
-                                <Border CornerRadius="3" BorderThickness="1" Height="30">
-                                    <Border.Style>
-                                        <Style TargetType="Border">
-                                            <Setter Property="BorderBrush" Value="Transparent"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Overwrite}}" Value="True">
-                                                    <Setter Property="BorderBrush" Value="White"/>
-                                                    <DataTrigger.EnterActions>
-                                                        <BeginStoryboard Storyboard="{StaticResource Pulse}"/>
-                                                    </DataTrigger.EnterActions>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-                                    <TextBlock VerticalAlignment="Center" Margin="10,0" FontWeight="Medium">
-                                        <TextBlock.Text>
-                                            <MultiBinding Converter="{StaticResource KeysToStringConverter}">
-                                                <Binding Path="Settings.OverwriteKey"/>
-                                                <Binding Path="Settings.OverwriteModifier"/>
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
-                                </Border>
-                                <ToggleButton Grid.Column="1" IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Overwrite}, Mode=OneWay}" 
+                        </Grid>
+                    </GroupBox>
+                    <!--Overwrite box-->
+                    <GroupBox Header="Backup and overwrite previous" Padding="3" BorderBrush="{StaticResource Ash}" FontSize="{StaticResource СommonFontSize}">
+                        <Grid Margin="-2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="120"/>
+                            </Grid.ColumnDefinitions>
+                            <Border CornerRadius="3" BorderThickness="1" Height="30">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="BorderBrush" Value="Transparent"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Overwrite}}" Value="True">
+                                                <Setter Property="BorderBrush" Value="White"/>
+                                                <DataTrigger.EnterActions>
+                                                    <BeginStoryboard Storyboard="{StaticResource Pulse}"/>
+                                                </DataTrigger.EnterActions>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock VerticalAlignment="Center" Margin="10,0" FontWeight="Medium">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource KeysToStringConverter}">
+                                            <Binding Path="Settings.OverwriteKey"/>
+                                            <Binding Path="Settings.OverwriteModifier"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </Border>
+                            <ToggleButton Grid.Column="1" IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Overwrite}, Mode=OneWay}" 
                                               Style="{StaticResource RecordHotkeyToggleButton}" Command="{Binding RegisterHotkeyCommand}" CommandParameter="{x:Static enums:HotkeyAction.Overwrite}"/>
-                            </Grid>
-                        </GroupBox>
-                    </StackPanel>
-                </Expander>
+                        </Grid>
+                    </GroupBox>
+                </StackPanel>
 
                 <!--Sound cues-->
                 <StackPanel Grid.Row="4" >
@@ -325,7 +184,7 @@
                 </StackPanel>
 
                 <!--Toggle sound cues Button-->
-                <ToggleButton Style="{StaticResource SlidingToggleButton}" Grid.Column="1" Grid.Row="4"
+                <ToggleButton Style="{StaticResource SlidingToggleButton}" Grid.Row="4" HorizontalAlignment="Right"
                               IsChecked="{Binding Settings.SoundCuesEnabled}"/>
             </Grid>
         </ScrollViewer>

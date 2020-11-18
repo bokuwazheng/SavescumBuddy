@@ -118,12 +118,12 @@
                         <ColumnDefinition Width="42"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="30"/>
                         <RowDefinition Height="44"/>
                         <RowDefinition Height="44"/>
                         <RowDefinition Height="44"/>
                         <RowDefinition Height="44"/>
-                        <RowDefinition Height="10"/>
+                        <RowDefinition Height="44"/>
+                        <RowDefinition Height="44"/>
                         <RowDefinition />
                     </Grid.RowDefinitions>
 
@@ -159,11 +159,10 @@
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
-                    <!--Savefile path line-->
-                    <TextBlock Text="Savefile path:" Style="{StaticResource Caption}" Grid.Column="0" Grid.Row="1" 
-                               VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10,0" Height="19" Width="82"/>
-                    <TextBox x:Name="SaveFileBox" Validation.ErrorTemplate="{StaticResource ValidationTemplate}"
-                             Height="28" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch">
+                    <!--Savefile path-->
+                    <TextBox x:Name="SaveFileBox" Validation.ErrorTemplate="{StaticResource ValidationTemplate}" 
+                             Style="{StaticResource TextBoxStyle3}" Tag="Savefile Path"
+                             Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch">
                         <TextBox.Text>
                             <Binding Path="SavefilePath" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
                                 <Binding.ValidationRules>
@@ -172,29 +171,14 @@
                             </Binding>
                         </TextBox.Text>
                     </TextBox>
-                    <!--SaveFileBox helper text-->
-                    <TextBlock IsHitTestVisible="False" Text="What savefile to backup?" VerticalAlignment="Center" HorizontalAlignment="Left" 
-                               Foreground="{StaticResource Grayish}" Grid.Column="1" Grid.Row="1" Height="16" Margin="10,12" >
-                        <TextBlock.Style>
-                            <Style TargetType="{x:Type TextBlock}">
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Text, ElementName=SaveFileBox}" Value="">
-                                        <Setter Property="Visibility" Value="Visible"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
                     <Button FontFamily="Segoe MDL2 Assets" Content="&#xE8E5;" FontSize="18" 
                             Command="{Binding DataContext.OpenFilePickerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                             CommandParameter="{Binding}" Grid.Column="2" Grid.Row="1"
                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <!--Backup directory line-->
-                    <TextBlock Text="Backup directory:" Style="{StaticResource Caption}" VerticalAlignment="Center" 
-                               HorizontalAlignment="Right" Grid.Row="2" Grid.Column="0" Height="19" Margin="10,0" Width="106"/>
-                    <TextBox x:Name="DirectoryBox" Validation.ErrorTemplate="{StaticResource ValidationTemplate}" 
-                             Height="28" Grid.Column="1" Grid.Row="2">
+                    <!--Backup directory-->
+                    <TextBox x:Name="DirectoryBox" Validation.ErrorTemplate="{StaticResource ValidationTemplate}"
+                             Style="{StaticResource TextBoxStyle3}" Tag="Backup Directory"
+                             Grid.Column="1" Grid.Row="2">
                         <TextBox.Text>
                             <Binding Path="BackupFolder" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
                                 <Binding.ValidationRules>
@@ -203,41 +187,14 @@
                             </Binding>
                         </TextBox.Text>
                     </TextBox>
-                    <!--DirectoryBox helper text-->
-                    <TextBlock IsHitTestVisible="False" Text="Where to store the backups?" VerticalAlignment="Center" HorizontalAlignment="Left" 
-                               Foreground="{StaticResource Grayish}" Grid.Column="1" Grid.Row="2" Height="16" Margin="10,12" >
-                        <TextBlock.Style>
-                            <Style TargetType="{x:Type TextBlock}">
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Text, ElementName=DirectoryBox}" Value="">
-                                        <Setter Property="Visibility" Value="Visible"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                    <!--TitleBox helper text-->
-                    <TextBlock IsHitTestVisible="False" Text="Try to recall game title..." VerticalAlignment="Center" HorizontalAlignment="Left" 
-                               Foreground="{StaticResource Grayish}" Grid.Column="1" Grid.Row="3" Height="16" Margin="10,12" >
-                        <TextBlock.Style>
-                            <Style TargetType="{x:Type TextBlock}">
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Text, ElementName=TitleBox}" Value="">
-                                        <Setter Property="Visibility" Value="Visible"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
                     <Button FontFamily="Segoe MDL2 Assets" Content="&#xE838;" FontSize="18" Grid.Column="2" Grid.Row="2" 
                             Command="{Binding DataContext.OpenFolderPickerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                             CommandParameter="{Binding}"
                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <!--Game title line-->
-                    <TextBlock Text="Game title:" Style="{StaticResource Caption}"  Grid.Row="3" Grid.Column="0" Margin="10,0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                    <TextBox x:Name="TitleBox" Text="{Binding Title, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Height="28"  Grid.Column="1" Grid.Row="3" Background="Transparent"/>
+                    <!--Game title-->
+                    <TextBox x:Name="TitleBox" Text="{Binding Title, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                             Style="{StaticResource TextBoxStyle3}" Tag="Game Title"
+                             Grid.Column="1" Grid.Row="3" Background="Transparent"/>
                     <!--Update button-->
                     <Button Content="Update" Width="75" Height="28" FontSize="12" 
                             Command="{Binding DataContext.UpdateGameCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
@@ -346,7 +303,6 @@
         <ListView x:Name="GamesListView" Grid.Column="1" ItemsSource="{Binding Games}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" SelectionMode="Single"
                   Margin="0,5" IsSynchronizedWithCurrentItem="True" BorderBrush="{x:Null}" Background="{x:Null}" 
                   ScrollViewer.CanContentScroll="True" Style="{DynamicResource ListViewNoScrollView}" MinWidth="485" ItemTemplate="{StaticResource Game}"/>
-
         <Button Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Foreground="{StaticResource SkyBlue}"
                 VerticalAlignment="Center" Margin="120,5,5,5" Command="{Binding AddGameCommand}" FontSize="14" Cursor="Hand"
                 Style="{StaticResource TextButton}" Height="28" Width="160">
