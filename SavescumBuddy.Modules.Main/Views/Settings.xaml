@@ -9,15 +9,17 @@
              xmlns:ext="clr-namespace:SavescumBuddy.Core.Extensions;assembly=SavescumBuddy.Core"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:controls="clr-namespace:SavescumBuddy.CustomControls;assembly=SavescumBuddy.CustomControls"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              SnapsToDevicePixels="True"
              prism:ViewModelLocator.AutoWireViewModel="True">
     
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="DeepPurple" SecondaryColor="Lime"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.CustomControls;component/DefaultTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -33,21 +35,23 @@
         <ScrollViewer VerticalScrollBarVisibility="Hidden" Grid.Column="1">
             <Grid HorizontalAlignment="Stretch" Margin="0,20,0,20">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="50"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="50"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-
                 <!--Auto backups-->
-                <TextBlock Text="Auto Backups" Style="{StaticResource Header}" />
+                <TextBlock Text="Auto Backups"/>
                 <!--Autobackup ToggleButton-->
-                <ToggleButton Style="{StaticResource SlidingToggleButton}" HorizontalAlignment="Right"
-                              IsChecked="{Binding Settings.AutobackupsEnabled}"/>
+                <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding Settings.AutobackupsEnabled}"/>
                 <StackPanel Grid.Row="1">
-                    <ComboBox Style="{StaticResource ComboBoxStyleWithPlaceholder}" Tag="Interval" SelectedItem="{Binding Settings.AutobackupInterval}" ItemStringFormat='{}{0} min'>
+                    <ComboBox materialDesign:HintAssist.Hint="Interval"
+                              Style="{StaticResource MaterialDesignFilledComboBox}"
+                              Margin="0,10"
+                              FontSize="14"
+                              SelectedItem="{Binding Settings.AutobackupInterval}" ItemStringFormat='{}{0} min'>
                         <sys:Int32>5</sys:Int32>
                         <sys:Int32>10</sys:Int32>
                         <sys:Int32>15</sys:Int32>
@@ -57,18 +61,27 @@
                         <sys:Int32>50</sys:Int32>
                         <sys:Int32>60</sys:Int32>
                     </ComboBox>
-                    <ComboBox Tag="Skip" Style="{StaticResource ComboBoxStyleWithPlaceholder}" ItemsSource="{ext:EnumToValueDescriptionPairListExtension EnumType={x:Type enums:SkipOption}}"
+                    <ComboBox materialDesign:HintAssist.Hint="Skip"
+                              materialDesign:HintAssist.IsFloating="True"
+                              Style="{StaticResource MaterialDesignFilledComboBox}"
+                              Margin="0,10"
+                              FontSize="14"
+                              ItemsSource="{ext:EnumToValueDescriptionPairListExtension EnumType={x:Type enums:SkipOption}}"
                               SelectedValuePath="Value" DisplayMemberPath="Description" SelectedValue="{Binding Settings.AutobackupSkipType}"/>
-                    <ComboBox Tag="Overwrite" Style="{StaticResource ComboBoxStyleWithPlaceholder}" ItemsSource="{ext:EnumToValueDescriptionPairListExtension EnumType={x:Type enums:OverwriteOption}}"
+                    <ComboBox materialDesign:HintAssist.Hint="Overwrite" 
+                              materialDesign:HintAssist.IsFloating="True"
+                              Style="{StaticResource MaterialDesignFilledComboBox}"
+                              Margin="0,10"
+                              FontSize="14"
+                              ItemsSource="{ext:EnumToValueDescriptionPairListExtension EnumType={x:Type enums:OverwriteOption}}"
                               SelectedValuePath="Value" DisplayMemberPath="Description" SelectedValue="{Binding Settings.AutobackupOverwriteType}"/>
                 </StackPanel>
                 <!--Auto backups region ends here-->
 
                 <!--Hotkeys-->
-                <TextBlock Grid.Row="2" Text="Hotkeys" Style="{StaticResource Header}"/>
+                <TextBlock Grid.Row="2" Text="Hotkeys"/>
                 <!--Toggle Hotkeys Buttons-->
-                <ToggleButton Grid.Row="2" Style="{StaticResource SlidingToggleButton}" HorizontalAlignment="Right"
-                              IsChecked="{Binding Settings.HotkeysEnabled}"/>
+                <ToggleButton Grid.Row="2" HorizontalAlignment="Right" IsChecked="{Binding Settings.HotkeysEnabled}"/>
                 <!--Hotkeys panel-->
                 <StackPanel Grid.Row="3" Orientation="Vertical" Margin="5">
                     <!--Backup box-->
@@ -102,7 +115,7 @@
                                 </TextBlock>
                             </Border>
                             <ToggleButton Grid.Column="1" IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Backup}, Mode=OneWay}" 
-                                              Style="{StaticResource RecordHotkeyToggleButton}" Command="{Binding RegisterHotkeyCommand}" CommandParameter="{x:Static enums:HotkeyAction.Backup}"/>
+                                          Style="{StaticResource RecordHotkeyToggleButton}" Command="{Binding RegisterHotkeyCommand}" CommandParameter="{x:Static enums:HotkeyAction.Backup}"/>
                         </Grid>
                     </GroupBox>
                     <!--Restore box-->
