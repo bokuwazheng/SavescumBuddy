@@ -18,6 +18,7 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
         private string _backupFolder;
         private readonly IEventAggregator _eventAggregator;
         private readonly IOpenFileService _openFileService;
+        private IRegionNavigationService _navigationService;
 
         public GameViewModel(IEventAggregator eventAggregator, IOpenFileService openFileService)
         {
@@ -99,6 +100,8 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
+            _navigationService = navigationContext.NavigationService;
+
             if (navigationContext.Parameters.Count == 0)
                 return;
             var game = (Game)navigationContext.Parameters["game"];

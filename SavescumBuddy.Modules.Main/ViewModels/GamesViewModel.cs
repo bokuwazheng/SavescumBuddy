@@ -54,7 +54,11 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                         {
                             return;
                         }
-                        else if (result.Id == 0)
+
+                        result.Id = game.Id;
+                        result.IsCurrent = game.IsCurrent;
+
+                        if (result.Id == 0)
                         {
                             _dataAccess.SaveGame(result);
                             Games.Add(new GameModel(result));

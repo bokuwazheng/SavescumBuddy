@@ -24,7 +24,7 @@
     </UserControl.Resources>
 
     <Grid>
-        <DataGrid ItemsSource="{Binding Games}" Style="{StaticResource DefaultDataGridStyle}" Margin="10">
+        <DataGrid ItemsSource="{Binding Games}" Style="{StaticResource DefaultDataGridStyle}" Margin="10" HeadersVisibility="Column">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseDoubleClick">
                     <i:InvokeCommandAction Command="{Binding EditCommand}" CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"/>
@@ -58,6 +58,7 @@
             </DataGrid.Columns>
         </DataGrid>
         <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+                Margin="10"
                 VerticalAlignment="Bottom"
                 HorizontalAlignment="Right"
                 Command="{Binding AddCommand}">

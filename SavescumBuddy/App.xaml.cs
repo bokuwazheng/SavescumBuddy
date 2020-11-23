@@ -90,10 +90,10 @@ namespace SavescumBuddy
                     {
                         if (r == DialogResult.OK)
                         {
-                            var activeRegion = regionManager.Regions[RegionNames.Overlay].ActiveViews.FirstOrDefault();
+                            //var activeRegion = regionManager.Regions[RegionNames.Overlay].ActiveViews.FirstOrDefault();
 
-                            if (activeRegion is object)
-                                regionManager.Regions[RegionNames.Overlay].Deactivate(activeRegion);
+                            //if (activeRegion is object)
+                            //    regionManager.Regions[RegionNames.Overlay].Deactivate(activeRegion);
                         }
                     })
                 }
