@@ -28,16 +28,15 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             Games = new ObservableCollection<GameModel>();
 
             LoadGamesCommand = new DelegateCommand(LoadGames);
-            AddCommand = new DelegateCommand(() => Games.Add(new GameModel(new Game())));
-            EditCommand = new DelegateCommand<GameModel>(EditGame);
+            AddCommand = new DelegateCommand(() => Edit(new GameModel(new Game())));
+            EditCommand = new DelegateCommand<GameModel>(Edit);
             MakeCurrentCommand = new DelegateCommand<GameModel>(MakeCurrent);
-            RemoveCommand = new DelegateCommand<GameModel>(RemoveGame);
-
+            RemoveCommand = new DelegateCommand<GameModel>(Remove);
 
             LoadGamesCommand.Execute();
         }
 
-        private void EditGame(GameModel game)
+        private void Edit(GameModel game)
         {
             var parameters = new NavigationParameters
             {
@@ -66,8 +65,8 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                         else
                         {
                             _dataAccess.UpdateGame(result);
-                            var g = Games.First(x => x.Id == result.Id);
-                            g = new GameModel(result);
+                            var g = Games.IndexOf(game);
+                            Games[g] = new GameModel(result);
                         }
                     })
                 }
@@ -84,6 +83,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 var games = _dataAccess.LoadGames();
                 var gameModels = games.Select(x => new GameModel(x));
                 Games = new ObservableCollection<GameModel>(gameModels);
+                RaisePropertyChanged(nameof(Games));
             }
             catch (Exception ex)
             {
@@ -91,7 +91,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             }
         }
 
-        private void RemoveGame(GameModel game)
+        private void Remove(GameModel game)
         {
             try
             {
