@@ -1,0 +1,148 @@
+﻿<UserControl x:Class="SavescumBuddy.Modules.Overlay.Views.Game"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:SavescumBuddy.Modules.Overlay.Views"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:enums="clr-namespace:SavescumBuddy.Core.Enums;assembly=SavescumBuddy.Core"
+             xmlns:core="clr-namespace:SavescumBuddy.Core;assembly=SavescumBuddy.Core"
+             xmlns:controls="clr-namespace:SavescumBuddy.CustomControls;assembly=SavescumBuddy.CustomControls"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:validation="clr-namespace:SavescumBuddy.CustomControls.Validation;assembly=SavescumBuddy.CustomControls"
+             SnapsToDevicePixels="True"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+    
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="DeepPurple" SecondaryColor="Lime"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.CustomControls;component/DefaultTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid Background="#7F000000">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseDown">
+                    <i:InvokeCommandAction Command="{Binding CloseDialogCommand}" CommandParameter="{x:Static enums:DialogResult.Cancel}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </Grid>
+        <Grid>
+            <Border CornerRadius="3" Background="White">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="30" Opacity=".3" ShadowDepth="0" Direction="0" RenderingBias="Quality"/>
+                </Border.Effect>
+            </Border>
+            <Grid Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="64"/>
+                    <RowDefinition Height="64"/>
+                    <RowDefinition Height="64"/>
+                    <RowDefinition Height="50"/>
+                </Grid.RowDefinitions>
+
+                <!--Savefile path TextBox-->
+                <TextBox x:Name="SaveFileBox"
+                         Style="{StaticResource MaterialDesignOutlinedTextFieldTextBox}"
+                         Grid.Column="1" Grid.Row="1"
+                         materialDesign:HintAssist.Hint="Savefile path"
+                         materialDesign:HintAssist.FloatingScale=".9"
+                         materialDesign:ValidationAssist.FontSize="11"
+                         materialDesign:ValidationAssist.HorizontalAlignment="Right"
+                         VerticalAlignment="Center">
+                    <TextBox.Text>
+                        <Binding Path="SavefilePath" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
+                            <Binding.ValidationRules>
+                                <validation:ProperPathRule IsFilePath="True"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+
+                <!--Open file picker button-->
+                <Button FontFamily="Segoe MDL2 Assets" Content="&#xE8E5;" FontSize="18"
+                        Style="{StaticResource MaterialDesignIconForegroundButton}"
+                        Command="{Binding OpenFilePickerCommand}"
+                        Grid.Column="2" Grid.Row="1"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <!--Backup directory-->
+                <TextBox x:Name="DirectoryBox" 
+                         Style="{StaticResource MaterialDesignOutlinedTextFieldTextBox}"
+                         Grid.Column="1" Grid.Row="2"
+                         materialDesign:HintAssist.Hint="Backup directory"
+                         materialDesign:HintAssist.FloatingScale=".9"
+                         materialDesign:ValidationAssist.FontSize="11"
+                         materialDesign:ValidationAssist.HorizontalAlignment="Right"
+                         VerticalAlignment="Center">
+                    <TextBox.Text>
+                        <Binding Path="BackupFolder" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
+                            <Binding.ValidationRules>
+                                <validation:ProperPathRule IsFilePath="False"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                <!--Open folder picker button-->
+                <Button FontFamily="Segoe MDL2 Assets" Content="&#xE838;" FontSize="18" 
+                        Style="{StaticResource MaterialDesignIconForegroundButton}"
+                        Command="{Binding OpenFolderPickerCommand}" 
+                        Grid.Column="2" Grid.Row="2" 
+                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <!--Game title-->
+                <TextBox x:Name="TitleBox" 
+                         Text="{Binding Title, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                         Style="{StaticResource MaterialDesignOutlinedTextFieldTextBox}"
+                         materialDesign:HintAssist.Hint="Game title"
+                         materialDesign:HintAssist.FloatingScale=".9"
+                         materialDesign:HintAssist.HelperText="Required"
+                         Grid.Column="1" Grid.Row="3"
+                         VerticalAlignment="Center"/>
+
+                <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1">
+                    <!--Update button-->
+                    <Button Content="SAVE"
+                            Command="{Binding CloseDialogCommand}" 
+                            CommandParameter="{x:Static enums:DialogResult.OK}">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatButton}">
+                                <Setter Property="IsEnabled" Value="True"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Path=Text, ElementName=SaveFileBox, Converter={StaticResource StringIsNullOrEmptyConverter}}" Value="True">
+                                        <Setter Property="IsEnabled" Value="False"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=Text, ElementName=DirectoryBox, Converter={StaticResource StringIsNullOrEmptyConverter}}" Value="True">
+                                        <Setter Property="IsEnabled" Value="False"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=Text, ElementName=TitleBox, Converter={StaticResource StringIsNullOrEmptyConverter}}" Value="True">
+                                        <Setter Property="IsEnabled" Value="False"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=(Validation.HasError), ElementName=SaveFileBox}" Value="True">
+                                        <Setter Property="IsEnabled" Value="False"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=(Validation.HasError), ElementName=DirectoryBox}" Value="True">
+                                        <Setter Property="IsEnabled" Value="False"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <!--Delete button-->
+                    <Button Style="{StaticResource MaterialDesignFlatButton}"
+                            Content="CANCEL" 
+                            Command="{Binding CloseDialogCommand}"
+                            CommandParameter="{x:Static enums:DialogResult.Cancel}"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

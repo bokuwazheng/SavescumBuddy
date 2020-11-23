@@ -1,6 +1,8 @@
 ﻿using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
+using Prism.Regions;
+using SavescumBuddy.Core;
 using SavescumBuddy.Core.Events;
 using SavescumBuddy.Data;
 using SavescumBuddy.Modules.Main.Models;
@@ -13,66 +15,63 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 {
     public class GamesViewModel : BindableBase
     {
+        private readonly IRegionManager _regionManager;
         private readonly IDataAccess _dataAccess;
         private readonly IEventAggregator _eventAggregator;
-        private readonly IOpenFileService _openFileService;
 
-        public GamesViewModel(IDataAccess dataAccess, IEventAggregator eventAggregator, IOpenFileService openFileService)
+        public GamesViewModel(IRegionManager regionManager, IDataAccess dataAccess, IEventAggregator eventAggregator)
         {
+            _regionManager = regionManager;
             _dataAccess = dataAccess;
             _eventAggregator = eventAggregator;
-            _openFileService = openFileService;
 
             Games = new ObservableCollection<GameModel>();
 
             LoadGamesCommand = new DelegateCommand(LoadGames);
-            AddGameCommand = new DelegateCommand(() => Games.Add(new GameModel(new Game())));
-            UpdateGameCommand = new DelegateCommand<GameModel>(UpdateGame);
-            SetCurrentCommand = new DelegateCommand<GameModel>(x => _dataAccess.SetGameAsCurrent(x.Game));
-            RemoveGameCommand = new DelegateCommand<GameModel>(RemoveGame);
-            OpenFilePickerCommand = new DelegateCommand<GameModel>(GetSavefilePath);
-            OpenFolderPickerCommand = new DelegateCommand<GameModel>(GetBackupFolderPath);
+            AddCommand = new DelegateCommand(() => Games.Add(new GameModel(new Game())));
+            EditCommand = new DelegateCommand<GameModel>(EditGame);
+            MakeCurrentCommand = new DelegateCommand<GameModel>(MakeCurrent);
+            RemoveCommand = new DelegateCommand<GameModel>(RemoveGame);
+
 
             LoadGamesCommand.Execute();
         }
-        
-        public ObservableCollection<GameModel> Games { get; private set; }
 
-        private void GetSavefilePath(GameModel game)
+        private void EditGame(GameModel game)
         {
-            try
+            var parameters = new NavigationParameters
             {
-                _openFileService.IsFolderPicker = false;
-                _openFileService.Multiselect = false;
-                _openFileService.ShowHiddenItems = true;
-
-                if (_openFileService.OpenFile())
-                    game.SavefilePath = _openFileService.FileName;
-            }
-            catch (Exception ex)
-            {
-                _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
-            }
-        }
-
-        private void GetBackupFolderPath(GameModel game)
-        {
-            try
-            {
-                _openFileService.IsFolderPicker = true;
-                _openFileService.Multiselect = false;
-                _openFileService.ShowHiddenItems = true;
-
-                if (_openFileService.OpenFile())
+                { "game", game.Game },
                 {
-                    game.BackupFolder = _openFileService.FileName;
+                    "callback", new Action<Game>(result =>
+                    {
+                        var activeRegion = _regionManager.Regions[RegionNames.Overlay].ActiveViews.FirstOrDefault();
+                     
+                        if (activeRegion is object)
+                            _regionManager.Regions[RegionNames.Overlay].Deactivate(activeRegion);
+
+                        if (result is null)
+                        {
+                            return;
+                        }
+                        else if (result.Id == 0)
+                        {
+                            _dataAccess.SaveGame(result);
+                            Games.Add(new GameModel(result));
+                        }
+                        else
+                        {
+                            _dataAccess.UpdateGame(result);
+                            var g = Games.First(x => x.Id == result.Id);
+                            g = new GameModel(result);
+                        }
+                    })
                 }
-            }
-            catch (Exception ex)
-            {
-                _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
-            }
+            };
+            _regionManager.RequestNavigate(RegionNames.Overlay, "Game", parameters);
         }
+
+        public ObservableCollection<GameModel> Games { get; private set; }
 
         private void LoadGames()
         {
@@ -81,24 +80,6 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 var games = _dataAccess.LoadGames();
                 var gameModels = games.Select(x => new GameModel(x));
                 Games = new ObservableCollection<GameModel>(gameModels);
-            }
-            catch (Exception ex)
-            {
-                _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
-            }
-        }
-
-        private void UpdateGame(GameModel game)
-        {
-            try
-            {
-                if (game.Id == 0)
-                {
-                    var id = _dataAccess.SaveGame(game.Game);
-                    game.Id = id;
-                }
-                else
-                    _dataAccess.UpdateGame(game.Game);
             }
             catch (Exception ex)
             {
@@ -119,12 +100,25 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             }
         }
 
+        private void MakeCurrent(GameModel game)
+        {
+            try
+            {
+                _dataAccess.SetGameAsCurrent(game.Game);
+                LoadGamesCommand.Execute();
+            }
+            catch (Exception ex)
+            {
+                _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
+            }
+        }
+
         public DelegateCommand LoadGamesCommand { get; }
-        public DelegateCommand AddGameCommand { get; }
+        public DelegateCommand AddCommand { get; }
+        public DelegateCommand<GameModel> EditCommand { get; }
         public DelegateCommand<GameModel> UpdateGameCommand { get; }
-        public DelegateCommand<GameModel> SetCurrentCommand { get; }
-        public DelegateCommand<GameModel> RemoveGameCommand { get; }
-        public DelegateCommand<GameModel> OpenFilePickerCommand { get; }
-        public DelegateCommand<GameModel> OpenFolderPickerCommand { get; }
+        public DelegateCommand<GameModel> MakeCurrentCommand { get; }
+        public DelegateCommand<GameModel> RemoveCommand { get; }
+
     }
 }

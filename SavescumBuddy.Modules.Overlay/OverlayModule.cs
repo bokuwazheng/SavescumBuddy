@@ -2,8 +2,6 @@
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Regions;
-using SavescumBuddy.Core;
-using System;
 
 namespace SavescumBuddy.Modules.Overlay
 {
@@ -18,19 +16,13 @@ namespace SavescumBuddy.Modules.Overlay
 
         public void OnInitialized(IContainerProvider containerProvider)
         {
-            //var callback = new Action(() => { });
-            //var pars = new NavigationParameters
-            //{
-            //    { "title", "123" },
-            //    { "message", "ASDF" },
-            //    { "callback", callback }
-            //};
-            //_regionManager.RequestNavigate(RegionNames.Overlay, "NotificationDialog", pars);
+
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterForNavigation<NotificationDialog>();
+            containerRegistry.RegisterForNavigation<Game>();
         }
     }
 }

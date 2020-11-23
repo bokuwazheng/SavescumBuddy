@@ -481,21 +481,7 @@
         </Grid>
         
         <!--DataGrid-->
-        <DataGrid Grid.Row="1" ItemsSource="{Binding Backups}" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False"
-                  IsReadOnly="True" AutoGenerateColumns="False" EnableRowVirtualization="True" EnableColumnVirtualization="True"
-                  HeadersVisibility="None" SelectionMode="Single" CanUserSortColumns="False" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource Bright}"
-                  BorderThickness="0" SelectionUnit="FullRow" Margin="10" Background="Transparent" HorizontalScrollBarVisibility="Hidden">
-            <DataGrid.CellStyle>
-                <Style TargetType="{x:Type DataGridCell}">
-                    <Style.Triggers>
-                        <Trigger Property="DataGridCell.IsSelected" Value="True">
-                            <Setter Property="BorderBrush" Value="{StaticResource Background.Selected}"/>
-                            <Setter Property="Background" Value="{StaticResource Background.Selected}"/>
-                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </DataGrid.CellStyle>
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Backups}" Style="{StaticResource DefaultDataGridStyle}" Margin="10">
             <!--Data Grid Context Menu-->
             <DataGrid.ContextMenu>
                 <ContextMenu Style="{StaticResource ContextMenuStyle}" HorizontalOffset="-16" VerticalOffset="-16">

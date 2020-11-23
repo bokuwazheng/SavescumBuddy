@@ -61,6 +61,38 @@
     <SolidColorBrush x:Key="Background.Selected" Color="#f5f5f5"/>
     <SolidColorBrush x:Key="Background.MouseOver" Color="#e6e6e6"/>
 
+    <Style x:Key="DefaultDataGridStyle" TargetType="{x:Type DataGrid}">
+        <Setter Property="CanUserAddRows" Value="False"/>
+        <Setter Property="CanUserDeleteRows" Value="False"/>
+        <Setter Property="CanUserReorderColumns" Value="False"/>
+        <Setter Property="CanUserSortColumns" Value="False"/>
+        <Setter Property="IsReadOnly" Value="True"/>
+        <Setter Property="AutoGenerateColumns" Value="False"/>
+        <Setter Property="EnableRowVirtualization" Value="True"/>
+        <Setter Property="EnableColumnVirtualization" Value="True"/>
+        <Setter Property="HeadersVisibility" Value="None"/>
+        <Setter Property="SelectionMode" Value="Single"/>
+        <Setter Property="SelectionUnit" Value="FullRow"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="HorizontalScrollBarVisibility" Value="Hidden"/>
+        <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+        <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource Bright}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="CellStyle">
+            <Setter.Value>
+                <Style TargetType="{x:Type DataGridCell}">
+                    <Style.Triggers>
+                        <Trigger Property="DataGridCell.IsSelected" Value="True">
+                            <Setter Property="BorderBrush" Value="{StaticResource Background.Selected}"/>
+                            <Setter Property="Background" Value="{StaticResource Background.Selected}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
     <Style x:Key="GroupBoxStyle1" TargetType="{x:Type GroupBox}">
         <Setter Property="Template">
             <Setter.Value>

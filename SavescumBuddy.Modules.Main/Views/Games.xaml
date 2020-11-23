@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:SavescumBuddy.Modules.Main.Views"
              xmlns:prism="http://prismlibrary.com/"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:core="clr-namespace:SavescumBuddy.Core;assembly=SavescumBuddy.Core"
              xmlns:controls="clr-namespace:SavescumBuddy.CustomControls;assembly=SavescumBuddy.CustomControls"
              xmlns:models="clr-namespace:SavescumBuddy.Modules.Main.Models"
@@ -19,299 +20,48 @@
                 <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.CustomControls;component/DefaultTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <!--ListView default (no ScrollView)-->
-            <SolidColorBrush x:Key="ListBox.Static.Background" Color="#FFFFFFFF"/>
-            <SolidColorBrush x:Key="ListBox.Static.Border" Color="#FFABADB3"/>
-            <SolidColorBrush x:Key="ListBox.Disabled.Background" Color="#FFFFFFFF"/>
-            <SolidColorBrush x:Key="ListBox.Disabled.Border" Color="#FFD9D9D9"/>
-            <Style x:Key="ListViewNoScrollView" TargetType="{x:Type ListView}">
-                <Setter Property="Background" Value="{StaticResource ListBox.Static.Background}"/>
-                <Setter Property="BorderBrush" Value="{StaticResource ListBox.Static.Border}"/>
-                <Setter Property="BorderThickness" Value="1"/>
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
-                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
-                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
-                <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
-                <Setter Property="ScrollViewer.PanningMode" Value="Both"/>
-                <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
-                <Setter Property="VerticalContentAlignment" Value="Center"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type ListView}">
-                            <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="1" SnapsToDevicePixels="true">
-                                <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsEnabled" Value="false">
-                                    <Setter Property="Background" TargetName="Bd" Value="{StaticResource ListBox.Disabled.Background}"/>
-                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource ListBox.Disabled.Border}"/>
-                                </Trigger>
-                                <MultiTrigger>
-                                    <MultiTrigger.Conditions>
-                                        <Condition Property="IsGrouping" Value="true"/>
-                                        <Condition Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="false"/>
-                                    </MultiTrigger.Conditions>
-                                    <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
-                                </MultiTrigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-            <SolidColorBrush x:Key="SelectedBackgroundBrush" Color="#FFF0F0F0"/>
-            <SolidColorBrush x:Key="DisabledForegroundBrush" Color="#888"/>
-            <SolidColorBrush x:Key="SelectedItemBrush" Color="Transparent"/>
-            <Style x:Key="{x:Type ListViewItem}" TargetType="ListViewItem">
-                <Setter Property="SnapsToDevicePixels" Value="true"/>
-                <Setter Property="OverridesDefaultStyle" Value="true"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="ListBoxItem">
-                            <Border Name="Border" Padding="2" SnapsToDevicePixels="true" Background="Transparent">
-                                <ContentPresenter HorizontalAlignment="Left"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsSelected" Value="true">
-                                    <Setter TargetName="Border" Property="Background" Value="{StaticResource SelectedItemBrush}"/>
-                                </Trigger>
-                                <Trigger Property="IsEnabled" Value="false">
-                                    <Setter Property="Foreground" Value="{StaticResource DisabledForegroundBrush}"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-            
-            <!--TextBox Style Flat-->
-            <Style x:Key="{x:Type TextBox}" TargetType="TextBox">
-                <Setter Property="BorderBrush" Value="{StaticResource Ash}"/>
-                <Setter Property="Foreground" Value="{StaticResource Ash}"/>
-                <Setter Property="Padding" Value="6,4,6,0"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type TextBox}">
-                            <Border x:Name="Border" BorderBrush="{StaticResource Ash}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True" CornerRadius="3">
-                                <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="true">
-                                    <Setter Property="BorderBrush" TargetName="Border" Value="{StaticResource ResourceKey=SkyBlueInteraction}"/>
-                                </Trigger>
-                                <Trigger Property="IsFocused" Value="true">
-                                    <Setter Property="BorderBrush" TargetName="Border" Value="{StaticResource ResourceKey=SkyBlueInteraction}"/>
-                                    <Setter Property="BorderThickness" TargetName="Border" Value="2"/>
-                                </Trigger>
-                                <Trigger Property="Validation.HasError" Value="true">
-                                    <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors)/ErrorContent}"/>
-                                    <Setter Property="BorderBrush" TargetName="Border" Value="Red"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-            
-            <!--Game Data Template-->
-            <DataTemplate x:Key="Game">
-                <Grid Background="White" Width="475" SnapsToDevicePixels="True">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition />
-                        <ColumnDefinition Width="42"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-
-                    <!--Splitter-->
-                    <Border BorderThickness="0,0,0,1" BorderBrush="#FFF0F0F0" Grid.ColumnSpan="3" Grid.Row="5"/>
-                    <!--Delete button-->
-                    <Button FontFamily="Segoe MDL2 Assets" Content="&#xE711;" FontSize="14" Grid.Column="2" Grid.Row="0" Cursor="Hand"
-                            HorizontalAlignment="Right" VerticalAlignment="Center" Margin="2" 
-                            Command="{Binding DataContext.RemoveGameCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" ToolTip="Delete">
-                        <Button.Style >
-                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-                                <Style.Triggers>
-                                    <Trigger Property="Button.IsMouseOver"  Value="True">
-                                        <Setter Property="Foreground" Value="#FFEE3B3B"/>
-                                    </Trigger>
-                                    <Trigger Property="Button.IsPressed"  Value="True">
-                                        <Setter Property="Foreground" Value="#FFEE3B3B"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                    <!--Check mark-->
-                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE73E;" FontSize="18" Grid.Column="0" Grid.Row="0"
-                               VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2" Foreground="{StaticResource SomeGreen}">
-                        <TextBlock.Style>
-                            <Style TargetType="{x:Type TextBlock}">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsCurrent}" Value="0">
-                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                    <!--Savefile path-->
-                    <TextBox x:Name="SaveFileBox" Text="{Binding SavefilePath}"
-                             Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" 
-                             materialDesign:HintAssist.Hint="Savefile Path"
-                             Grid.Column="1" Grid.Row="1" Height="60"
-                             FontSize="14"/>
-
-
-                    <Button FontFamily="Segoe MDL2 Assets" Content="&#xE8E5;" FontSize="18" 
-                            Command="{Binding DataContext.OpenFilePickerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                            CommandParameter="{Binding}" Grid.Column="2" Grid.Row="1"
-                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <!--Backup directory-->
-                    <TextBox x:Name="DirectoryBox" Validation.ErrorTemplate="{StaticResource ValidationTemplate}"
-                             Style="{StaticResource TextBoxStyle3}" Tag="Backup Directory"
-                             Grid.Column="1" Grid.Row="2">
-                        <TextBox.Text>
-                            <Binding Path="BackupFolder" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
-                                <Binding.ValidationRules>
-                                    <validation:ProperPathRule IsFilePath="False"/>
-                                </Binding.ValidationRules>
-                            </Binding>
-                        </TextBox.Text>
-                    </TextBox>
-                    <Button FontFamily="Segoe MDL2 Assets" Content="&#xE838;" FontSize="18" Grid.Column="2" Grid.Row="2" 
-                            Command="{Binding DataContext.OpenFolderPickerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                            CommandParameter="{Binding}"
-                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <!--Game title-->
-                    <TextBox x:Name="TitleBox" Text="{Binding Title, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                             Style="{StaticResource TextBoxStyle3}" Tag="Game Title"
-                             Grid.Column="1" Grid.Row="3" Background="Transparent"/>
-                    <!--Update button-->
-                    <Button Content="Update" Width="75" Height="28" FontSize="12" 
-                            Command="{Binding DataContext.UpdateGameCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                            CommandParameter="{Binding}" Grid.Row="4" 
-                            HorizontalAlignment="Left" Grid.Column="1" FontWeight="Medium">
-                        <Button.Style>
-                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-                                <Setter Property="Foreground" Value="{StaticResource Ash}"/>
-                                <Setter Property="Background" Value="Transparent"/>
-                                <Setter Property="IsEnabled" Value="True"/>
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="{x:Type Button}">
-                                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding Foreground}" 
-                                                    CornerRadius="3" BorderThickness="1">
-                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Path=Text, ElementName=SaveFileBox, Converter={StaticResource StringIsNullOrEmptyConverter}}" Value="True">
-                                        <Setter Property="IsEnabled" Value="False"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Path=Text, ElementName=DirectoryBox, Converter={StaticResource StringIsNullOrEmptyConverter}}" Value="True">
-                                        <Setter Property="IsEnabled" Value="False"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Path=Text, ElementName=TitleBox, Converter={StaticResource StringIsNullOrEmptyConverter}}" Value="True">
-                                        <Setter Property="IsEnabled" Value="False"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Path=(Validation.HasError), ElementName=SaveFileBox}" Value="True">
-                                        <Setter Property="IsEnabled" Value="False"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Path=(Validation.HasError), ElementName=DirectoryBox}" Value="True">
-                                        <Setter Property="IsEnabled" Value="False"/>
-                                    </DataTrigger>
-                                    <Trigger Property="IsEnabled"  Value="True">
-                                        <Setter Property="Foreground" Value="{StaticResource SkyBlue}"/>
-                                        <Setter Property="BorderBrush" Value="{StaticResource SkyBlue}"/>
-                                    </Trigger>
-                                    <Trigger Property="Button.IsMouseOver"  Value="True">
-                                        <Setter Property="Foreground" Value="{StaticResource SkyBlueInteraction}"/>
-                                        <Setter Property="BorderBrush" Value="{StaticResource SkyBlueInteraction}"/>
-                                    </Trigger>
-                                    <Trigger Property="Button.IsPressed"  Value="True">
-                                        <Setter Property="Foreground" Value="{StaticResource SkyBlueInteraction}"/>
-                                        <Setter Property="BorderBrush" Value="{StaticResource SkyBlueInteraction}"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                    <!--Set as Current button-->
-                    <Button x:Name="SetCurrentButton" Content="Set as Current" Width="105" Height="28" FontSize="12" 
-                            Command="{Binding DataContext.SetCurrentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                            CommandParameter="{Binding}" Grid.Row="4" Cursor="Hand"
-                            HorizontalAlignment="Left" Grid.Column="1" Margin="90,0" FontWeight="Medium">
-                        <Button.Style>
-                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-                                <Setter Property="Foreground" Value="{StaticResource Ash}"/>
-                                <Setter Property="Background" Value="Transparent"/>
-                                <Setter Property="IsEnabled" Value="True"/>
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="{x:Type Button}">
-                                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding Foreground}" 
-                                                    CornerRadius="3" BorderThickness="1">
-                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsCurrent}" Value="1">
-                                        <Setter Property="Visibility" Value="Hidden"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Id}" Value="0">
-                                        <Setter Property="IsEnabled" Value="False"/>
-                                    </DataTrigger>
-                                    <!--<Trigger Property="IsEnabled"  Value="False">
-                                        <Setter Property="Visibility" Value="Hidden"/>
-                                    </Trigger>-->
-                                    <Trigger Property="Button.IsMouseOver"  Value="True">
-                                        <Setter Property="Foreground" Value="{StaticResource SomeGreen}"/>
-                                        <Setter Property="BorderBrush" Value="{StaticResource SomeGreen}"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                </Grid>
-            </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
-    
+
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <ListView x:Name="GamesListView" Grid.Column="1" ItemsSource="{Binding Games}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" SelectionMode="Single"
-                  Margin="0,5" IsSynchronizedWithCurrentItem="True" BorderBrush="{x:Null}" Background="{x:Null}" 
-                  ScrollViewer.CanContentScroll="True" Style="{DynamicResource ListViewNoScrollView}" MinWidth="485" ItemTemplate="{StaticResource Game}"/>
-        <Button Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Foreground="{StaticResource SkyBlue}"
-                VerticalAlignment="Center" Margin="120,5,5,5" Command="{Binding AddGameCommand}" FontSize="14" Cursor="Hand"
-                Style="{StaticResource TextButton}" Height="28" Width="160">
-            <Button.Content>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Right" 
-                               VerticalAlignment="Center" FontSize="14" Margin="0,0,5,0"/>
-                    <TextBlock Text="Add another game"/>
-                </StackPanel>
-            </Button.Content>
+        <DataGrid ItemsSource="{Binding Games}" Style="{StaticResource DefaultDataGridStyle}" Margin="10">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseDoubleClick">
+                    <i:InvokeCommandAction Command="{Binding EditCommand}" CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <!--Data Grid Context Menu-->
+            <DataGrid.ContextMenu>
+                <ContextMenu Style="{StaticResource ContextMenuStyle}" HorizontalOffset="-16" VerticalOffset="-16">
+                    <MenuItem Header="Delete" Style="{StaticResource MenuItemStyleButton}" Margin="0,10,0,0"
+                              Command="{Binding RemoveCommand}"
+                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}">
+                        <MenuItem.Icon>
+                            <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="16"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Make Current" Style="{StaticResource MenuItemStyleButton}" Margin="0,0,0,10"
+                              Command="{Binding MakeCurrentCommand}"
+                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}">
+                        <MenuItem.Icon>
+                            <TextBlock Text="&#xEC50;" FontFamily="Segoe MDL2 Assets" FontSize="16"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+            <!--Data Grid Columns-->
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Title" Binding="{Binding Title}"/>
+                <DataGridTextColumn Header="Savefile path" Binding="{Binding SavefilePath}"/>
+                <DataGridTextColumn Header="Backup folder" Binding="{Binding BackupFolder}"/>
+                <DataGridTextColumn Header="IsCurrent" Binding="{Binding IsCurrent}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+                VerticalAlignment="Bottom"
+                HorizontalAlignment="Right"
+                Command="{Binding AddCommand}">
+            <materialDesign:PackIcon Kind="Plus" Height="24" Width="24"/>
         </Button>
     </Grid>
 </UserControl>
