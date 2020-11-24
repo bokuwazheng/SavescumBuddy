@@ -24,7 +24,8 @@
     </UserControl.Resources>
 
     <Grid>
-        <DataGrid ItemsSource="{Binding Games}" Style="{StaticResource DefaultDataGridStyle}" Margin="10" HeadersVisibility="Column">
+        <DataGrid ItemsSource="{Binding Games}" HeadersVisibility="Column" CanUserAddRows="False" AutoGenerateColumns="False" IsReadOnly="True" 
+                  CanUserResizeColumns="False" CanUserReorderColumns="False" CanUserSortColumns="False">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseDoubleClick">
                     <i:InvokeCommandAction Command="{Binding EditCommand}" CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"/>
@@ -32,36 +33,24 @@
             </i:Interaction.Triggers>
             <!--Data Grid Context Menu-->
             <DataGrid.ContextMenu>
-                <ContextMenu Style="{StaticResource ContextMenuStyle}" HorizontalOffset="-16" VerticalOffset="-16">
-                    <MenuItem Header="Delete" Style="{StaticResource MenuItemStyleButton}" Margin="0,10,0,0"
+                <ContextMenu>
+                    <MenuItem Header="Edit"
                               Command="{Binding EditCommand}"
-                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}">
-                        <MenuItem.Icon>
-                            <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="16"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <MenuItem Header="Delete" Style="{StaticResource MenuItemStyleButton}" Margin="0,0,0,0"
+                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                    <MenuItem Header="Delete"
                               Command="{Binding RemoveCommand}"
-                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}">
-                        <MenuItem.Icon>
-                            <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="16"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <MenuItem Header="Make Current" Style="{StaticResource MenuItemStyleButton}" Margin="0,0,0,10"
+                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                    <MenuItem Header="Make Current"
                               Command="{Binding MakeCurrentCommand}"
-                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}">
-                        <MenuItem.Icon>
-                            <TextBlock Text="&#xEC50;" FontFamily="Segoe MDL2 Assets" FontSize="16"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
+                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <!--Data Grid Columns-->
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Title" Binding="{Binding Title}"/>
-                <DataGridTextColumn Header="Savefile path" Binding="{Binding SavefilePath}"/>
-                <DataGridTextColumn Header="Backup folder" Binding="{Binding BackupFolder}"/>
-                <DataGridTextColumn Header="IsCurrent" Binding="{Binding IsCurrent}"/>
+                <DataGridTextColumn Header="Title" Binding="{Binding Title}" ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"/>
+                <DataGridTextColumn Header="Savefile path" Binding="{Binding SavefilePath}" ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"/>
+                <DataGridTextColumn Header="Backup folder" Binding="{Binding BackupFolder}" ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"/>
+                <DataGridTextColumn Header="IsCurrent" Binding="{Binding IsCurrent}" ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"/>
             </DataGrid.Columns>
         </DataGrid>
         <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}"
