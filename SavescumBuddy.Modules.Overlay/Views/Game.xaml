@@ -37,14 +37,8 @@
                     <DropShadowEffect BlurRadius="30" Opacity=".3" ShadowDepth="0" Direction="0" RenderingBias="Quality"/>
                 </Border.Effect>
             </Border>
-            <Grid Margin="20, 20, 10, 10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="4"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+            <Grid Margin="20">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
                     <RowDefinition Height="64"/>
                     <RowDefinition Height="64"/>
                     <RowDefinition Height="64"/>
@@ -54,12 +48,17 @@
                 <!--Savefile path TextBox-->
                 <TextBox x:Name="SaveFileBox"
                          Style="{StaticResource MaterialDesignOutlinedTextFieldTextBox}"
-                         Grid.Column="0" Grid.Row="1"
+                         Grid.Column="0" Grid.Row="0"
                          materialDesign:HintAssist.Hint="Savefile path"
                          materialDesign:HintAssist.FloatingScale=".9"
                          materialDesign:ValidationAssist.FontSize="11"
                          materialDesign:ValidationAssist.HorizontalAlignment="Right"
                          VerticalAlignment="Center">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="GotFocus">
+                            <i:InvokeCommandAction Command="{Binding OpenFilePickerCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                     <TextBox.Text>
                         <Binding Path="SavefilePath" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
                             <Binding.ValidationRules>
@@ -68,23 +67,20 @@
                         </Binding>
                     </TextBox.Text>
                 </TextBox>
-
-                <!--Open file picker button-->
-                <Button Style="{StaticResource MaterialDesignIconForegroundButton}"
-                        Command="{Binding OpenFilePickerCommand}"
-                        Grid.Column="2" Grid.Row="1"
-                        HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <materialDesign:PackIcon Kind="FileSearchOutline"/>
-                </Button>
                 <!--Backup directory-->
                 <TextBox x:Name="DirectoryBox" 
                          Style="{StaticResource MaterialDesignOutlinedTextFieldTextBox}"
-                         Grid.Column="0" Grid.Row="2"
+                         Grid.Column="0" Grid.Row="1"
                          materialDesign:HintAssist.Hint="Backup directory"
                          materialDesign:HintAssist.FloatingScale=".9"
                          materialDesign:ValidationAssist.FontSize="11"
                          materialDesign:ValidationAssist.HorizontalAlignment="Right"
                          VerticalAlignment="Center">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="GotFocus">
+                            <i:InvokeCommandAction Command="{Binding OpenFolderPickerCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                     <TextBox.Text>
                         <Binding Path="BackupFolder" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
                             <Binding.ValidationRules>
@@ -93,13 +89,6 @@
                         </Binding>
                     </TextBox.Text>
                 </TextBox>
-                <!--Open folder picker button-->
-                <Button Style="{StaticResource MaterialDesignIconForegroundButton}"
-                        Command="{Binding OpenFolderPickerCommand}" 
-                        Grid.Column="2" Grid.Row="2" 
-                        HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <materialDesign:PackIcon Kind="FolderSearchOutline" />
-                </Button>
                 <!--Game title-->
                 <TextBox x:Name="TitleBox" 
                          Text="{Binding Title, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
@@ -107,16 +96,16 @@
                          materialDesign:HintAssist.Hint="Game title"
                          materialDesign:HintAssist.FloatingScale=".9"
                          materialDesign:HintAssist.HelperText="Required"
-                         Grid.Column="0" Grid.Row="3"
+                         Grid.Column="0" Grid.Row="2"
                          VerticalAlignment="Center"/>
 
-                <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Right">
-                    <!--Delete button-->
+                <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Right">
+                    <!--Cancel button-->
                     <Button Style="{StaticResource MaterialDesignFlatButton}"
                             Content="CANCEL" 
                             Command="{Binding CloseDialogCommand}"
                             CommandParameter="{x:Static enums:DialogResult.Cancel}"/>
-                    <!--Update button-->
+                    <!--Save button-->
                     <Button Content="SAVE"
                             Command="{Binding CloseDialogCommand}" 
                             CommandParameter="{x:Static enums:DialogResult.OK}">

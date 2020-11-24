@@ -14,8 +14,6 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using Prism.Regions;
 using SavescumBuddy.Core;
-using System.Linq;
-using DialogResult = SavescumBuddy.Core.Enums.DialogResult;
 
 namespace SavescumBuddy
 {
@@ -84,19 +82,7 @@ namespace SavescumBuddy
             var parameters = new NavigationParameters
             {
                 { "title", "Error" },
-                { "message", ex.Message },
-                {
-                    "callback", new Action<DialogResult>(r =>
-                    {
-                        if (r == DialogResult.OK)
-                        {
-                            //var activeRegion = regionManager.Regions[RegionNames.Overlay].ActiveViews.FirstOrDefault();
-
-                            //if (activeRegion is object)
-                            //    regionManager.Regions[RegionNames.Overlay].Deactivate(activeRegion);
-                        }
-                    })
-                }
+                { "message", ex.Message }
             };
             regionManager.RequestNavigate(RegionNames.Overlay, "NotificationDialog", parameters);
         }

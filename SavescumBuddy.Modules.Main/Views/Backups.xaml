@@ -6,6 +6,7 @@
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:core="clr-namespace:SavescumBuddy.Core;assembly=SavescumBuddy.Core"
              xmlns:controls="clr-namespace:SavescumBuddy.CustomControls;assembly=SavescumBuddy.CustomControls"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:behaviors="clr-namespace:SavescumBuddy.CustomControls.Behaviors;assembly=SavescumBuddy.CustomControls"
              SnapsToDevicePixels="True"
              prism:ViewModelLocator.AutoWireViewModel="True">
@@ -13,6 +14,8 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="DeepPurple" SecondaryColor="Lime"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.CustomControls;component/DefaultTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
@@ -48,263 +51,6 @@
                 </Setter>
             </Style>
 
-            <!--Backup Data Template-->
-            <DataTemplate x:Key="Backup">
-                <Grid x:Name="MainGrid" Height="110" Width="388" Background="Transparent" SnapsToDevicePixels="True">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="1.65*"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="189"/>
-                        <ColumnDefinition Width="199"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.InputBindings>
-                        <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.ShowInExplorerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
-                    </Grid.InputBindings>
-                    <!--Thumbnail-->
-                    <Grid HorizontalAlignment="Center" Height="100" VerticalAlignment="Center" Width="179" Grid.Column="0" Grid.RowSpan="3" >
-                        <Border Background="White">
-                            <TextBlock Text="NO IMAGE" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource Grayish}"
-                                       FontWeight="Bold" Visibility="{Binding PicturePath, Converter={StaticResource InverseExistsToVisibilityConverter}}"/>
-                        </Border>
-                        <Image Source="{Binding PicturePath, Converter={StaticResource UriToImgConverter}}" RenderOptions.BitmapScalingMode="Fant"
-                               Stretch="UniformToFill"/>
-                    </Grid>
-                    <!--NoteBox-->
-                    <TextBox x:Name="NoteBox" Text="{Binding Note, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}" MaxLength="180" TextWrapping="Wrap"  
-                             Margin="5,3,5,5" Grid.Column="1" MaxLines="2" Padding="4,0,0,0" BorderBrush="#FFDCDCDC" Foreground="{StaticResource Dark}" Style="{StaticResource TextBoxStyleFlat}" Grid.Row="2">
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="LostFocus">
-                                <i:InvokeCommandAction Command="{Binding DataContext.UpdateNoteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </TextBox>
-                    <!--Helper text-->
-                    <TextBlock IsHitTestVisible="False" Text="Click to enter your note..." VerticalAlignment="Top" HorizontalAlignment="Left" 
-                               Foreground="{StaticResource Ash}" Margin="{Binding Margin, ElementName=NoteBox}" Padding="7,5,0,0" Grid.Column="1" Grid.Row="2">
-                        <TextBlock.Style>
-                            <Style TargetType="{x:Type TextBlock}">
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Text, ElementName=NoteBox}" Value="{x:Null}">
-                                        <Setter Property="Visibility" Value="Visible"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                    <!--DateTimeTag-->
-                    <TextBlock Text="{Binding TimeStamp, FallbackValue='00:00:00 00.00.00000'}"
-                               Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Foreground" Value="{StaticResource Dark}"/>
-                                <Style.Triggers>
-                                    <Trigger Property="Text" Value="N/A">
-                                        <Setter Property="Foreground" Value="{StaticResource Grayish}"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                    <!--Question mark-->
-                    <TextBlock Text="&#xF142;" FontFamily="Segoe MDL2 Assets" Grid.Column="1" Grid.Row="0"
-                               VerticalAlignment="Top" HorizontalAlignment="Right" Cursor="Help"
-                               ToolTip="Double-click to show in windows explorer.">
-                        <TextBlock.Style>
-                            <Style TargetType="{x:Type TextBlock}">
-                                <Setter Property="Visibility" Value="Visible"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=MainGrid, Path=IsMouseOver}" Value="false">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                    <!--Buttons-->
-                    <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" >
-                        <!--Heart button-->
-                        <ToggleButton FontFamily="Segoe MDL2 Assets" Width="22" FontSize="16" Height="20" 
-                                      Command="{Binding DataContext.UpdateIsLikedCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" 
-                                      IsChecked="{Binding IsLiked, Mode=TwoWay, Converter={StaticResource IntToBoolConverter}}">
-                            <ToggleButton.Style>
-                                <Style TargetType="{x:Type ToggleButton}">
-                                    <Setter Property="Content" Value="&#x0000EB51;"/>
-                                    <Setter Property="Foreground" Value="#FFDAC6E0"/>
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="{x:Type ToggleButton}">
-                                                <Border Background="{x:Null}">
-                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Style.Triggers>
-                                        <Trigger Property="IsChecked" Value="True">
-                                            <Setter Property="Foreground" Value="#FFEEA6F1"/>
-                                            <Setter Property="Content" Value="&#xEB52;"/>
-                                        </Trigger>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Foreground" Value="#FFEEA6F1"/>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </ToggleButton.Style>
-                        </ToggleButton>
-                        <!--Cloud-->
-                        <Grid Margin="5,0,0,0" Visibility="{Binding SavefilePath, Converter={StaticResource ExistsToVisibilityConverter}}">
-                            <!--Cloud icon-->
-                            <ToggleButton FontFamily="Segoe MDL2 Assets" IsChecked="{Binding IsInDrive, Mode=OneWay}"
-                                          Width="22" FontSize="20" Height="20" IsThreeState="True" Content="&#xE753;"
-                                          Command="{Binding DataContext.ExecuteDriveActionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
-                                        <Setter Property="Foreground" Value="{StaticResource Ash}"/>
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="{x:Type ToggleButton}">
-                                                    <Grid Background="Transparent">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition/>
-                                                            <ColumnDefinition/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Grid.ColumnSpan="2"/>
-                                                        <TextBlock x:Name="statusIcon" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Bottom" FontSize="10"
-                                                       RenderTransformOrigin=".5, .5" Margin="0,0,0,-1" Text="&#xF140;"/>
-                                                    </Grid>
-                                                    <ControlTemplate.Triggers>
-                                                        <!--null-->
-                                                        <Trigger Property="IsChecked" Value="{x:Null}">
-                                                            <Setter Property="Text" TargetName="statusIcon" Value="&#xF140;"/>
-                                                            <Setter Property="Foreground" TargetName="statusIcon" Value="IndianRed"/>
-                                                            <Setter Property="FontSize" TargetName="statusIcon" Value="11"/>
-                                                            <Setter Property="FontWeight" TargetName="statusIcon" Value="Bold"/>
-                                                            <Setter Property="ToolTip" Value="Not authorized"/>
-                                                            <Setter Property="Cursor" Value="No"/>
-                                                        </Trigger>
-                                                        <!--false-->
-                                                        <Trigger Property="IsChecked" Value="False">
-                                                            <Setter Property="Text" TargetName="statusIcon" Value="&#xF0D5;"/>
-                                                            <Setter Property="Foreground" TargetName="statusIcon" Value="ForestGreen"/>
-                                                            <Setter Property="LayoutTransform" TargetName="statusIcon">
-                                                                <Setter.Value>
-                                                                    <RotateTransform Angle="90"/>
-                                                                </Setter.Value>
-                                                            </Setter>
-                                                            <Setter Property="ToolTip" Value="Upload"/>
-                                                        </Trigger>
-                                                        <!--true-->
-                                                        <Trigger Property="IsChecked" Value="True">
-                                                            <Setter Property="Text" TargetName="statusIcon" Value="&#xEB90;"/>
-                                                            <Setter Property="Foreground" TargetName="statusIcon" Value="IndianRed"/>
-                                                            <Setter Property="ToolTip" Value="Delete"/>
-                                                        </Trigger>
-                                                        <!--mouse over-->
-                                                        <Trigger Property="IsMouseOver" Value="False">
-                                                            <Setter Property="Visibility" TargetName="statusIcon"  Value="Collapsed"/>
-                                                        </Trigger>
-                                                    </ControlTemplate.Triggers>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                        <Style.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Foreground" Value="{StaticResource SkyBlue}"/>
-                                            </Trigger>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Foreground" Value="{StaticResource SkyBlueInteraction}"/>
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ToggleButton.Style>
-                            </ToggleButton>
-                        </Grid>
-                    </StackPanel>
-                    <!--Upload status-->
-                    <Border CornerRadius="3" Background="{StaticResource Ash}" Grid.Column="1" Grid.Row="1" Margin="6,4">
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Setter Property="Visibility" Value="Visible"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding DriveStatus}" Value="{x:Null}">
-                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                        <Grid>
-                            <!--Status-->
-                            <TextBlock Text="{Binding DriveStatus}" Grid.Column="1" Grid.Row="1"
-                           HorizontalAlignment="Left" VerticalAlignment="Center" Height="20" Margin="6,0,0,0"
-                           Foreground="White" FontSize="12"/>
-                            <!--Cancel button-->
-                            <Button Content="&#xE711;" FontFamily="Segoe MDL2 Assets" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right" 
-                        VerticalAlignment="Stretch" Foreground="White" ToolTip="Cancel"
-                        Command="{Binding CancelCommand}" IsCancel="True" Cursor="Hand" Width="20">
-                                <Button.Style>
-                                    <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                                        <Setter Property="Background" Value="Transparent"/>
-                                        <Style.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="Red"/>
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Button.Style>
-                            </Button>
-                        </Grid>
-                    </Border>
-                    <!--Caution icon-->
-                    <StackPanel Grid.Column="0" Grid.RowSpan="3" VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Vertical"
-                    Visibility="{Binding SavefilePath, Converter={StaticResource InverseExistsToVisibilityConverter}}" Background="White">
-                        <TextBlock Text="&#xE7BA;" FontFamily="Segoe MDL2 Assets" FontSize="26" Margin="0,0,0,4"
-                       Foreground="IndianRed" Visibility="Visible" TextAlignment="Center"/>
-                        <TextBlock TextWrapping="Wrap" Width="160" FontStyle="Italic" Foreground="{DynamicResource Ash}"
-                       TextAlignment="Center">
-                    The folder could not be found. Would you like to
-                    <Hyperlink Command="{Binding LocateCommand}">locate</Hyperlink> it?
-                        </TextBlock>
-                    </StackPanel>
-                    <!--Char counter-->
-                    <TextBlock Grid.Column="1" FontSize="10" Foreground="#FF969696" TextAlignment="Right" Grid.Row="1"
-                   VerticalAlignment="Bottom" Margin="0,0,10,0">
-            <Run Text="{Binding Text.Length, ElementName=NoteBox, Mode=OneWay}"/>
-            <Run Text="/"/>
-            <Run Text="{Binding MaxLength, ElementName=NoteBox, Mode=OneWay}"/>
-                        <TextBlock.Style>
-                            <Style TargetType="{x:Type TextBlock}">
-                                <Setter Property="Visibility" Value="Visible"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsFocused, ElementName=NoteBox}" Value="False">
-                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                    <!--Autobackup label-->
-                    <Border BorderThickness="0" Margin="10,8,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="0,0,0,2" Height="16" CornerRadius="2" Opacity=".85" Grid.Column="0" Grid.Row="0">
-                        <Border.Style>
-                            <Style TargetType="{x:Type Border}">
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                                <Setter Property="Background" Value="#FFF0F0F0"/>
-                                <Setter Property="Opacity" Value="1"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsAutobackup, Converter={StaticResource IntToBoolConverter}}" Value="True">
-                                        <Setter Property="Visibility" Value="Visible"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                        <TextBlock x:Name="AutosaveLabel" IsHitTestVisible="False" Text=" Autosave " VerticalAlignment="Center" HorizontalAlignment="Left" 
-                       Foreground="#FF969696" Grid.Column="0" FontWeight="SemiBold"/>
-                    </Border>
-                </Grid>
-            </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -315,40 +61,28 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <!--Divider-->
+            
+            <!--Divider (double, horizontal)-->
             <Border Grid.ColumnSpan="2" BorderThickness="0,1" BorderBrush="{StaticResource Bright}"/>
+            
             <!--Sorting panel-->
-            <StackPanel Orientation="Horizontal" Grid.Column="0">
+            <StackPanel Orientation="Horizontal" Grid.Column="0" Margin="10">
                 <!--Add button-->
-                <Button Content="Add" Style="{StaticResource TextButton}" Command="{Binding AddCommand}" 
-                        Width="70" Height="30" Background="{StaticResource Background.Selected}" Margin="5"/>
+                <Button Content="ADD" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AddCommand}"/>
+                
                 <!--Divider (vertical)-->
-                <Border Width="1" Margin="6" BorderBrush="{StaticResource Bright}" BorderThickness="1,0,0,0"/>
-                <!--Heart button-->
-                <ToggleButton FontFamily="Segoe MDL2 Assets" Width="25" Height="25" Margin="5,0" IsChecked="{Binding Filter.LikedOnly}" >
-                    <ToggleButton.Style>
-                        <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
-                            <Setter Property="Content" Value="&#xEB51;"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsChecked" Value="True">
-                                    <Setter Property="Foreground" Value="{StaticResource HeartButtonBrush}"/>
-                                    <Setter Property="Content" Value="&#xEB52;"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ToggleButton.Style>
-                </ToggleButton>
+                <Border Width="1" Margin="10,2" BorderBrush="{StaticResource Bright}" BorderThickness="1,0,0,0"/>
+
                 <!--Autobackups button-->
-                <ToggleButton FontFamily="Segoe UI" FontSize="12" Width="40" Margin="5,0" IsChecked="{Binding Filter.HideAutobackups}">
+                <ToggleButton FontFamily="Segoe UI" FontSize="12" Margin="5,0" IsChecked="{Binding Filter.HideAutobackups}">
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="Hide" TextAlignment="Center"/>
-                        <TextBlock Text="Autob.." TextAlignment="Center"/>
+                        <TextBlock Text="Autobackups" TextAlignment="Center"/>
                     </StackPanel>
                     <ToggleButton.Style>
                         <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
@@ -360,8 +94,9 @@
                         </Style>
                     </ToggleButton.Style>
                 </ToggleButton>
+
                 <!--Current button-->
-                <ToggleButton FontFamily="Segoe UI" FontSize="12" Width="40" Margin="5,0" IsChecked="{Binding Filter.CurrentOnly}" >
+                <ToggleButton FontFamily="Segoe UI" FontSize="12" Margin="5,0" IsChecked="{Binding Filter.CurrentOnly}" >
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="Current" TextAlignment="Center"/>
                         <TextBlock Text="Only" TextAlignment="Center"/>
@@ -376,54 +111,11 @@
                         </Style>
                     </ToggleButton.Style>
                 </ToggleButton>
-                <!--Order button-->
-                <ToggleButton FontFamily="Segoe MDL2 Assets" Content="&#xE8CB;" Width="25" Height="25" Margin="5,0" IsChecked="{Binding Filter.OrderByDesc}">
-                    <ToggleButton.Style>
-                        <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
-                            <Style.Triggers>
-                                <Trigger Property="IsChecked" Value="True">
-                                    <Setter Property="Foreground" Value="{StaticResource GroupByGameButtonBrush}"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ToggleButton.Style>
-                </ToggleButton>
-                <!--SearchBox-->
-                <TextBox x:Name="SearchBox" Text="{Binding Filter.Note, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch" Height="34" VerticalAlignment="Center"
-                         BorderBrush="Transparent" Background="Transparent" Foreground="{StaticResource Dark}" Padding="6,1,10,0" FontSize="14">
-                    <TextBox.Style>
-                        <Style TargetType="{x:Type TextBox}">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="{x:Type TextBox}">
-                                        <Border x:Name="border" BorderBrush="Transparent" BorderThickness="{TemplateBinding BorderThickness}" 
-                                                Background="Transparent" SnapsToDevicePixels="True" VerticalAlignment="Center">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition/>
-                                                </Grid.ColumnDefinitions>
-                                                <ScrollViewer x:Name="PART_ContentHost" Grid.Column="1" Focusable="False" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
-                                                <TextBlock x:Name="WatermarkIcon" IsHitTestVisible="False" Foreground="{StaticResource Ash}" VerticalAlignment="Center"
-                                                           FontFamily="Segoe MDL2 Assets" Text="&#xE721;" FontSize="18"/>
-                                                <TextBlock x:Name="WatermarkText" Grid.Column="1" Visibility="Collapsed" IsHitTestVisible="False" Foreground="{StaticResource Ash}" Padding="8,1,10,0"
-                                                           FontFamily="Segoe UI" Text="Search by note..." FontSize="14" VerticalAlignment="Center"/>
-                                            </Grid>
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="Text" Value="">
-                                                <Setter Property="Visibility" TargetName="WatermarkText" Value="Visible"/>
-                                            </Trigger>
-                                            <Trigger Property="Text" Value="{x:Null}">
-                                                <Setter Property="Visibility" TargetName="WatermarkText" Value="Visible"/>
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </TextBox.Style>
-                </TextBox>
+
+                <Button Command="{Binding RemoveSelectedCommand}" Style="{StaticResource MaterialDesignIconForegroundButton}">
+                    <materialDesign:PackIcon Kind="DeleteOutline"/>
+                </Button>
+
             </StackPanel>
             <!--Sorting panel (ends here)-->
             
@@ -431,87 +123,64 @@
             <Grid HorizontalAlignment="Right" Grid.Column="1" Margin="7,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="30"/>
-                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Button x:Name="PageNavigatorButton" Margin="10,0" Style="{StaticResource TextButton}" Width="100" Height="30">
-                    <i:Interaction.Behaviors>
-                        <behaviors:ContextMenuLeftClickBehavior/>
-                    </i:Interaction.Behaviors>
-                    <Button.Content>
-                        <TextBlock>
-                            <TextBlock.Text>
-                                <MultiBinding StringFormat=" {0} - {1} out of {2} ">
-                                    <Binding Path="From" FallbackValue="0"/>
-                                    <Binding Path="To" FallbackValue="0"/>
-                                    <Binding Path="TotalNumberOfBackups" FallbackValue="0"/>
-                                </MultiBinding>
-                            </TextBlock.Text>
-                        </TextBlock>
-                    </Button.Content>
-                    <Button.ContextMenu>
-                        <ContextMenu Style="{StaticResource ContextMenuStyle}">
-                            <MenuItem Header="To First" Style="{StaticResource MenuItemStyleButton}" Margin="0,10,0,0"
-                                      Command="{Binding NavigateToStartCommand}">
-                                <MenuItem.Icon>
-                                    <TextBlock Text="&#xE896;" FontFamily="Segoe MDL2 Assets" FontSize="16">
-                                        <TextBlock.LayoutTransform>
-                                            <RotateTransform Angle="90"/>
-                                        </TextBlock.LayoutTransform>
-                                    </TextBlock>
-                                </MenuItem.Icon>
-                            </MenuItem>
-                            <MenuItem Header="To Last" Style="{StaticResource MenuItemStyleButton}" Margin="0,0,0,10"
-                                      Command="{Binding NavigateToEndCommand}">
-                                <MenuItem.Icon>
-                                    <TextBlock Text="&#xE896;" FontFamily="Segoe MDL2 Assets" FontSize="16">
-                                        <TextBlock.LayoutTransform>
-                                            <RotateTransform Angle="-90"/>
-                                        </TextBlock.LayoutTransform>
-                                    </TextBlock>
-                                </MenuItem.Icon>
-                            </MenuItem>
-                        </ContextMenu>
-                    </Button.ContextMenu>
+                <materialDesign:PopupBox Margin="10,0">
+                    <materialDesign:PopupBox.ToggleContent>
+                        <Grid>
+                            <TextBlock Width="100" Padding="7">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource MaterialDesignLightBackground}"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat=" {0} - {1} out of {2} ">
+                                        <Binding Path="From" FallbackValue="0"/>
+                                        <Binding Path="To" FallbackValue="0"/>
+                                        <Binding Path="TotalNumberOfBackups" FallbackValue="0"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </Grid>
+                    </materialDesign:PopupBox.ToggleContent>
+                    <StackPanel>
+                        <Button Content="To Start" Command="{Binding NavigateToStartCommand}"/>
+                        <Button Content="To End" Command="{Binding NavigateToEndCommand}"/>
+                    </StackPanel>
+                </materialDesign:PopupBox>
+                <Button Grid.Column="1" Command="{Binding NavigateBackwardCommand}" Style="{StaticResource MaterialDesignIconForegroundButton}">
+                    <materialDesign:PackIcon Kind="ChevronLeft"/>
                 </Button>
-                <Button Grid.Column="1" Content="&#xE973;" FontFamily="Segoe MDL2 Assets" Command="{Binding NavigateBackwardCommand}" Style="{StaticResource TextButton}"/>
-                <Button Grid.Column="2" Content="&#xE974;" FontFamily="Segoe MDL2 Assets" Command="{Binding NavigateForwardCommand}" Style="{StaticResource TextButton}"/>
+                <Button Grid.Column="2" Command="{Binding NavigateForwardCommand}" Style="{StaticResource MaterialDesignIconForegroundButton}">
+                    <materialDesign:PackIcon Kind="ChevronRight"/>
+                </Button>
             </Grid>
             <!--Paging panel (ends here)-->
         </Grid>
         
         <!--DataGrid-->
-        <DataGrid Grid.Row="1" ItemsSource="{Binding Backups}" Style="{StaticResource DefaultDataGridStyle}" Margin="10">
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Backups}" CanUserAddRows="False" AutoGenerateColumns="False" IsReadOnly="True" 
+                  CanUserResizeColumns="False" CanUserReorderColumns="False" CanUserSortColumns="False">
             <!--Data Grid Context Menu-->
             <DataGrid.ContextMenu>
-                <ContextMenu Style="{StaticResource ContextMenuStyle}" HorizontalOffset="-16" VerticalOffset="-16">
-                    <MenuItem Header="Restore" Style="{StaticResource MenuItemStyleButton}" Margin="0,10,0,0"
+                <ContextMenu HorizontalOffset="-16" VerticalOffset="-16">
+                    <MenuItem Header="Restore"
                               Command="{Binding RestoreCommand}"
-                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}">
-                        <MenuItem.Icon>
-                            <TextBlock Text="&#xE777;" FontFamily="Segoe MDL2 Assets" FontSize="16"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <MenuItem Header="Delete" Style="{StaticResource MenuItemStyleButton}"
+                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                    <MenuItem Header="Delete" 
                               Command="{Binding RemoveCommand}"
-                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}">
-                        <MenuItem.Icon>
-                            <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="16"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <MenuItem Header="Show in Explorer" Style="{StaticResource MenuItemStyleButton}"
+                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                    <MenuItem Header="Show in Explorer"
                               Command="{Binding ShowInExplorerCommand}"
+                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                    <MenuItem Command="{Binding ExecuteDriveActionCommand}"
                               CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}">
-                        <MenuItem.Icon>
-                            <TextBlock Text="&#xEC50;" FontFamily="Segoe MDL2 Assets" FontSize="16"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <MenuItem Style="{StaticResource MenuItemStyleButton}" Margin="0,0,0,10"
-                              Command="{Binding ExecuteDriveActionCommand}"
-                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}">
-                        <MenuItem.Icon>
-                            <TextBlock Text="&#xE753;" FontFamily="Segoe MDL2 Assets" FontSize="16"/>
-                        </MenuItem.Icon>
                         <MenuItem.Header>
                             <TextBlock>
                                 <TextBlock.Style>
@@ -530,8 +199,23 @@
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.Columns>
+                <DataGridCheckBoxColumn IsReadOnly="False"
+                                        Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" 
+                                        ElementStyle="{StaticResource MaterialDesignDataGridCheckBoxColumnStyle}"
+                                        EditingElementStyle="{StaticResource MaterialDesignDataGridCheckBoxColumnEditingStyle}">
+                    <DataGridCheckBoxColumn.Header>
+                        <Border Background="Transparent">
+                            <CheckBox IsChecked="{Binding DataContext.IsAllItemsSelected, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"/>
+                        </Border>
+                    </DataGridCheckBoxColumn.Header>
+                    <DataGridCheckBoxColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                        </Style>
+                    </DataGridCheckBoxColumn.HeaderStyle>
+                </DataGridCheckBoxColumn>
                 <!--Error icon-->
-                <DataGridTemplateColumn>
+                <!--<DataGridTemplateColumn>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE783;" ToolTip="Savefile not found" 
@@ -539,9 +223,9 @@
                                        Visibility="{Binding SavefilePath, Converter={StaticResource ExistsToVisibilityConverter}}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                </DataGridTemplateColumn>-->
                 <!--Image-->
-                <DataGridTemplateColumn Header="Image">
+                <DataGridTemplateColumn>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Grid>
@@ -572,6 +256,22 @@
                 </DataGridTemplateColumn>
                 <!--Time Stamp-->
                 <DataGridTextColumn Binding="{Binding TimeStamp, Converter={StaticResource LongToDateTimeConverter}, StringFormat='MMM dd, yyyy h:mm:ss tt'}">
+                    <DataGridTextColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <ToggleButton FontFamily="Segoe MDL2 Assets" Content="&#xE8CB;" Width="25" Height="25" Margin="5,0" 
+                                          IsChecked="{Binding DataContext.Filter.OrderByDesc, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}">
+                                <ToggleButton.Style>
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource GroupByGameButtonBrush}"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ToggleButton.Style>
+                            </ToggleButton>
+                        </DataTemplate>
+                    </DataGridTextColumn.HeaderTemplate>
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="Margin" Value="10,0"/>
@@ -587,10 +287,28 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
+                <!--Heart button-->
                 <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <ToggleButton FontFamily="Segoe MDL2 Assets" Width="25" Height="25" Margin="5,0" 
+                                          IsChecked="{Binding DataContext.Filter.LikedOnly, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}">
+                                <ToggleButton.Style>
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
+                                        <Setter Property="Content" Value="&#xEB51;"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource HeartButtonBrush}"/>
+                                                <Setter Property="Content" Value="&#xEB52;"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ToggleButton.Style>
+                            </ToggleButton>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <!--Heart button-->
                             <ToggleButton FontFamily="Segoe MDL2 Assets" FontSize="16" Width="22" Height="22" Margin="5"
                                           Command="{Binding DataContext.UpdateIsLikedCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                                           CommandParameter="{Binding}"
@@ -624,10 +342,28 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                <!--Cloud Button-->
                 <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <ToggleButton FontFamily="Segoe MDL2 Assets" Width="25" Height="25" Margin="5,0" 
+                                          IsChecked="{Binding DataContext.Filter.LikedOnly, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}">
+                                <ToggleButton.Style>
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
+                                        <Setter Property="Content" Value="&#xE753;"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource HeartButtonBrush}"/>
+                                                <!--<Setter Property="Content" Value="&#xEB52;"/>-->
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ToggleButton.Style>
+                            </ToggleButton>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <!--Cloud Button-->
                             <ToggleButton FontFamily="Segoe MDL2 Assets" FontSize="20" Width="22" Height="22" Content="&#xE753;" Margin="5"
                                           IsChecked="{Binding GoogleDriveId, Converter={StaticResource ObjectToBoolConverter}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
                                 <ToggleButton.Style>
@@ -651,7 +387,50 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                <!--Note-->
                 <DataGridTemplateColumn Width="*">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBox x:Name="SearchBox" 
+                                     Text="{Binding DataContext.Filter.Note, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, UpdateSourceTrigger=PropertyChanged}"
+                                     HorizontalAlignment="Stretch" Height="34" VerticalAlignment="Center"
+                                     BorderBrush="Transparent" Background="Transparent" Foreground="{StaticResource Dark}" Padding="6,1,10,0" 
+                                     FontWeight="Normal" FontSize="14">
+                                <TextBox.Style>
+                                    <Style TargetType="{x:Type TextBox}">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type TextBox}">
+                                                    <Border x:Name="border" BorderBrush="Transparent" BorderThickness="{TemplateBinding BorderThickness}" 
+                                                            Background="Transparent" SnapsToDevicePixels="True" VerticalAlignment="Center">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <ScrollViewer x:Name="PART_ContentHost" Grid.Column="1" Focusable="False" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                                                            <TextBlock x:Name="WatermarkIcon" IsHitTestVisible="False" Foreground="{StaticResource Ash}" VerticalAlignment="Center"
+                                                                       FontFamily="Segoe MDL2 Assets" Text="&#xE721;" FontSize="18"/>
+                                                            <TextBlock x:Name="WatermarkText" Grid.Column="1" Visibility="Collapsed" IsHitTestVisible="False" Foreground="{StaticResource Ash}" Padding="8,1,10,0"
+                                                                       FontFamily="Segoe UI" Text="Search by note..." FontSize="14" VerticalAlignment="Center"/>
+                                                        </Grid>
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="Text" Value="">
+                                                            <Setter Property="Visibility" TargetName="WatermarkText" Value="Visible"/>
+                                                        </Trigger>
+                                                        <Trigger Property="Text" Value="{x:Null}">
+                                                            <Setter Property="Visibility" TargetName="WatermarkText" Value="Visible"/>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Grid>

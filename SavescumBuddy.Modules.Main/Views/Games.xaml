@@ -34,6 +34,13 @@
             <DataGrid.ContextMenu>
                 <ContextMenu Style="{StaticResource ContextMenuStyle}" HorizontalOffset="-16" VerticalOffset="-16">
                     <MenuItem Header="Delete" Style="{StaticResource MenuItemStyleButton}" Margin="0,10,0,0"
+                              Command="{Binding EditCommand}"
+                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}">
+                        <MenuItem.Icon>
+                            <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="16"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Delete" Style="{StaticResource MenuItemStyleButton}" Margin="0,0,0,0"
                               Command="{Binding RemoveCommand}"
                               CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}">
                         <MenuItem.Icon>

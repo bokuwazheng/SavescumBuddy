@@ -3,7 +3,6 @@ using Prism.Mvvm;
 using Prism.Regions;
 using SavescumBuddy.Core;
 using SavescumBuddy.Core.Enums;
-using System;
 using System.Linq;
 
 namespace SavescumBuddy.Modules.Overlay.ViewModels
@@ -12,7 +11,6 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
     {
         private string _title;
         private string _message;
-        private event Action<DialogResult> _requestClose;
         private IRegionNavigationService _navigationService;
         private IRegionManager _regionManager;
 
@@ -37,9 +35,6 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
                 if (activeRegion is object)
                     _regionManager.Regions[RegionNames.Overlay].Deactivate(activeRegion);
             }
-
-            if (result.HasValue)
-                _requestClose?.Invoke(result.Value);
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)
@@ -50,7 +45,6 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
                 return;
             Message = navigationContext.Parameters["message"].ToString();
             Title = navigationContext.Parameters["title"].ToString();
-            _requestClose = (Action<DialogResult>)navigationContext.Parameters["callback"];
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)
@@ -60,7 +54,7 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
 
         public void OnNavigatedFrom(NavigationContext navigationContext)
         {
-            _requestClose = null;
+
         }
 
         public DelegateCommand<DialogResult?> CloseDialogCommand { get; }

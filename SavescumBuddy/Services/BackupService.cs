@@ -18,7 +18,7 @@ namespace SavescumBuddy.Services
         public void DeleteFiles(Backup backup)
         {
             var dirName = Path.GetDirectoryName(backup.SavefilePath);
-            Directory.Delete(dirName);
+            Directory.Delete(dirName, true);
         }
 
         public void RestoreBackup(Backup backup)

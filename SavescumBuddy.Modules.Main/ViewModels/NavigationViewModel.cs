@@ -13,17 +13,9 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         {
             _regionManager = regionManager;
 
-            NavigateToBackupsCommand = new DelegateCommand(() => _regionManager.RequestNavigate(RegionNames.ContentRegion, "Backups"));
-            NavigateToSettingsCommand = new DelegateCommand(() => _regionManager.RequestNavigate(RegionNames.ContentRegion, "Settings"));
-            NavigateToGamesCommand = new DelegateCommand(() => _regionManager.RequestNavigate(RegionNames.ContentRegion, "Games"));
-            NavigateToGoogleDriveCommand = new DelegateCommand(() => _regionManager.RequestNavigate(RegionNames.ContentRegion, "GoogleDrive"));
-            NavigateToAboutCommand = new DelegateCommand(() => _regionManager.RequestNavigate(RegionNames.ContentRegion, "About"));
+            NavigateCommand = new DelegateCommand<string>(s => _regionManager.RequestNavigate(RegionNames.ContentRegion, s));
         }
 
-        public DelegateCommand NavigateToBackupsCommand { get; }
-        public DelegateCommand NavigateToSettingsCommand { get; }
-        public DelegateCommand NavigateToGamesCommand { get; }
-        public DelegateCommand NavigateToGoogleDriveCommand { get; }
-        public DelegateCommand NavigateToAboutCommand { get; }
+        public DelegateCommand<string> NavigateCommand { get; }
     }
 }

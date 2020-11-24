@@ -6,11 +6,14 @@ namespace SavescumBuddy.Modules.Main.Models
 {
     public class BackupModel : BindableBase
     {
+        private bool _isSelected;
+
         public BackupModel(Backup backup)
         {
             Backup = backup ?? throw new ArgumentNullException(nameof(backup));
         }
 
+        public bool IsSelected { get => _isSelected; set => SetProperty(ref _isSelected, value); }
         public Backup Backup { get; }
 
         public int Id { get => Backup.Id; set { Backup.Id = value; RaisePropertyChanged(); } }

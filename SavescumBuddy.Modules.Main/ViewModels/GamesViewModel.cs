@@ -120,9 +120,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         public DelegateCommand LoadGamesCommand { get; }
         public DelegateCommand AddCommand { get; }
         public DelegateCommand<GameModel> EditCommand { get; }
-        public DelegateCommand<GameModel> UpdateGameCommand { get; }
         public DelegateCommand<GameModel> MakeCurrentCommand { get; }
         public DelegateCommand<GameModel> RemoveCommand { get; }
-
     }
 }

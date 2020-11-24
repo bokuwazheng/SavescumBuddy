@@ -40,6 +40,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             AddCommand = new DelegateCommand(Add);
             RemoveCommand = new DelegateCommand<BackupModel>(Remove);
             RestoreCommand = new DelegateCommand<BackupModel>(x => _backupService.RestoreBackup(x.Backup));
+            RemoveSelectedCommand = new DelegateCommand(RemoveSelected);
 
             NavigateForwardCommand = new DelegateCommand(() => ++CurrentPageIndex, () => To < TotalNumberOfBackups);
             NavigateBackwardCommand = new DelegateCommand(() => --CurrentPageIndex, () => From > 1);
@@ -69,6 +70,25 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 if (_cts is null || _cts.IsCancellationRequested)
                     _cts = new CancellationTokenSource();
                 return _cts.Token;
+            }
+        }
+        public bool? IsAllItemsSelected
+        {
+            get
+            {
+                var selected = Backups.Select(item => item.IsSelected).Distinct().ToList();
+                return selected.Count == 1 ? selected.Single() : (bool?)null;
+            }
+            set
+            {
+                if (value.HasValue)
+                {
+                    foreach (var backup in Backups)
+                    {
+                        backup.IsSelected = value.Value;
+                    }
+                    RaisePropertyChanged();
+                }
             }
         }
         public ObservableCollection<BackupModel> Backups { get; private set; }
@@ -134,6 +154,16 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             {
                 var backups = _dataAccess.SearchBackups(Filter);
                 var backupModels = backups.Select(x => new BackupModel(x)).ToList();
+
+                foreach (var model in backupModels)
+                {
+                    model.PropertyChanged += (s, e) =>
+                    {
+                        if (e.PropertyName == nameof(BackupModel.IsSelected))
+                            RaisePropertyChanged(nameof(IsAllItemsSelected));
+                    };
+                }
+
                 Backups = new ObservableCollection<BackupModel>(backupModels);
                 RaisePropertyChanged(nameof(Backups));
                 RaisePropertyChanged(nameof(TotalNumberOfBackups));
@@ -179,6 +209,20 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             }
         }
 
+        private void RemoveSelected()
+        {
+            var selected = Backups.Where(item => item.IsSelected);
+
+            if (selected.Any())
+            {
+                foreach (var backup in selected)
+                {
+                    RemoveCommand.Execute(backup);
+                }
+            }
+        }
+
+        public DelegateCommand RemoveSelectedCommand { get; }
         public DelegateCommand<BackupModel> RemoveCommand { get; }
         public DelegateCommand AddCommand { get; }
         public DelegateCommand<BackupModel> RestoreCommand { get; }
