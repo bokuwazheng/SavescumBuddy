@@ -18,81 +18,105 @@ namespace SavescumBuddy.Services
         #region Backup table methods
         public int GetTotalNumberOfBackups(IBackupSearchRequest request)
         {
-            var isLiked = request.LikedOnly ? "1" : "0";
-            var isAutobackup = request.HideAutobackups ? "0" : "1";
-            var note = request.Note;
+            var whereParams = "";
+            var whereClauses = new List<string>();
 
-            var queryBuilder = new StringBuilder();
-            queryBuilder.Append("select count(*) from [Backup] b where ");
-            if (!string.IsNullOrWhiteSpace(note))
-                queryBuilder.Append("(b.Note like @LC or b.Note like @UC) and ");
-            queryBuilder.Append("b.IsLiked >= @IsLiked and b.IsAutobackup <= @IsAutobackup");
-            if (request.CurrentOnly)
-                queryBuilder.Append(" and b.GameId = (select g.Title from [Game] g where g.IsCurrent = 1)");
+            var query = "SELECT * FROM [Backup] b {0}";
 
-            var sql = queryBuilder.ToString();
+            if (request.Liked.HasValue)
+                whereClauses.Add($"b.IsLiked = { request.Liked.Value.ToSqliteIntParameter() }");
 
-            object args;
+            if (request.Autobackups.HasValue)
+                whereClauses.Add($"b.IsAutobackup = { request.Autobackups.Value.ToSqliteIntParameter() }");
 
-            if (string.IsNullOrWhiteSpace(note))
+            if (request.Current.HasValue)
+                whereClauses.Add($"b.GameId = (SELECT g.Id FROM [Game] g WHERE g.IsCurrent = { request.Current.Value.ToSqliteIntParameter() })");
+
+            if (request.IsInGoogleDrive.HasValue)
+                whereClauses.Add($"b.GoogleDriveId { request.Current.Value.ToSqliteStringParameter() }");
+
+            object args = null;
+
+            if (!string.IsNullOrWhiteSpace(request.Note))
             {
+                whereClauses.Add("(b.Note like @LC or b.Note like @UC)");
+
                 args = new
                 {
-                    IsLiked = isLiked,
-                    IsAutobackup = isAutobackup
+                    LC = "%" + request.Note.ToLower() + "%",
+                    UC = "%" + request.Note.ToUpper() + "%",
                 };
             }
-            else
+
+            if (whereClauses.Count > 0)
             {
-                args = new
-                {
-                    LC = "%" + note.ToLower() + "%",
-                    UC = "%" + note.ToUpper() + "%",
-                    IsLiked = isLiked,
-                    IsAutobackup = isAutobackup
-                };
+                var sb = new StringBuilder(" WHERE ");
+                sb.AppendJoin(" AND ", whereClauses);
+                whereParams = sb.ToString();
             }
+
+            var sql = string.Format(query, whereParams);
 
             return _sqlService.ExecuteScalar<int>(sql, args);
         }
 
         public List<Backup> SearchBackups(IBackupSearchRequest request)
         {
-            var isLiked = request.LikedOnly ? "1" : "0";
-            var isAutobackup = request.HideAutobackups ? "0" : "1";
-            var note = request.Note;
+            var whereParams = "";
+            var sortParams = "";
+            var whereClauses = new List<string>();
+            var sortClauses = new List<string>();
 
-            var queryBuilder = new StringBuilder();
-            queryBuilder.Append("select * from [Backup] b where ");
-            if (!string.IsNullOrWhiteSpace(note))
-                queryBuilder.Append("(b.Note like @LC or b.Note like @UC) and ");
-            queryBuilder.Append("b.IsLiked >= @IsLiked and b.IsAutobackup <= @IsAutobackup ");
-            if (request.CurrentOnly)
-                queryBuilder.Append("and b.GameId = (select g.Id from [Game] g where g.IsCurrent = 1) ");
-            queryBuilder.Append($"order by b.Id { request.Order } limit { request.Limit } offset { request.Offset }");
+            var order = request.Order ? "DESC" : "ASC";
 
-            var sql = queryBuilder.ToString();
+            var query = "SELECT * FROM [Backup] b {0} ORDER BY Id {1} {2}";
 
-            object args;
+            if (request.Liked.HasValue)
+                whereClauses.Add($"b.IsLiked = { request.Liked.Value.ToSqliteIntParameter() }");
 
-            if (string.IsNullOrWhiteSpace(request.Note))
+            if (request.Autobackups.HasValue)
+                whereClauses.Add($"b.IsAutobackup = { request.Autobackups.Value.ToSqliteIntParameter() }");
+
+            if (request.Current.HasValue)
+                whereClauses.Add($"b.GameId = (SELECT g.Id FROM [Game] g WHERE g.IsCurrent = { request.Current.Value.ToSqliteIntParameter() })");
+
+            if (request.IsInGoogleDrive.HasValue)
+                whereClauses.Add($"b.GoogleDriveId { request.Current.Value.ToSqliteStringParameter() }");
+
+            if (request.Limit.HasValue)
+                sortClauses.Add($"LIMIT { request.Limit.Value }");
+
+            if (request.Offset.HasValue)
+                sortClauses.Add($"OFFSET { request.Offset.Value }");
+
+            object args = null;
+
+            if (!string.IsNullOrWhiteSpace(request.Note))
             {
+                whereClauses.Add("(b.Note like @LC or b.Note like @UC)");
+
                 args = new
                 {
-                    IsLiked = isLiked,
-                    IsAutobackup = isAutobackup
+                    LC = $"%{ request.Note.ToLower() }%",
+                    UC = $"%{ request.Note.ToUpper() }%",
                 };
             }
-            else
+
+            if (whereClauses.Count > 0)
             {
-                args = new
-                {
-                    LC = "%" + note.ToLower() + "%",
-                    UC = "%" + note.ToUpper() + "%",
-                    IsLiked = isLiked,
-                    IsAutobackup = isAutobackup
-                };
+                var sb = new StringBuilder(" WHERE ");
+                sb.AppendJoin(" AND ", whereClauses);
+                whereParams = sb.ToString();
             }
+
+            if (sortClauses.Count > 0)
+            {
+                var sb = new StringBuilder();
+                sb.AppendJoin(" ", sortClauses);
+                sortParams = sb.ToString();
+            }
+
+            var sql = string.Format(query, whereParams, order, sortParams);
 
             return _sqlService.Query<Backup>(sql, args);
         }
@@ -105,11 +129,6 @@ namespace SavescumBuddy.Services
         public void RemoveBackup(Backup backup)
         {
             _sqlService.Execute("delete from Backup where Id = @Id;", new { Id = backup.Id });
-        }
-
-        public Backup GetBackup(Backup backup)
-        {
-            return _sqlService.QueryFirstOrDefault<Backup>($"select * from Backup where Id = @Id;", new { Id = backup.Id });
         }
 
         public Backup GetLatestBackup()
@@ -181,5 +200,11 @@ namespace SavescumBuddy.Services
             return _sqlService.QueryFirstOrDefault<Game>("select * from Game where Id = @Id", new { Id = id });
         }
         #endregion
+    }
+
+    public static class SqliteExtensions
+    {
+        public static int ToSqliteIntParameter(this bool value) => value ? 1 : 0;
+        public static string ToSqliteStringParameter(this bool value) => value ? "IS NOT NULL" : "IS NULL";
     }
 }

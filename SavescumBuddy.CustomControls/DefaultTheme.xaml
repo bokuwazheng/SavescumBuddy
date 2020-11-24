@@ -61,6 +61,22 @@
     <SolidColorBrush x:Key="Background.Selected" Color="#f5f5f5"/>
     <SolidColorBrush x:Key="Background.MouseOver" Color="#e6e6e6"/>
 
+    <!--Checkbox style (Simple)-->
+    <Style x:Key="CheckBoxStyleSimple" TargetType="CheckBox">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type CheckBox}">
+                    <Grid Background="Transparent" SnapsToDevicePixels="True">
+                        <ContentPresenter Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" 
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!--Checkbox style (Simple) ends here-->
+
     <Style x:Key="DefaultDataGridStyle" TargetType="{x:Type DataGrid}">
         <Setter Property="CanUserAddRows" Value="False"/>
         <Setter Property="CanUserDeleteRows" Value="False"/>

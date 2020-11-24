@@ -9,7 +9,6 @@ namespace SavescumBuddy.Services.Interfaces
         List<Backup> SearchBackups(IBackupSearchRequest request);
         void SaveBackup(Backup backup);
         void RemoveBackup(Backup backup);
-        Backup GetBackup(Backup backup);
         Backup GetLatestBackup();
         Backup GetLatestAutobackup();
         void UpdateNote(Backup backup);

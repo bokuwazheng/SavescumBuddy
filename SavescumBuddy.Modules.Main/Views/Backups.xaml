@@ -79,7 +79,7 @@
                 <Border Width="1" Margin="10,2" BorderBrush="{StaticResource Bright}" BorderThickness="1,0,0,0"/>
 
                 <!--Autobackups button-->
-                <ToggleButton FontFamily="Segoe UI" FontSize="12" Margin="5,0" IsChecked="{Binding Filter.HideAutobackups}">
+                <ToggleButton FontFamily="Segoe UI" FontSize="12" Margin="5,0" IsChecked="{Binding Filter.Autobackups}">
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="Hide" TextAlignment="Center"/>
                         <TextBlock Text="Autobackups" TextAlignment="Center"/>
@@ -96,7 +96,7 @@
                 </ToggleButton>
 
                 <!--Current button-->
-                <ToggleButton FontFamily="Segoe UI" FontSize="12" Margin="5,0" IsChecked="{Binding Filter.CurrentOnly}" >
+                <ToggleButton FontFamily="Segoe UI" FontSize="12" Margin="5,0" IsChecked="{Binding Filter.Current}" >
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="Current" TextAlignment="Center"/>
                         <TextBlock Text="Only" TextAlignment="Center"/>
@@ -291,20 +291,34 @@
                 <DataGridTemplateColumn>
                     <DataGridTemplateColumn.HeaderTemplate>
                         <DataTemplate>
-                            <ToggleButton FontFamily="Segoe MDL2 Assets" Width="25" Height="25" Margin="5,0" 
-                                          IsChecked="{Binding DataContext.Filter.LikedOnly, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
-                                        <Setter Property="Content" Value="&#xEB51;"/>
+                            <CheckBox FontFamily="Segoe MDL2 Assets" Width="25" Height="25" Margin="5,0" IsThreeState="True"
+                                      IsChecked="{Binding DataContext.Filter.Liked, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}">
+                                <CheckBox.Style>
+                                    <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource CheckBoxStyleSimple}">
+                                        <Setter Property="Content">
+                                            <Setter.Value>
+                                                <materialDesign:PackIcon Kind="HeartOutline"/>
+                                            </Setter.Value>
+                                        </Setter>
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Foreground" Value="{StaticResource HeartButtonBrush}"/>
-                                                <Setter Property="Content" Value="&#xEB52;"/>
+                                                <Setter Property="Content">
+                                                    <Setter.Value>
+                                                        <materialDesign:PackIcon Kind="Heart"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="{x:Null}">
+                                                <Setter Property="Content">
+                                                    <Setter.Value>
+                                                        <materialDesign:PackIcon Kind="HeartHalfFull"/>
+                                                    </Setter.Value>
+                                                </Setter>
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
-                                </ToggleButton.Style>
-                            </ToggleButton>
+                                </CheckBox.Style>
+                            </CheckBox>
                         </DataTemplate>
                     </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
@@ -347,7 +361,7 @@
                     <DataGridTemplateColumn.HeaderTemplate>
                         <DataTemplate>
                             <ToggleButton FontFamily="Segoe MDL2 Assets" Width="25" Height="25" Margin="5,0" 
-                                          IsChecked="{Binding DataContext.Filter.LikedOnly, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}">
+                                          IsChecked="{Binding DataContext.Filter.InGoogleDrive, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}">
                                 <ToggleButton.Style>
                                     <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
                                         <Setter Property="Content" Value="&#xE753;"/>

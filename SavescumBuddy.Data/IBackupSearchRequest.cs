@@ -4,11 +4,12 @@
     {
         public int? Offset { get; set; }
         public int? Limit { get; set; }
-        public string Order { get; set; }
+        public bool Order { get; set; }
         public string GroupBy { get; set; }
-        public bool LikedOnly { get; set; }
-        public bool HideAutobackups { get; set; }
-        public bool CurrentOnly { get; set; }
+        public bool? Liked { get; set; }
+        public bool? Autobackups { get; set; }
+        public bool? Current { get; set; }
+        public bool? IsInGoogleDrive { get; set; }
         public string Note { get; set; }
     }
 }
