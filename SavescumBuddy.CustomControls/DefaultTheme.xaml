@@ -65,6 +65,7 @@
     <!--Checkbox style (Simple)-->
     <Style x:Key="CheckBoxStyleSimple" TargetType="CheckBox">
         <Setter Property="Foreground" Value="{StaticResource Foreground.Static}"/>
+        <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type CheckBox}">
@@ -460,6 +461,8 @@
     <Style x:Key="Header" TargetType="TextBlock">
         <Setter Property="FontSize" Value="{StaticResource HeaderFontSize}"/>
         <Setter Property="Foreground" Value="{StaticResource Dark}"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
     <!--Caption-->
     <Style x:Key="Caption" TargetType="TextBlock">
