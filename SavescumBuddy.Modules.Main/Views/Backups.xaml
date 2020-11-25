@@ -454,15 +454,24 @@
                 <DataGridTextColumn Binding="{Binding GameTitle}" ElementStyle="{StaticResource TextElementStyle}">
                     <DataGridTextColumn.HeaderTemplate>
                         <DataTemplate>
-                            <ComboBox ItemsSource="{Binding DataContext.Games, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
-                                      SelectedValue="{Binding DataContext.Filter.GameId, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                            <ComboBox ItemsSource="{Binding DataContext.Games, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, UpdateSourceTrigger=PropertyChanged}"
+                                      SelectedValue="{Binding DataContext.Filter.GameId, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, UpdateSourceTrigger=PropertyChanged}"
                                       SelectedValuePath="Id"
                                       DisplayMemberPath="Title">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
-                                            <materialDesign:PackIcon Kind="Star" Visibility="{Binding IsCurrent, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                                            <TextBlock Text="{Binding Title}"/>
+                                            <TextBlock Text="{Binding Title}">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsCurrent}" Value="1">
+                                                                <Setter Property="Foreground" Value="{StaticResource GroupByGameButtonBrush}"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
                                         </StackPanel>
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>

@@ -43,14 +43,14 @@
                 </Grid.RowDefinitions>
 
                 <!--Auto backups-->
-                <TextBlock Text="Auto Backups"/>
+                <TextBlock Text="Auto Backups" Style="{StaticResource Header}"/>
                 <!--Autobackup ToggleButton-->
                 <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding Settings.AutobackupsEnabled}"/>
                 <StackPanel Grid.Row="1">
                     <ComboBox materialDesign:HintAssist.Hint="Interval"
-                              Style="{StaticResource MaterialDesignFilledComboBox}"
+                              materialDesign:HintAssist.IsFloating="True"
+                              materialDesign:HintAssist.FloatingScale=".9"
                               Margin="0,10"
-                              FontSize="14"
                               SelectedItem="{Binding Settings.AutobackupInterval}" ItemStringFormat='{}{0} min'>
                         <sys:Int32>5</sys:Int32>
                         <sys:Int32>10</sys:Int32>
@@ -63,30 +63,29 @@
                     </ComboBox>
                     <ComboBox materialDesign:HintAssist.Hint="Skip"
                               materialDesign:HintAssist.IsFloating="True"
-                              Style="{StaticResource MaterialDesignFilledComboBox}"
+                              materialDesign:HintAssist.FloatingScale=".9"
                               Margin="0,10"
-                              FontSize="14"
                               ItemsSource="{ext:EnumToValueDescriptionPairListExtension EnumType={x:Type enums:SkipOption}}"
                               SelectedValuePath="Value" DisplayMemberPath="Description" SelectedValue="{Binding Settings.AutobackupSkipType}"/>
                     <ComboBox materialDesign:HintAssist.Hint="Overwrite" 
                               materialDesign:HintAssist.IsFloating="True"
-                              Style="{StaticResource MaterialDesignFilledComboBox}"
+                              materialDesign:HintAssist.FloatingScale=".9"
                               Margin="0,10"
-                              FontSize="14"
                               ItemsSource="{ext:EnumToValueDescriptionPairListExtension EnumType={x:Type enums:OverwriteOption}}"
                               SelectedValuePath="Value" DisplayMemberPath="Description" SelectedValue="{Binding Settings.AutobackupOverwriteType}"/>
                 </StackPanel>
                 <!--Auto backups region ends here-->
 
                 <!--Hotkeys-->
-                <TextBlock Grid.Row="2" Text="Hotkeys"/>
+                <TextBlock Grid.Row="2" Text="Hotkeys" Style="{StaticResource Header}"/>
                 <!--Toggle Hotkeys Buttons-->
                 <ToggleButton Grid.Row="2" HorizontalAlignment="Right" IsChecked="{Binding Settings.HotkeysEnabled}"/>
+
                 <!--Hotkeys panel-->
                 <StackPanel Grid.Row="3" Orientation="Vertical" Margin="5">
                     <!--Backup box-->
-                    <GroupBox Header="Backup" Padding="3" BorderBrush="{StaticResource Ash}" FontSize="{StaticResource СommonFontSize}" >
-                        <Grid Margin="-2">
+                    <Border Padding="3" BorderBrush="{StaticResource Ash}" BorderThickness="1" CornerRadius="3">
+                        <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="120"/>
@@ -117,10 +116,10 @@
                             <ToggleButton Grid.Column="1" IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Backup}, Mode=OneWay}" 
                                           Style="{StaticResource RecordHotkeyToggleButton}" Command="{Binding RegisterHotkeyCommand}" CommandParameter="{x:Static enums:HotkeyAction.Backup}"/>
                         </Grid>
-                    </GroupBox>
+                    </Border>
                     <!--Restore box-->
-                    <GroupBox Header="Restore previous" Padding="3" BorderBrush="{StaticResource Ash}" FontSize="{StaticResource СommonFontSize}">
-                        <Grid Margin="-2">
+                    <Border Padding="3" BorderBrush="{StaticResource Ash}" BorderThickness="1" CornerRadius="3">
+                        <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="120"/>
@@ -151,9 +150,9 @@
                             <ToggleButton Grid.Column="1" IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Restore}, Mode=OneWay}" 
                                               Style="{StaticResource RecordHotkeyToggleButton}" Command="{Binding RegisterHotkeyCommand}" CommandParameter="{x:Static enums:HotkeyAction.Restore}"/>
                         </Grid>
-                    </GroupBox>
+                    </Border>
                     <!--Overwrite box-->
-                    <GroupBox Header="Backup and overwrite previous" Padding="3" BorderBrush="{StaticResource Ash}" FontSize="{StaticResource СommonFontSize}">
+                    <Border Padding="3" BorderBrush="{StaticResource Ash}" BorderThickness="1" CornerRadius="3">
                         <Grid Margin="-2">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -185,7 +184,7 @@
                             <ToggleButton Grid.Column="1" IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Overwrite}, Mode=OneWay}" 
                                               Style="{StaticResource RecordHotkeyToggleButton}" Command="{Binding RegisterHotkeyCommand}" CommandParameter="{x:Static enums:HotkeyAction.Overwrite}"/>
                         </Grid>
-                    </GroupBox>
+                    </Border>
                 </StackPanel>
 
                 <!--Sound cues-->
@@ -193,12 +192,11 @@
                     <!--Header-->
                     <TextBlock Text="Sound Cues" Style="{StaticResource Header}" />
                     <!--Caption-->
-                    <TextBlock Text="Play a sound cue when a hotkey is pressed." Style="{StaticResource Caption}"/>
+                    <!--<TextBlock Text="Play a sound cue when a hotkey is pressed." Style="{StaticResource Caption}"/>-->
                 </StackPanel>
 
                 <!--Toggle sound cues Button-->
-                <ToggleButton Style="{StaticResource SlidingToggleButton}" Grid.Row="4" HorizontalAlignment="Right"
-                              IsChecked="{Binding Settings.SoundCuesEnabled}"/>
+                <ToggleButton Grid.Row="4" HorizontalAlignment="Right" IsChecked="{Binding Settings.SoundCuesEnabled}"/>
             </Grid>
         </ScrollViewer>
     </Grid>
