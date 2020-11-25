@@ -70,47 +70,13 @@
             <!--Divider (double, horizontal)-->
             <Border Grid.ColumnSpan="2" BorderThickness="0,1" BorderBrush="{StaticResource Bright}"/>
             
-            <!--Sorting panel-->
-            <StackPanel Orientation="Horizontal" Grid.Column="0" Margin="10">
+            <!--Tool bar-->
+            <StackPanel Orientation="Horizontal" Grid.Column="0" Margin="0">
                 <!--Add button-->
-                <Button Content="ADD" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AddCommand}"/>
+                <Button Content="ADD" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AddCommand}" Margin="10,0"/>
                 
                 <!--Divider (vertical)-->
-                <Border Width="1" Margin="10,2" BorderBrush="{StaticResource Bright}" BorderThickness="1,0,0,0"/>
-
-                <!--Autobackups button-->
-                <ToggleButton FontFamily="Segoe UI" FontSize="12" Margin="5,0" IsChecked="{Binding Filter.Autobackups}">
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock Text="Hide" TextAlignment="Center"/>
-                        <TextBlock Text="Autobackups" TextAlignment="Center"/>
-                    </StackPanel>
-                    <ToggleButton.Style>
-                        <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
-                            <Style.Triggers>
-                                <Trigger Property="IsChecked" Value="True">
-                                    <Setter Property="Foreground" Value="{StaticResource AutobackupsButtonBrush}"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ToggleButton.Style>
-                </ToggleButton>
-
-                <!--Current button-->
-                <ToggleButton FontFamily="Segoe UI" FontSize="12" Margin="5,0" IsChecked="{Binding Filter.Current}" >
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock Text="Current" TextAlignment="Center"/>
-                        <TextBlock Text="Only" TextAlignment="Center"/>
-                    </StackPanel>
-                    <ToggleButton.Style>
-                        <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
-                            <Style.Triggers>
-                                <Trigger Property="IsChecked" Value="True">
-                                    <Setter Property="Foreground" Value="{StaticResource CurrentButtonBrush}"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ToggleButton.Style>
-                </ToggleButton>
+                <Border Width="1" Margin="10" BorderBrush="{StaticResource Bright}" BorderThickness="1,0,0,0"/>
 
                 <Button Command="{Binding RemoveSelectedCommand}" Style="{StaticResource MaterialDesignIconForegroundButton}">
                     <materialDesign:PackIcon Kind="DeleteOutline"/>
@@ -165,11 +131,25 @@
         </Grid>
         
         <!--DataGrid-->
-        <DataGrid Grid.Row="1" ItemsSource="{Binding Backups}" CanUserAddRows="False" AutoGenerateColumns="False" IsReadOnly="True" 
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Backups}" SelectedItem="{Binding SelectedBackup}" CanUserAddRows="False" AutoGenerateColumns="False" IsReadOnly="True"
                   CanUserResizeColumns="False" CanUserReorderColumns="False" CanUserSortColumns="False">
+            <DataGrid.Resources>
+                <Style x:Key="TextElementStyle" TargetType="{x:Type TextBlock}">
+                    <Setter Property="Margin" Value="10,0"/>
+                    <!--<Setter Property="FontWeight" Value="Medium"/>-->
+                    <Setter Property="Foreground" Value="{StaticResource Foreground.Static}"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}}" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource Foreground.Selected}"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.Resources>
             <!--Data Grid Context Menu-->
             <DataGrid.ContextMenu>
-                <ContextMenu HorizontalOffset="-16" VerticalOffset="-16">
+                <ContextMenu>
                     <MenuItem Header="Restore"
                               Command="{Binding RestoreCommand}"
                               CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
@@ -255,16 +235,25 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <!--Time Stamp-->
-                <DataGridTextColumn Binding="{Binding TimeStamp, Converter={StaticResource LongToDateTimeConverter}, StringFormat='MMM dd, yyyy h:mm:ss tt'}">
+                <DataGridTextColumn Binding="{Binding TimeStamp, Converter={StaticResource LongToDateTimeConverter}, StringFormat='MMM dd, yyyy h:mm:ss tt'}"
+                                    ElementStyle="{StaticResource TextElementStyle}">
                     <DataGridTextColumn.HeaderTemplate>
                         <DataTemplate>
-                            <ToggleButton FontFamily="Segoe MDL2 Assets" Content="&#xE8CB;" Width="25" Height="25" Margin="5,0" 
-                                          IsChecked="{Binding DataContext.Filter.OrderByDesc, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}">
+                            <ToggleButton IsChecked="{Binding DataContext.Filter.Descending, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}">
                                 <ToggleButton.Style>
                                     <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
+                                        <Setter Property="Content">
+                                            <Setter.Value>
+                                                <materialDesign:PackIcon Kind="SortAscending" Width="20" Height="20"/>
+                                            </Setter.Value>
+                                        </Setter>
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Foreground" Value="{StaticResource GroupByGameButtonBrush}"/>
+                                                <Setter Property="Content">
+                                                    <Setter.Value>
+                                                        <materialDesign:PackIcon Kind="SortDescending" Width="20" Height="20"/>
+                                                    </Setter.Value>
+                                                </Setter>
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
@@ -272,48 +261,36 @@
                             </ToggleButton>
                         </DataTemplate>
                     </DataGridTextColumn.HeaderTemplate>
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Margin" Value="10,0"/>
-                            <Setter Property="FontWeight" Value="Medium"/>
-                            <Setter Property="Foreground" Value="{StaticResource Foreground.Static}"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}}" Value="True">
-                                    <Setter Property="Foreground" Value="{StaticResource Foreground.Selected}"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
                 <!--Heart button-->
                 <DataGridTemplateColumn>
                     <DataGridTemplateColumn.HeaderTemplate>
                         <DataTemplate>
-                            <CheckBox FontFamily="Segoe MDL2 Assets" Width="25" Height="25" Margin="5,0" IsThreeState="True"
-                                      IsChecked="{Binding DataContext.Filter.Liked, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}">
+                            <CheckBox IsThreeState="True"
+                                      IsChecked="{Binding DataContext.Filter.IsLiked, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}">
                                 <CheckBox.Style>
                                     <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource CheckBoxStyleSimple}">
                                         <Setter Property="Content">
                                             <Setter.Value>
-                                                <materialDesign:PackIcon Kind="HeartOutline"/>
+                                                <materialDesign:PackIcon Kind="HeartOutline" Width="20" Height="20"/>
                                             </Setter.Value>
                                         </Setter>
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
                                                 <Setter Property="Content">
                                                     <Setter.Value>
-                                                        <materialDesign:PackIcon Kind="Heart"/>
+                                                        <materialDesign:PackIcon Kind="Heart" Width="20" Height="20"/>
                                                     </Setter.Value>
                                                 </Setter>
+                                                <Setter Property="Foreground" Value="{StaticResource HeartButtonBrush}"/>
                                             </Trigger>
                                             <Trigger Property="IsChecked" Value="{x:Null}">
                                                 <Setter Property="Content">
                                                     <Setter.Value>
-                                                        <materialDesign:PackIcon Kind="HeartHalfFull"/>
+                                                        <materialDesign:PackIcon Kind="HeartOutline" Width="20" Height="20"/>
                                                     </Setter.Value>
                                                 </Setter>
+                                                <Setter Property="Foreground" Value="{StaticResource HeartButtonBrush}"/>
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
@@ -323,31 +300,24 @@
                     </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ToggleButton FontFamily="Segoe MDL2 Assets" FontSize="16" Width="22" Height="22" Margin="5"
-                                          Command="{Binding DataContext.UpdateIsLikedCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                            <ToggleButton Command="{Binding DataContext.UpdateIsLikedCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                                           CommandParameter="{Binding}"
-                                          Cursor="Hand"
                                           IsChecked="{Binding IsLiked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IntToBoolConverter}}">
                                 <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
-                                        <Setter Property="Content" Value="&#xEB51;"/>
-                                        <Setter Property="Foreground" Value="#DAC6E0"/>
-                                        <Setter Property="Template">
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
+                                        <Setter Property="Content">
                                             <Setter.Value>
-                                                <ControlTemplate TargetType="{x:Type ToggleButton}">
-                                                    <Border Background="{x:Null}">
-                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                    </Border>
-                                                </ControlTemplate>
+                                                <materialDesign:PackIcon Kind="HeartOutline" Width="20" Height="20"/>
                                             </Setter.Value>
                                         </Setter>
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Foreground" Value="#EEA6F1"/>
-                                                <Setter Property="Content" Value="&#xEB52;"/>
-                                            </Trigger>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Foreground" Value="#EEA6F1"/>
+                                                <Setter Property="Foreground" Value="{StaticResource HeartButtonBrush}"/>
+                                                <Setter Property="Content">
+                                                    <Setter.Value>
+                                                        <materialDesign:PackIcon Kind="Heart" Width="20" Height="20"/>
+                                                    </Setter.Value>
+                                                </Setter>
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
@@ -357,42 +327,59 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <!--Cloud Button-->
-                <DataGridTemplateColumn>
+                <DataGridTemplateColumn IsReadOnly="True">
                     <DataGridTemplateColumn.HeaderTemplate>
                         <DataTemplate>
-                            <ToggleButton FontFamily="Segoe MDL2 Assets" Width="25" Height="25" Margin="5,0" 
-                                          IsChecked="{Binding DataContext.Filter.InGoogleDrive, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
-                                        <Setter Property="Content" Value="&#xE753;"/>
+                            <CheckBox IsChecked="{Binding DataContext.Filter.IsInGoogleDrive, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                                      IsThreeState="True">
+                                <CheckBox.Style>
+                                    <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource CheckBoxStyleSimple}">
+                                        <Setter Property="Content">
+                                            <Setter.Value>
+                                                <materialDesign:PackIcon Kind="CloudOutline" Width="20" Height="20"/>
+                                            </Setter.Value>
+                                        </Setter>
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Foreground" Value="{StaticResource HeartButtonBrush}"/>
-                                                <!--<Setter Property="Content" Value="&#xEB52;"/>-->
+                                                <Setter Property="Content">
+                                                    <Setter.Value>
+                                                        <materialDesign:PackIcon Kind="CloudCheck" Width="20" Height="20"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Setter Property="Foreground" Value="{StaticResource AutobackupsButtonBrush}"/>
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="{x:Null}">
+                                                <Setter Property="Content">
+                                                    <Setter.Value>
+                                                        <materialDesign:PackIcon Kind="CloudOutline" Width="20" Height="20"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Setter Property="Foreground" Value="{StaticResource AutobackupsButtonBrush}"/>
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
-                                </ToggleButton.Style>
-                            </ToggleButton>
+                                </CheckBox.Style>
+                            </CheckBox>
                         </DataTemplate>
                     </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ToggleButton FontFamily="Segoe MDL2 Assets" FontSize="20" Width="22" Height="22" Content="&#xE753;" Margin="5"
-                                          IsChecked="{Binding GoogleDriveId, Converter={StaticResource ObjectToBoolConverter}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                            <ToggleButton IsChecked="{Binding GoogleDriveId, Converter={StaticResource ObjectToBoolConverter}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
                                 <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
-                                        <Setter Property="Template">
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
+                                        <Setter Property="Content">
                                             <Setter.Value>
-                                                <ControlTemplate TargetType="{x:Type ToggleButton}">
-                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                </ControlTemplate>
+                                                <materialDesign:PackIcon Kind="CloudOutline" Width="20" Height="20"/>
                                             </Setter.Value>
                                         </Setter>
-                                        <Setter Property="Foreground" Value="{StaticResource SkyBlue}"/>
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding GoogleDriveId}" Value="{x:Null}">
-                                                <Setter Property="Foreground" Value="{StaticResource Ash}"/>
+                                            <DataTrigger Binding="{Binding GoogleDriveId, Converter={StaticResource ObjectToBoolConverter}}" Value="True">
+                                                <Setter Property="Content">
+                                                    <Setter.Value>
+                                                        <materialDesign:PackIcon Kind="CloudCheck" Width="20" Height="20"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Setter Property="Foreground" Value="{StaticResource AutobackupsButtonBrush}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -401,6 +388,88 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                <!--Autobackups Button-->
+                <DataGridTemplateColumn IsReadOnly="True">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding DataContext.Filter.IsAutobackup, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                                      IsThreeState="True">
+                                <CheckBox.Style>
+                                    <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource CheckBoxStyleSimple}">
+                                        <Setter Property="Content">
+                                            <Setter.Value>
+                                                <materialDesign:PackIcon Kind="TimerOutline" Width="20" Height="20"/>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter Property="Content">
+                                                    <Setter.Value>
+                                                        <materialDesign:PackIcon Kind="Timer" Width="20" Height="20"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Setter Property="Foreground" Value="{StaticResource CurrentButtonBrush}"/>
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="{x:Null}">
+                                                <Setter Property="Content">
+                                                    <Setter.Value>
+                                                        <materialDesign:PackIcon Kind="TimerOutline" Width="20" Height="20"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Setter Property="Foreground" Value="{StaticResource CurrentButtonBrush}"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </CheckBox.Style>
+                            </CheckBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ToggleButton IsChecked="{Binding IsAutobackup, Converter={StaticResource ObjectToBoolConverter}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                <ToggleButton.Style>
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
+                                        <Setter Property="Content">
+                                            <Setter.Value>
+                                                <materialDesign:PackIcon Kind="TimerOutline" Width="20" Height="20"/>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsAutobackup, Converter={StaticResource NumberToBoolConverter}}" Value="True">
+                                                <Setter Property="Content">
+                                                    <Setter.Value>
+                                                        <materialDesign:PackIcon Kind="Timer" Width="20" Height="20"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Setter Property="Foreground" Value="{StaticResource CurrentButtonBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ToggleButton.Style>
+                            </ToggleButton>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <!--Game title-->
+                <DataGridTextColumn Binding="{Binding GameTitle}" ElementStyle="{StaticResource TextElementStyle}">
+                    <DataGridTextColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <ComboBox ItemsSource="{Binding DataContext.Games, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                                      SelectedValue="{Binding DataContext.Filter.GameId, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                                      SelectedValuePath="Id"
+                                      DisplayMemberPath="Title">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <materialDesign:PackIcon Kind="Star" Visibility="{Binding IsCurrent, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                            <TextBlock Text="{Binding Title}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </DataTemplate>
+                    </DataGridTextColumn.HeaderTemplate>
+                </DataGridTextColumn>
                 <!--Note-->
                 <DataGridTemplateColumn Width="*">
                     <DataGridTemplateColumn.HeaderTemplate>

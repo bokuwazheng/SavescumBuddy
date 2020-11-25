@@ -5,15 +5,17 @@ namespace SavescumBuddy.Modules.Main.Models
 {
     public class FilterModel : BindableBase, IBackupSearchRequest
     {
-        public int? _offset;
-        public int? _limit;
-        public bool _order;
-        public string _groupBy;
-        public bool? _liked;
-        public bool? _autobackups;
-        public bool? _isInGoogleDrive;
-        public bool? _current;
-        public string _note;
+        private int? _offset;
+        private int? _limit;
+        private bool _descending;
+        private string _groupBy;
+        private bool? _isLiked;
+        private bool? _isAutobackup;
+        private bool? _isInGoogleDrive;
+        private bool? _current;
+        private string _note;
+        private int[] _gameIds;
+        private int _gameId;
 
         public FilterModel()
         {
@@ -23,12 +25,12 @@ namespace SavescumBuddy.Modules.Main.Models
 
         public int? Offset { get => _offset; set => SetProperty(ref _offset, value); }
         public int? Limit { get => _limit; set => SetProperty(ref _limit, value); }
-        public bool Order { get => _order ; set => SetProperty(ref _order, value); }
+        public bool Descending { get => _descending ; set => SetProperty(ref _descending, value); }
         public string GroupBy { get => _groupBy; set => SetProperty(ref _groupBy, value); }
-        public bool? Liked { get => _liked; set => SetProperty(ref _liked, value); }
-        public bool? Autobackups { get => _autobackups; set => SetProperty(ref _autobackups, value); }
-        public bool? IsInGoogleDrive { get => _autobackups; set => SetProperty(ref _autobackups, value); }
-        public bool? Current { get => _current; set => SetProperty(ref _current, value); }
+        public bool? IsLiked { get => _isLiked; set => SetProperty(ref _isLiked, value); }
+        public bool? IsAutobackup { get => _isAutobackup; set => SetProperty(ref _isAutobackup, value); }
+        public bool? IsInGoogleDrive { get => _isInGoogleDrive; set => SetProperty(ref _isInGoogleDrive, value); }
         public string Note { get => _note; set => SetProperty(ref _note, value); }
+        public int GameId { get => _gameId; set => SetProperty(ref _gameId, value); }
     }
 }

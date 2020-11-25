@@ -28,7 +28,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TextBlock Text="{Binding AuthorizedAs, StringFormat='Authorized as: {0}'}" Margin="10"/>
+        <TextBlock Text="{Binding AuthorizedAs, StringFormat='Authorized as: {0}'}" Margin="20"/>
         <Button Style="{StaticResource MaterialDesignRaisedButton}" Content="Authorize" Command="{Binding AuthorizeCommand}" Grid.Row="1"
                 Visibility="{Binding AuthorizedAs, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=False}"/>
         <Button Style="{StaticResource MaterialDesignRaisedButton}" Content="Reauthorize" Command="{Binding ReauthorizeCommand}" Grid.Row="2"

@@ -21,19 +21,19 @@ namespace SavescumBuddy.Services
             var whereParams = "";
             var whereClauses = new List<string>();
 
-            var query = "SELECT * FROM [Backup] b {0}";
+            var query = "SELECT COUNT(*) FROM [Backup] b {0}";
 
-            if (request.Liked.HasValue)
-                whereClauses.Add($"b.IsLiked = { request.Liked.Value.ToSqliteIntParameter() }");
+            if (request.IsLiked.HasValue)
+                whereClauses.Add($"b.IsLiked = { request.IsLiked.Value.ToSqliteIntParameter() }");
 
-            if (request.Autobackups.HasValue)
-                whereClauses.Add($"b.IsAutobackup = { request.Autobackups.Value.ToSqliteIntParameter() }");
+            if (request.IsAutobackup.HasValue)
+                whereClauses.Add($"b.IsAutobackup = { request.IsAutobackup.Value.ToSqliteIntParameter() }");
 
-            if (request.Current.HasValue)
-                whereClauses.Add($"b.GameId = (SELECT g.Id FROM [Game] g WHERE g.IsCurrent = { request.Current.Value.ToSqliteIntParameter() })");
+            if (request.GameId != 0)
+                whereClauses.Add($"b.GameId = (SELECT g.Id FROM [Game] g WHERE g.Id = { request.GameId })");
 
             if (request.IsInGoogleDrive.HasValue)
-                whereClauses.Add($"b.GoogleDriveId { request.Current.Value.ToSqliteStringParameter() }");
+                whereClauses.Add($"b.GoogleDriveId { request.IsInGoogleDrive.Value.ToSqliteStringParameter() }");
 
             object args = null;
 
@@ -67,21 +67,21 @@ namespace SavescumBuddy.Services
             var whereClauses = new List<string>();
             var sortClauses = new List<string>();
 
-            var order = request.Order ? "DESC" : "ASC";
+            var order = request.Descending ? "DESC" : "ASC";
 
             var query = "SELECT * FROM [Backup] b {0} ORDER BY Id {1} {2}";
 
-            if (request.Liked.HasValue)
-                whereClauses.Add($"b.IsLiked = { request.Liked.Value.ToSqliteIntParameter() }");
+            if (request.IsLiked.HasValue)
+                whereClauses.Add($"b.IsLiked = { request.IsLiked.Value.ToSqliteIntParameter() }");
 
-            if (request.Autobackups.HasValue)
-                whereClauses.Add($"b.IsAutobackup = { request.Autobackups.Value.ToSqliteIntParameter() }");
+            if (request.IsAutobackup.HasValue)
+                whereClauses.Add($"b.IsAutobackup = { request.IsAutobackup.Value.ToSqliteIntParameter() }");
 
-            if (request.Current.HasValue)
-                whereClauses.Add($"b.GameId = (SELECT g.Id FROM [Game] g WHERE g.IsCurrent = { request.Current.Value.ToSqliteIntParameter() })");
+            if (request.GameId != 0)
+                whereClauses.Add($"b.GameId = (SELECT g.Id FROM [Game] g WHERE g.Id = { request.GameId })");
 
             if (request.IsInGoogleDrive.HasValue)
-                whereClauses.Add($"b.GoogleDriveId { request.Current.Value.ToSqliteStringParameter() }");
+                whereClauses.Add($"b.GoogleDriveId { request.IsInGoogleDrive.Value.ToSqliteStringParameter() }");
 
             if (request.Limit.HasValue)
                 sortClauses.Add($"LIMIT { request.Limit.Value }");
@@ -133,12 +133,12 @@ namespace SavescumBuddy.Services
 
         public Backup GetLatestBackup()
         {
-            return _sqlService.QueryFirstOrDefault<Backup>("select * from [Backup] b where b.GameId = (select g.Title from [Game] g where g.IsCurrent = 1) and b.IsAutobackup = 0 order by b.Id desc");
+            return _sqlService.QueryFirstOrDefault<Backup>("select * from [Backup] b where b.GameId = (select g.Id from [Game] g where g.IsCurrent = 1) and b.IsAutobackup = 0 order by b.Id desc");
         }
 
         public Backup GetLatestAutobackup()
         {
-            return _sqlService.QueryFirstOrDefault<Backup>("select * from [Backup] b where b.GameId = (select g.Title from [Game] g where g.IsCurrent = 1) and b.IsAutobackup = 1 order by b.Id desc");
+            return _sqlService.QueryFirstOrDefault<Backup>("select * from [Backup] b where b.GameId = (select g.Id from [Game] g where g.IsCurrent = 1) and b.IsAutobackup = 1 order by b.Id desc");
         }
 
         public void UpdateNote(Backup backup)
@@ -185,7 +185,7 @@ namespace SavescumBuddy.Services
 
         public void SetGameAsCurrent(Game game)
         {
-            _sqlService.Execute("update Game set IsCurrent = 0;");
+            _sqlService.Execute("update Game set IsCurrent = 0 where IsCurrent = 1;");
             _sqlService.Execute("update Game set IsCurrent = @IsCurrent where Id = @Id;", new { Id = game.Id, IsCurrent = 1 });
         }
 

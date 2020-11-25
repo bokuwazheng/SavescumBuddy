@@ -3,6 +3,7 @@ using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
 using SavescumBuddy.Core.Events;
+using SavescumBuddy.Data;
 using SavescumBuddy.Modules.Main.Models;
 using SavescumBuddy.Services.Interfaces;
 using System;
@@ -14,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
-    public class BackupsViewModel : BindableBase
+    public class BackupsViewModel : BindableBase, INavigationAware
     {
         private readonly IRegionManager _regionManager;
         private readonly IDataAccess _dataAccess;
@@ -23,6 +24,12 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         private readonly IBackupService _backupService;
         private readonly IBackupFactory _backupFactory;
         private readonly IGoogleDrive _googleDrive;
+
+        // Backing fields
+        private CancellationTokenSource _cts;
+        private FilterModel _filter;
+        private BackupModel _selectedBackup;
+        private int _currentPageIndex;
 
         public BackupsViewModel(IRegionManager regionManager, IDataAccess dataAccess, ISettingsAccess settingsAccess, IEventAggregator eventAggregator, 
             IBackupService backupService, IBackupFactory backupFactory, IGoogleDrive googleDrive)
@@ -37,10 +44,11 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
             _eventAggregator.GetEvent<BackupListUpdateRequestedEvent>().Subscribe(UpdateBackupList);
 
+            UpdateGamesCommand = new DelegateCommand(UpdateGameList);
             AddCommand = new DelegateCommand(Add);
             RemoveCommand = new DelegateCommand<BackupModel>(Remove);
             RestoreCommand = new DelegateCommand<BackupModel>(x => _backupService.RestoreBackup(x.Backup));
-            RemoveSelectedCommand = new DelegateCommand(RemoveSelected);
+            RemoveSelectedCommand = new DelegateCommand(RemoveSelected, () => IsAllItemsSelected.HasValue ? IsAllItemsSelected.Value != false : true);
 
             NavigateForwardCommand = new DelegateCommand(() => ++CurrentPageIndex, () => To < TotalNumberOfBackups);
             NavigateBackwardCommand = new DelegateCommand(() => --CurrentPageIndex, () => From > 1);
@@ -55,12 +63,6 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             Filter.PropertyChanged += (s, e) => OnFilterPropertyChanged(e.PropertyName);
             UpdateBackupList();
         }
-
-        // Backing fields
-        private CancellationTokenSource _cts;
-        private FilterModel _filter;
-        private BackupModel _selectedBackup;
-        private int _currentPageIndex;
 
         // Properties
         public CancellationToken Ct
@@ -92,9 +94,10 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             }
         }
         public ObservableCollection<BackupModel> Backups { get; private set; }
+        public ObservableCollection<GameModel> Games { get; private set; }
         public bool CurrentGameIsSet => _dataAccess.GetCurrentGame() is object;
         public int CurrentPageIndex { get => _currentPageIndex; private set => SetProperty(ref _currentPageIndex, value, () => Filter.Offset = value * PageSize); }
-        public BackupModel SelectedBackup { get => _selectedBackup; set => SetProperty(ref _selectedBackup, value); }
+        public BackupModel SelectedBackup { get => _selectedBackup; set => SetProperty(ref _selectedBackup, value, ExecuteDriveActionCommand.RaiseCanExecuteChanged); }
         public FilterModel Filter { get => _filter ??= new FilterModel(); private set => SetProperty(ref _filter, value); }
         public int TotalNumberOfBackups => _dataAccess.GetTotalNumberOfBackups(Filter);
         public int PageSize => 10; // _settingsAccess.BackupsPerPage
@@ -160,8 +163,13 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                     model.PropertyChanged += (s, e) =>
                     {
                         if (e.PropertyName == nameof(BackupModel.IsSelected))
+                        {
                             RaisePropertyChanged(nameof(IsAllItemsSelected));
+                            RemoveSelectedCommand.RaiseCanExecuteChanged();
+                        }    
                     };
+
+                    model.GameTitle = _dataAccess.GetGame(model.GameId).Title;
                 }
 
                 Backups = new ObservableCollection<BackupModel>(backupModels);
@@ -170,6 +178,22 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 RaisePropertyChanged(nameof(From));
                 RaisePropertyChanged(nameof(To));
                 RaiseNavigateCanExecute();
+            }
+            catch (Exception ex)
+            {
+                _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
+            }
+        }
+
+        public void UpdateGameList()
+        {
+            try
+            {
+                var games = _dataAccess.LoadGames();
+                games.Add(new Game() { Title = "ALL" });
+                var gameModels = games.Select(x => new GameModel(x));
+                Games = new ObservableCollection<GameModel>(gameModels);
+                RaisePropertyChanged(nameof(Games));
             }
             catch (Exception ex)
             {
@@ -222,6 +246,22 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             }
         }
 
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            UpdateGameList();
+        }
+
+        public bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+            return true;
+        }
+
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
+            
+        }
+
+        public DelegateCommand UpdateGamesCommand { get; }
         public DelegateCommand RemoveSelectedCommand { get; }
         public DelegateCommand<BackupModel> RemoveCommand { get; }
         public DelegateCommand AddCommand { get; }

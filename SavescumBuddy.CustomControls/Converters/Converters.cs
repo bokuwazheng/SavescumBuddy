@@ -31,6 +31,13 @@ namespace SavescumBuddy.CustomControls.Converters
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => value is bool val ? val ? 1 : 0 : (int?)null;
     }
 
+    public class NumberToBoolConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) => System.Convert.ToInt32(value) > 0;
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+    }
+
     public class LongToDateTimeConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) => new DateTime((long)value);
@@ -175,7 +182,7 @@ namespace SavescumBuddy.CustomControls.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
             => value is string stringVal
             ? string.IsNullOrWhiteSpace(stringVal)
-            : throw new ArgumentException();
+            : true;
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
             => throw new NotImplementedException();

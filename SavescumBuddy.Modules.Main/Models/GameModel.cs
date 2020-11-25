@@ -6,11 +6,14 @@ namespace SavescumBuddy.Modules.Main.Models
 {
     public class GameModel : BindableBase
     {
+        private bool _isSelected;
+
         public GameModel(Game game)
         {
             Game = game ?? throw new ArgumentNullException(nameof(game));
         }
 
+        public bool IsSelected { get => _isSelected; set => SetProperty(ref _isSelected, value); }
         public Game Game { get; }
 
         public int Id { get => Game.Id; set { Game.Id = value; RaisePropertyChanged(nameof(Id)); } }

@@ -45,6 +45,7 @@
     <converters:EnumEqualityConverter x:Key="EnumEqualityConverter"/>
     <converters:StringIsNullOrEmptyConverter x:Key="StringIsNullOrEmptyConverter"/>
     <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+    <converters:NumberToBoolConverter x:Key="NumberToBoolConverter"/>
 
     <!--Main brushes-->
     <SolidColorBrush x:Key="Dark" Color="#FF464646"/>
@@ -63,6 +64,7 @@
 
     <!--Checkbox style (Simple)-->
     <Style x:Key="CheckBoxStyleSimple" TargetType="CheckBox">
+        <Setter Property="Foreground" Value="{StaticResource Foreground.Static}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type CheckBox}">
@@ -74,6 +76,11 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource Foreground.MouseOver}"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
     <!--Checkbox style (Simple) ends here-->
 
@@ -407,12 +414,12 @@
 
     <!--Filter ToggleButton Style-->
     <Style x:Key="FilterToggleButton" TargetType="ToggleButton">
-        <Setter Property="Foreground" Value="{StaticResource Dark}"/>
-        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="Foreground" Value="{StaticResource Foreground.Static}"/>
+        <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ToggleButton}">
-                    <Border Background="{x:Null}">
+                    <Border Background="Transparent">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                 </ControlTemplate>
@@ -420,7 +427,7 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Opacity" Value="0.75"/>
+                <Setter Property="Foreground" Value="{StaticResource Foreground.MouseOver}"/>
             </Trigger>
         </Style.Triggers>
     </Style>
