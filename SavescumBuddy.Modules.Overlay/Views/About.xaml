@@ -1,0 +1,65 @@
+﻿<UserControl x:Class="SavescumBuddy.Modules.Overlay.Views.About"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:enums="clr-namespace:SavescumBuddy.Core.Enums;assembly=SavescumBuddy.Core"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="DeepPurple" SecondaryColor="Lime"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.CustomControls;component/DefaultTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid Background="#7F000000">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseDown">
+                    <i:InvokeCommandAction Command="{Binding CloseDialogCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </Grid>
+        <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Border CornerRadius="3" Background="White">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="30" Opacity=".3" ShadowDepth="0" Direction="0" RenderingBias="Quality"/>
+                </Border.Effect>
+            </Border>
+            <Grid Width="340" Margin="20">
+                <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" >
+                    <TextBlock Text="Savescum Buddy" TextAlignment="Left" Style="{StaticResource Header}" />
+                    <TextBlock Style="{StaticResource Caption}" Margin="0,4">
+                        <Run Text="version"/>
+                        <Run Text="{Binding Version, Mode=OneWay, FallbackValue='1.0.0.0'}"/>
+                    </TextBlock>
+                    <TextBlock FontSize="14" Foreground="{StaticResource Dark}">
+                        This software is 
+                        <Hyperlink Command="{Binding StartProcessCommand}" CommandParameter="https://github.com/bokuwazheng/SavescumBuddy/blob/master/LICENSE">
+                            unlicensed
+                        </Hyperlink>.
+                    </TextBlock>
+                    <TextBlock FontSize="14" Foreground="{StaticResource Dark}" TextWrapping="Wrap" Margin="0,4">
+                        Savescum Buddy provides a convenient way to "savescum" in
+                        any game that has only a single savefile.
+                    </TextBlock>
+                    <TextBlock FontSize="14" Foreground="{StaticResource Dark}" Margin="0,4">
+                        Source code is available on 
+                        <Hyperlink Command="{Binding StartProcessCommand}" CommandParameter="https://github.com/bokuwazheng/SavescumBuddy/" >
+                            GitHub
+                        </Hyperlink>.
+                    </TextBlock>
+                    <Button Content="CLOSE" Style="{StaticResource MaterialDesignFlatButton}"
+                            Command="{Binding CloseDialogCommand}"
+                            HorizontalAlignment="Right" Margin="0,10,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

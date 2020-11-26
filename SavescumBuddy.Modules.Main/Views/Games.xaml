@@ -47,14 +47,31 @@
             </DataGrid.ContextMenu>
             <!--Data Grid Columns-->
             <DataGrid.Columns>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.Style>
+                                    <Style TargetType="{x:Type Grid}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsCurrent}" Value="0">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Grid.Style>
+                                <materialDesign:PackIcon Kind="Check" Foreground="{StaticResource GroupByGameButtonBrush}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Title" Binding="{Binding Title}" ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"/>
                 <DataGridTextColumn Header="Savefile path" Binding="{Binding SavefilePath}" ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"/>
                 <DataGridTextColumn Header="Backup folder" Binding="{Binding BackupFolder}" ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"/>
-                <DataGridTextColumn Header="IsCurrent" Binding="{Binding IsCurrent}" ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"/>
             </DataGrid.Columns>
         </DataGrid>
         <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}"
-                Margin="10"
+                Margin="24,14"
                 VerticalAlignment="Bottom"
                 HorizontalAlignment="Right"
                 Command="{Binding AddCommand}">

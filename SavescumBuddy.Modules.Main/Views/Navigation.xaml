@@ -21,6 +21,10 @@
     </UserControl.Resources>
 
     <Grid Background="{StaticResource Bright}">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
         <TabControl Style="{StaticResource MaterialDesignNavigatilRailTabControl}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
@@ -47,11 +51,10 @@
                     <materialDesign:PackIcon Kind="Cog" Width="24" Height="24"/>
                 </TabItem.Header>
             </TabItem>
-            <TabItem Style="{StaticResource MaterialDesignNavigationRailTabItem}" Tag="About">
-                <TabItem.Header>
-                    <materialDesign:PackIcon Kind="InformationOutline" Width="24" Height="24"/>
-                </TabItem.Header>
-            </TabItem>
         </TabControl>
+        <Button Style="{StaticResource TextButton}" Grid.Row="1" Margin="5"
+                Command="{Binding OpenAboutDialogCommand}">
+            <materialDesign:PackIcon Kind="InformationOutline" Width="24" Height="24"/>
+        </Button>
     </Grid>
 </UserControl>

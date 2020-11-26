@@ -4,7 +4,19 @@
         xmlns:prism="http://prismlibrary.com/"
         prism:ViewModelLocator.AutoWireViewModel="True"
         xmlns:core="clr-namespace:SavescumBuddy.Core;assembly=SavescumBuddy.Core"
-        Title="{Binding Title}" Height="600" Width="1200">
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="{Binding Title}" Height="700" Width="1200">
+    
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="DeepPurple" SecondaryColor="Lime"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.CustomControls;component/DefaultTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+        
+    </Window.Resources>
     <Grid>
         <DockPanel>
             <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Navigation}"/>
@@ -12,5 +24,6 @@
         </DockPanel>
         <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Overlay}"/>
         <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Autobackuper}" VerticalAlignment="Bottom"/>
+        <materialDesign:Snackbar MessageQueue="{Binding MessageQueue}"/>
     </Grid>
 </Window>

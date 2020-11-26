@@ -62,6 +62,19 @@
     <SolidColorBrush x:Key="Background.Selected" Color="#f5f5f5"/>
     <SolidColorBrush x:Key="Background.MouseOver" Color="#e6e6e6"/>
 
+    <!--Data Grid Text Element Style-->
+    <Style x:Key="TextElementStyle" TargetType="{x:Type TextBlock}">
+        <Setter Property="Margin" Value="10,0"/>
+        <Setter Property="Foreground" Value="{StaticResource Foreground.Static}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}}" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource Foreground.Selected}"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
     <!--Checkbox style (Simple)-->
     <Style x:Key="CheckBoxStyleSimple" TargetType="CheckBox">
         <Setter Property="Foreground" Value="{StaticResource Foreground.Static}"/>

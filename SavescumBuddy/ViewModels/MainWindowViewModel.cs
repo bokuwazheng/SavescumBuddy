@@ -1,19 +1,19 @@
-﻿using Prism.Mvvm;
+﻿using MaterialDesignThemes.Wpf;
+using Prism.Mvvm;
 
 namespace SavescumBuddy.ViewModels
 {
     public class MainWindowViewModel : BindableBase
     {
         private string _title = "Savescum Buddy";
-        public string Title
+
+        public MainWindowViewModel(ISnackbarMessageQueue messageQueue)
         {
-            get { return _title; }
-            set { SetProperty(ref _title, value); }
+            MessageQueue = messageQueue;
         }
 
-        public MainWindowViewModel()
-        {
+        public string Title { get => _title; set => SetProperty(ref _title, value); } 
 
-        }
+        public ISnackbarMessageQueue MessageQueue { get; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Prism.Commands;
+﻿using MaterialDesignThemes.Wpf;
+using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
@@ -15,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
-    public class BackupsViewModel : BindableBase, INavigationAware
+    public class BackupsViewModel : BindableBase
     {
         private readonly IRegionManager _regionManager;
         private readonly IDataAccess _dataAccess;
@@ -24,6 +25,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         private readonly IBackupService _backupService;
         private readonly IBackupFactory _backupFactory;
         private readonly IGoogleDrive _googleDrive;
+        private readonly ISnackbarMessageQueue _messageQueue;
 
         // Backing fields
         private CancellationTokenSource _cts;
@@ -32,7 +34,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         private int _currentPageIndex;
 
         public BackupsViewModel(IRegionManager regionManager, IDataAccess dataAccess, ISettingsAccess settingsAccess, IEventAggregator eventAggregator, 
-            IBackupService backupService, IBackupFactory backupFactory, IGoogleDrive googleDrive)
+            IBackupService backupService, IBackupFactory backupFactory, IGoogleDrive googleDrive, ISnackbarMessageQueue messageQueue)
         {
             _regionManager = regionManager;
             _dataAccess = dataAccess;
@@ -41,27 +43,27 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             _backupService = backupService;
             _backupFactory = backupFactory;
             _googleDrive = googleDrive;
+            _messageQueue = messageQueue;
 
-            _eventAggregator.GetEvent<BackupListUpdateRequestedEvent>().Subscribe(UpdateBackupList);
+            _eventAggregator.GetEvent<BackupListUpdateRequestedEvent>().Subscribe(UpdateBackups);
 
-            UpdateGamesCommand = new DelegateCommand(UpdateGameList);
             AddCommand = new DelegateCommand(Add);
             RemoveCommand = new DelegateCommand<BackupModel>(Remove);
-            RestoreCommand = new DelegateCommand<BackupModel>(x => _backupService.RestoreBackup(x.Backup));
             RemoveSelectedCommand = new DelegateCommand(RemoveSelected, () => IsAllItemsSelected.HasValue ? IsAllItemsSelected.Value != false : true);
+            RestoreCommand = new DelegateCommand<BackupModel>(x => _backupService.RestoreBackup(x.Backup));
 
             NavigateForwardCommand = new DelegateCommand(() => ++CurrentPageIndex, () => To < TotalNumberOfBackups);
             NavigateBackwardCommand = new DelegateCommand(() => --CurrentPageIndex, () => From > 1);
             NavigateToStartCommand = new DelegateCommand(() => CurrentPageIndex = 0, () => From > 1);
             NavigateToEndCommand = new DelegateCommand(() => CurrentPageIndex = TotalNumberOfBackups / PageSize, () => To < TotalNumberOfBackups);
 
-            ShowInExplorerCommand = new DelegateCommand<BackupModel>(x => _eventAggregator.GetEvent<ExecuteRequestedEvent>().Publish(Path.GetDirectoryName(x.SavefilePath)));
+            ShowInExplorerCommand = new DelegateCommand<BackupModel>(x => _eventAggregator.GetEvent<StartProcessRequestedEvent>().Publish(Path.GetDirectoryName(x.SavefilePath)));
             UpdateNoteCommand = new DelegateCommand<BackupModel>(x => _dataAccess.UpdateNote(x.Backup));
             UpdateIsLikedCommand = new DelegateCommand<BackupModel>(x => _dataAccess.UpdateIsLiked(x.Backup));
             ExecuteDriveActionCommand = new DelegateCommand<BackupModel>(async x => await ExecuteCloudAction(x, Ct).ConfigureAwait(false), x => _googleDrive.UserCredential is object);
 
             Filter.PropertyChanged += (s, e) => OnFilterPropertyChanged(e.PropertyName);
-            UpdateBackupList();
+            UpdateBackups();
         }
 
         // Properties
@@ -94,7 +96,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             }
         }
         public ObservableCollection<BackupModel> Backups { get; private set; }
-        public ObservableCollection<GameModel> Games { get; private set; }
+        public ObservableCollection<Game> Games => GetGames();
         public bool CurrentGameIsSet => _dataAccess.GetCurrentGame() is object;
         public int CurrentPageIndex { get => _currentPageIndex; private set => SetProperty(ref _currentPageIndex, value, () => Filter.Offset = value * PageSize); }
         public BackupModel SelectedBackup { get => _selectedBackup; set => SetProperty(ref _selectedBackup, value, ExecuteDriveActionCommand.RaiseCanExecuteChanged); }
@@ -106,7 +108,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
         private void OnFilterPropertyChanged(string propName)
         {
-            UpdateBackupList();
+            UpdateBackups();
             if (!propName.Equals(nameof(Filter.Offset)))
                 NavigateToStartCommand?.Execute();
         }
@@ -127,7 +129,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 _dataAccess.SaveBackup(backup);
                 _backupService.BackupSavefile(backup);
                 _backupService.SaveScreenshot(backup.PicturePath);
-                UpdateBackupList();
+                UpdateBackups();
             }
             catch (Exception ex)
             {
@@ -143,7 +145,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                     return;
                 _dataAccess.RemoveBackup(backup.Backup);
                 _backupService.DeleteFiles(backup.Backup);
-                UpdateBackupList();
+                UpdateBackups();
             }
             catch (Exception ex)
             {
@@ -151,7 +153,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             }
         }
 
-        public void UpdateBackupList()
+        public void UpdateBackups()
         {
             try
             {
@@ -185,24 +187,24 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             }
         }
 
-        public void UpdateGameList()
+        public ObservableCollection<Game> GetGames()
         {
             try
             {
                 var games = _dataAccess.LoadGames();
                 games.Add(new Game() { Title = "ALL" });
-                var gameModels = games.Select(x => new GameModel(x));
-                Games = new ObservableCollection<GameModel>(gameModels);
-                RaisePropertyChanged(nameof(Games));
+                return new ObservableCollection<Game>(games);
             }
             catch (Exception ex)
             {
                 _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
             }
+            return null;
         }
 
         // TODO: lock?
         // TODO: check if succeeded in finally?
+        // TODO: check if this solution is ok for multiple files/operations
         private async Task ExecuteCloudAction(BackupModel backupModel, CancellationToken ct = default)
         {
             var backup = backupModel.Backup;
@@ -210,8 +212,12 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             {
                 if (backup.GoogleDriveId is null)
                 {
+                    _messageQueue.Enqueue("Upload started...", "CANCEL", x => _cts?.Cancel(), null, true, true);
+
                     var gameTitle = _dataAccess.GetGame(backup.GameId).Title;
-                    var backupCloudFolderId = await _googleDrive.UploadBackupAsync(backup, gameTitle, ct).ConfigureAwait(false);
+                    var backupCloudFolderId = await _googleDrive.UploadBackupAsync(backup, gameTitle, ct).ConfigureAwait(true);
+
+                    _messageQueue.Enqueue("Upload finished!", "", () => { }, true);
 
                     if (backupCloudFolderId is object)
                     {
@@ -221,6 +227,10 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 }
                 else
                 {
+                    var countdown = TimeSpan.FromSeconds(3d);
+                    _messageQueue.Enqueue("Undo deletion?", "UNDO", x => _cts?.Cancel(), null, true, true, countdown);
+                    await Task.Delay(countdown);
+
                     var result = await _googleDrive.DeleteBackupAsync(backup, ct).ConfigureAwait(false);
 
                     backupModel.GoogleDriveId = null;
@@ -245,26 +255,9 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 }
             }
         }
-
-        public void OnNavigatedTo(NavigationContext navigationContext)
-        {
-            UpdateGameList();
-        }
-
-        public bool IsNavigationTarget(NavigationContext navigationContext)
-        {
-            return true;
-        }
-
-        public void OnNavigatedFrom(NavigationContext navigationContext)
-        {
-            
-        }
-
-        public DelegateCommand UpdateGamesCommand { get; }
-        public DelegateCommand RemoveSelectedCommand { get; }
-        public DelegateCommand<BackupModel> RemoveCommand { get; }
         public DelegateCommand AddCommand { get; }
+        public DelegateCommand<BackupModel> RemoveCommand { get; }
+        public DelegateCommand RemoveSelectedCommand { get; }
         public DelegateCommand<BackupModel> RestoreCommand { get; }
         public DelegateCommand NavigateForwardCommand { get; }
         public DelegateCommand NavigateBackwardCommand { get; }

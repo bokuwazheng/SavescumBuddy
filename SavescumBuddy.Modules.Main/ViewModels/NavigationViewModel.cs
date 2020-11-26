@@ -14,8 +14,10 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             _regionManager = regionManager;
 
             NavigateCommand = new DelegateCommand<string>(s => _regionManager.RequestNavigate(RegionNames.ContentRegion, s));
+            OpenAboutDialogCommand = new DelegateCommand(() => _regionManager.RequestNavigate(RegionNames.Overlay, "About"));
         }
 
         public DelegateCommand<string> NavigateCommand { get; }
+        public DelegateCommand OpenAboutDialogCommand { get; }
     }
 }

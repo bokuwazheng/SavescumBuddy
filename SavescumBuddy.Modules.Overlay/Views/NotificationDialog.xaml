@@ -4,12 +4,15 @@
              xmlns:prism="http://prismlibrary.com/"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:enums="clr-namespace:SavescumBuddy.Core.Enums;assembly=SavescumBuddy.Core"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              SnapsToDevicePixels="True"
              prism:ViewModelLocator.AutoWireViewModel="True">
     
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="DeepPurple" SecondaryColor="Lime"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.CustomControls;component/DefaultTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
@@ -41,7 +44,7 @@
                 <TextBlock Grid.Row="1" Text="{Binding Message, FallbackValue=Message}" Margin="10" TextWrapping="Wrap"/>
 
                 <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="OK" Style="{StaticResource TextButton}" Command="{Binding CloseDialogCommand}" 
+                    <Button Content="OK" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CloseDialogCommand}" 
                             CommandParameter="{x:Static enums:DialogResult.OK}" Margin="10" Width="80" Height="30"/>
                 </StackPanel>
             </Grid>

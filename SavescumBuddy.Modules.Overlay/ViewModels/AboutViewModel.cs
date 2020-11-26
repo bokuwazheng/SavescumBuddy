@@ -1,28 +1,31 @@
 ﻿using Prism.Commands;
+using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
 using SavescumBuddy.Core;
+using SavescumBuddy.Core.Events;
 using System.Linq;
 
 namespace SavescumBuddy.Modules.Overlay.ViewModels
 {
-    public class NotificationDialogViewModel : BindableBase, INavigationAware
+    public class AboutViewModel : BindableBase, INavigationAware
     {
-        private string _title;
-        private string _message;
         private IRegionNavigationService _navigationService;
+        private IEventAggregator _eventAggregator;
         private IRegionManager _regionManager;
 
-        public NotificationDialogViewModel(IRegionManager regionManager)
+        public AboutViewModel(IEventAggregator eventAggregator, IRegionManager regionManager)
         {
+            _eventAggregator = eventAggregator;
             _regionManager = regionManager;
-            
+
+            StartProcessCommand = new DelegateCommand<string>(s => _eventAggregator.GetEvent<StartProcessRequestedEvent>().Publish(s));
             CloseDialogCommand = new DelegateCommand(CloseDialog);
         }
 
-        public string Title { get => _title; set => SetProperty(ref _title, value); }
-        public string Message { get => _message; set => SetProperty(ref _message, value); }
-        
+        public string Version => System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
+        // TODO: figure out why navigation stack is not empty when trying to close for first time
         private void CloseDialog()
         {
             if (_navigationService.Journal.CanGoBack)
@@ -39,11 +42,6 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
             _navigationService = navigationContext.NavigationService;
-
-            if (navigationContext.Parameters.Count == 0)
-                return;
-            Message = navigationContext.Parameters["message"].ToString();
-            Title = navigationContext.Parameters["title"].ToString();
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)
@@ -57,5 +55,7 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
         }
 
         public DelegateCommand CloseDialogCommand { get; }
+
+        public DelegateCommand<string> StartProcessCommand { get; }
     }
 }

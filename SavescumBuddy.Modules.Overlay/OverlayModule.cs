@@ -23,6 +23,7 @@ namespace SavescumBuddy.Modules.Overlay
         {
             containerRegistry.RegisterForNavigation<NotificationDialog>();
             containerRegistry.RegisterForNavigation<Game>();
+            containerRegistry.RegisterForNavigation<About>();
         }
     }
 }

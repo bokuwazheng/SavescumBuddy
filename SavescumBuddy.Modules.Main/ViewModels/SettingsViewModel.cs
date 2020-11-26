@@ -7,6 +7,7 @@ using SavescumBuddy.Services.Interfaces;
 using SavescumBuddy.Modules.Main.Models;
 using SavescumBuddy.Core.Events;
 using SavescumBuddy.Core;
+using MaterialDesignThemes.Wpf;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
@@ -15,17 +16,19 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         private readonly IRegionManager _regionManager;
         private readonly ISettingsAccess _settingsAccess;
         private readonly IEventAggregator _eventAggregator;
+        private readonly ISnackbarMessageQueue _messageQueue;
 
         private HotkeyAction? _recordedHotkeyType = null;
 
         public SettingsModel Settings { get; }
         public HotkeyAction? SelectedHotkeyAction { get => _recordedHotkeyType; set => SetProperty(ref _recordedHotkeyType, value); }
 
-        public SettingsViewModel(IRegionManager regionManager, ISettingsAccess settingsAccess, IEventAggregator eventAggregator)
+        public SettingsViewModel(IRegionManager regionManager, ISettingsAccess settingsAccess, IEventAggregator eventAggregator, ISnackbarMessageQueue messageQueue)
         {
             _regionManager = regionManager;
             _settingsAccess = settingsAccess;
             _eventAggregator = eventAggregator;
+            _messageQueue = messageQueue;
 
             _eventAggregator.GetEvent<HookKeyDownEvent>().Subscribe(keyboardHook_KeyDown);
 
@@ -90,6 +93,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
             _eventAggregator.GetEvent<HookEnabledChangedEvent>().Publish(false);
+            _messageQueue.Enqueue("Hotkeys are disabled when Settings tab is open.");
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)

@@ -14,6 +14,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using Prism.Regions;
 using SavescumBuddy.Core;
+using MaterialDesignThemes.Wpf;
 
 namespace SavescumBuddy
 {
@@ -30,7 +31,7 @@ namespace SavescumBuddy
             ea.GetEvent<ErrorOccuredEvent>().Subscribe(OnErrorOccured);
             ea.GetEvent<HookChangedEvent>().Subscribe(OnHookChanged);
             ea.GetEvent<HookEnabledChangedEvent>().Subscribe(OnHookEnabledChanged);
-            ea.GetEvent<ExecuteRequestedEvent>().Subscribe(OnExecuteRequested);
+            ea.GetEvent<StartProcessRequestedEvent>().Subscribe(OnStartProcessRequested);
 
             var settings = Container.Resolve<ISettingsAccess>();
             var hotkeysEnabled = settings.HotkeysEnabled;
@@ -57,7 +58,8 @@ namespace SavescumBuddy
                 .Register<IBackupFactory, BackupFactory>()
                 .RegisterInstance(new GlobalKeyboardHook(), "Settings")
                 .RegisterInstance(new GlobalKeyboardHook(), "Application")
-                .RegisterSingleton<IGoogleDrive, GoogleDrive>();
+                .RegisterSingleton<IGoogleDrive, GoogleDrive>()
+                .RegisterSingleton<ISnackbarMessageQueue, SnackbarMessageQueue>();
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
@@ -87,7 +89,7 @@ namespace SavescumBuddy
             regionManager.RequestNavigate(RegionNames.Overlay, "NotificationDialog", parameters);
         }
 
-        private void OnExecuteRequested(string path)
+        private void OnStartProcessRequested(string path)
         {
             try
             {

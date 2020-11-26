@@ -6,6 +6,7 @@
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:core="clr-namespace:SavescumBuddy.Core;assembly=SavescumBuddy.Core"
              xmlns:controls="clr-namespace:SavescumBuddy.CustomControls;assembly=SavescumBuddy.CustomControls"
+             xmlns:domain="clr-namespace:SavescumBuddy.CustomControls.Domain;assembly=SavescumBuddy.CustomControls"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:behaviors="clr-namespace:SavescumBuddy.CustomControls.Behaviors;assembly=SavescumBuddy.CustomControls"
              SnapsToDevicePixels="True"
@@ -72,11 +73,9 @@
             
             <!--Tool bar-->
             <StackPanel Orientation="Horizontal" Grid.Column="0" Margin="0">
-                <!--Add button-->
-                <Button Content="ADD" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AddCommand}" Margin="10,0"/>
                 
                 <!--Divider (vertical)-->
-                <Border Width="1" Margin="10" BorderBrush="{StaticResource Bright}" BorderThickness="1,0,0,0"/>
+                <Border Width="1" Margin="10" BorderBrush="{StaticResource Bright}" BorderThickness="1,0,0,0" Visibility="Collapsed"/>
 
                 <Button Command="{Binding RemoveSelectedCommand}" Style="{StaticResource MaterialDesignIconForegroundButton}">
                     <materialDesign:PackIcon Kind="DeleteOutline"/>
@@ -134,18 +133,7 @@
         <DataGrid Grid.Row="1" ItemsSource="{Binding Backups}" SelectedItem="{Binding SelectedBackup}" CanUserAddRows="False" AutoGenerateColumns="False" IsReadOnly="True"
                   CanUserResizeColumns="False" CanUserReorderColumns="False" CanUserSortColumns="False">
             <DataGrid.Resources>
-                <Style x:Key="TextElementStyle" TargetType="{x:Type TextBlock}">
-                    <Setter Property="Margin" Value="10,0"/>
-                    <!--<Setter Property="FontWeight" Value="Medium"/>-->
-                    <Setter Property="Foreground" Value="{StaticResource Foreground.Static}"/>
-                    <Setter Property="VerticalAlignment" Value="Center"/>
-                    <Setter Property="HorizontalAlignment" Value="Left"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}}" Value="True">
-                            <Setter Property="Foreground" Value="{StaticResource Foreground.Selected}"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
+                <domain:BindingProxy x:Key="DataContextProxy" Data="{Binding}"/>
             </DataGrid.Resources>
             <!--Data Grid Context Menu-->
             <DataGrid.ContextMenu>
@@ -179,13 +167,14 @@
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.Columns>
+                <!--Select column-->
                 <DataGridCheckBoxColumn IsReadOnly="False"
                                         Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" 
                                         ElementStyle="{StaticResource MaterialDesignDataGridCheckBoxColumnStyle}"
                                         EditingElementStyle="{StaticResource MaterialDesignDataGridCheckBoxColumnEditingStyle}">
                     <DataGridCheckBoxColumn.Header>
                         <Border Background="Transparent">
-                            <CheckBox IsChecked="{Binding DataContext.IsAllItemsSelected, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"/>
+                            <CheckBox IsChecked="{Binding Data.IsAllItemsSelected, Source={StaticResource DataContextProxy}}"/>
                         </Border>
                     </DataGridCheckBoxColumn.Header>
                     <DataGridCheckBoxColumn.HeaderStyle>
@@ -194,6 +183,7 @@
                         </Style>
                     </DataGridCheckBoxColumn.HeaderStyle>
                 </DataGridCheckBoxColumn>
+                
                 <!--Error icon-->
                 <!--<DataGridTemplateColumn>
                     <DataGridTemplateColumn.CellTemplate>
@@ -204,6 +194,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>-->
+                
                 <!--Image-->
                 <DataGridTemplateColumn>
                     <DataGridTemplateColumn.CellTemplate>
@@ -239,7 +230,7 @@
                                     ElementStyle="{StaticResource TextElementStyle}">
                     <DataGridTextColumn.HeaderTemplate>
                         <DataTemplate>
-                            <ToggleButton IsChecked="{Binding DataContext.Filter.Descending, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}">
+                            <ToggleButton IsChecked="{Binding Data.Filter.Descending, Source={StaticResource DataContextProxy}}">
                                 <ToggleButton.Style>
                                     <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
                                         <Setter Property="Content">
@@ -267,7 +258,7 @@
                     <DataGridTemplateColumn.HeaderTemplate>
                         <DataTemplate>
                             <CheckBox IsThreeState="True"
-                                      IsChecked="{Binding DataContext.Filter.IsLiked, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}">
+                                      IsChecked="{Binding Data.Filter.IsLiked, Source={StaticResource DataContextProxy}}">
                                 <CheckBox.Style>
                                     <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource CheckBoxStyleSimple}">
                                         <Setter Property="Content">
@@ -300,7 +291,7 @@
                     </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ToggleButton Command="{Binding DataContext.UpdateIsLikedCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                            <ToggleButton Command="{Binding Data.UpdateIsLikedCommand, Source={StaticResource DataContextProxy}}"
                                           CommandParameter="{Binding}"
                                           IsChecked="{Binding IsLiked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IntToBoolConverter}}">
                                 <ToggleButton.Style>
@@ -330,7 +321,7 @@
                 <DataGridTemplateColumn IsReadOnly="True">
                     <DataGridTemplateColumn.HeaderTemplate>
                         <DataTemplate>
-                            <CheckBox IsChecked="{Binding DataContext.Filter.IsInGoogleDrive, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                            <CheckBox IsChecked="{Binding Data.Filter.IsInGoogleDrive, Source={StaticResource DataContextProxy}}"
                                       IsThreeState="True">
                                 <CheckBox.Style>
                                     <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource CheckBoxStyleSimple}">
@@ -392,7 +383,7 @@
                 <DataGridTemplateColumn IsReadOnly="True">
                     <DataGridTemplateColumn.HeaderTemplate>
                         <DataTemplate>
-                            <CheckBox IsChecked="{Binding DataContext.Filter.IsAutobackup, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                            <CheckBox IsChecked="{Binding Data.Filter.IsAutobackup, Source={StaticResource DataContextProxy}}"
                                       IsThreeState="True">
                                 <CheckBox.Style>
                                     <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource CheckBoxStyleSimple}">
@@ -454,16 +445,15 @@
                 <DataGridTextColumn Binding="{Binding GameTitle}" ElementStyle="{StaticResource TextElementStyle}">
                     <DataGridTextColumn.HeaderTemplate>
                         <DataTemplate>
-                            <ComboBox ItemsSource="{Binding DataContext.Games, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, UpdateSourceTrigger=PropertyChanged}"
-                                      SelectedValue="{Binding DataContext.Filter.GameId, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, UpdateSourceTrigger=PropertyChanged}"
-                                      SelectedValuePath="Id"
-                                      DisplayMemberPath="Title">
+                            <ComboBox ItemsSource="{Binding Data.Games, Source={StaticResource DataContextProxy}, UpdateSourceTrigger=PropertyChanged}"
+                                      SelectedValue="{Binding Data.Filter.GameId, Source={StaticResource DataContextProxy}, UpdateSourceTrigger=PropertyChanged}"
+                                      SelectedValuePath="Id">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{Binding Title}">
+                                            <TextBlock Text="{Binding Title, TargetNullValue=''}">
                                                 <TextBlock.Style>
-                                                    <Style TargetType="TextBlock">
+                                                    <Style TargetType="{x:Type TextBlock}">
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsCurrent}" Value="1">
                                                                 <Setter Property="Foreground" Value="{StaticResource GroupByGameButtonBrush}"/>
@@ -480,11 +470,11 @@
                     </DataGridTextColumn.HeaderTemplate>
                 </DataGridTextColumn>
                 <!--Note-->
-                <DataGridTemplateColumn Width="*">
+                <DataGridTemplateColumn>
                     <DataGridTemplateColumn.HeaderTemplate>
                         <DataTemplate>
                             <TextBox x:Name="SearchBox" 
-                                     Text="{Binding DataContext.Filter.Note, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, UpdateSourceTrigger=PropertyChanged}"
+                                     Text="{Binding Data.Filter.Note, Source={StaticResource DataContextProxy}, UpdateSourceTrigger=PropertyChanged}"
                                      HorizontalAlignment="Stretch" Height="34" VerticalAlignment="Center"
                                      BorderBrush="Transparent" Background="Transparent" Foreground="{StaticResource Dark}" Padding="6,1,10,0" 
                                      FontWeight="Normal" FontSize="14">
@@ -536,7 +526,7 @@
                                          Grid.ColumnSpan="2" Tag="&#xE70F;">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="LostFocus">
-                                            <i:InvokeCommandAction Command="{Binding DataContext.UpdateNoteCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                                            <i:InvokeCommandAction Command="{Binding Data.UpdateNoteCommand, Source={StaticResource DataContextProxy}}"
                                                                    CommandParameter="{Binding}"/>
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
@@ -564,5 +554,12 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
+        <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+                Margin="24,14" Grid.Row="1"
+                VerticalAlignment="Bottom"
+                HorizontalAlignment="Right"
+                Command="{Binding AddCommand}">
+            <materialDesign:PackIcon Kind="Plus" Height="24" Width="24"/>
+        </Button>
     </Grid>
 </UserControl>

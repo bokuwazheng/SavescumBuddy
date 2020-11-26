@@ -13,7 +13,7 @@ namespace SavescumBuddy.Modules.Main.Models
         private bool? _isAutobackup;
         private bool? _isInGoogleDrive;
         private string _note;
-        private int? _gameId;
+        private int _gameId;
 
         public FilterModel()
         {
@@ -29,6 +29,6 @@ namespace SavescumBuddy.Modules.Main.Models
         public bool? IsAutobackup { get => _isAutobackup; set => SetProperty(ref _isAutobackup, value); }
         public bool? IsInGoogleDrive { get => _isInGoogleDrive; set => SetProperty(ref _isInGoogleDrive, value); }
         public string Note { get => _note; set => SetProperty(ref _note, value); }
-        public int? GameId { get => _gameId; set => SetProperty(ref _gameId, value); }
+        public int GameId { get => _gameId; set => SetProperty(ref _gameId, value); }
     }
 }
