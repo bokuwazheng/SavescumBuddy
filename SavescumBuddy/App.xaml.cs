@@ -15,6 +15,8 @@ using System.Diagnostics;
 using Prism.Regions;
 using SavescumBuddy.Core;
 using MaterialDesignThemes.Wpf;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace SavescumBuddy
 {
@@ -41,6 +43,13 @@ namespace SavescumBuddy
                 hook.Hook();
                 hook.KeyDown += ApplicationHook_KeyDown;
             }
+
+            Task.Run(async () => 
+            {
+                var gd = Container.Resolve<IGoogleDrive>();
+                if (gd.CredentialExists())
+                    await gd.AuthorizeAsync(CancellationToken.None);
+            });
         }
 
         protected override Window CreateShell()

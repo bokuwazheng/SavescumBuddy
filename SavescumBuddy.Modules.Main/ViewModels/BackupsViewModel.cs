@@ -137,6 +137,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             }
         }
 
+        // TODO: If in Google Drive -- promtp user to delete files from clould (leave the backup in DB and adjust context menu accordingly)
         private void Remove(BackupModel backup)
         {
             try

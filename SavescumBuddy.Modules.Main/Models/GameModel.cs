@@ -7,6 +7,7 @@ namespace SavescumBuddy.Modules.Main.Models
     public class GameModel : BindableBase
     {
         private bool _isSelected;
+        private int _backupCount;
 
         public GameModel(Game game)
         {
@@ -14,6 +15,7 @@ namespace SavescumBuddy.Modules.Main.Models
         }
 
         public bool IsSelected { get => _isSelected; set => SetProperty(ref _isSelected, value); }
+        public int BackupCount { get => _backupCount; set => SetProperty(ref _backupCount, value); }
         public Game Game { get; }
 
         public int Id { get => Game.Id; set { Game.Id = value; RaisePropertyChanged(nameof(Id)); } }

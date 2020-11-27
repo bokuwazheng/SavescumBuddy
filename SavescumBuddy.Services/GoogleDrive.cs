@@ -19,9 +19,6 @@ namespace SavescumBuddy.Services
         // If modifying these scopes, delete your previously saved credentials.
         private readonly string[] _scopes;
         private readonly string _applicationName;
-        private readonly TimeSpan _timeoutDelay;
-        private readonly string _timeoutError;
-
         private readonly string _credentialsFileName = "sb_credentials.json";
         private readonly string _tokenFolderName = "token.json";
 
@@ -39,8 +36,6 @@ namespace SavescumBuddy.Services
         {
             _scopes = new string[] { DriveService.Scope.DriveFile, DriveService.Scope.DriveAppdata };
             _applicationName = "Savescum Buddy";
-            _timeoutDelay = TimeSpan.FromSeconds(180d);
-            _timeoutError = $"Error: Timeout. Authorization canceled after { _timeoutDelay.TotalSeconds } seconds.";
         }
 
         public DriveService GetDriveApiService()
@@ -79,7 +74,6 @@ namespace SavescumBuddy.Services
 
         public bool CredentialExists()
         {
-            var credentials = CredentialsFileName;
             var token = TokenFolderName;
 
             var folderExists = Directory.Exists(token);
@@ -215,6 +209,9 @@ namespace SavescumBuddy.Services
             return result?.Id;
         }
 
+        // TODO:
+        // Define a separate class for backups
+        // Transaction-like method
         public async Task<string> UploadBackupAsync(Backup backup, string gameTitle, CancellationToken ct = default)
         {
             var rootId = await GetAppRootFolderIdAsync(ct).ConfigureAwait(false);

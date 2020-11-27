@@ -68,6 +68,7 @@
                 <DataGridTextColumn Header="Title" Binding="{Binding Title}" ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"/>
                 <DataGridTextColumn Header="Savefile path" Binding="{Binding SavefilePath}" ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"/>
                 <DataGridTextColumn Header="Backup folder" Binding="{Binding BackupFolder}" ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"/>
+                <DataGridTextColumn Header="Backup count" Binding="{Binding BackupCount, UpdateSourceTrigger=PropertyChanged}" ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"/>
             </DataGrid.Columns>
         </DataGrid>
         <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}"

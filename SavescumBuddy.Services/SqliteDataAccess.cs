@@ -30,7 +30,7 @@ namespace SavescumBuddy.Services
                 whereClauses.Add($"b.IsAutobackup = { request.IsAutobackup.Value.ToSqliteIntParameter() }");
 
             if (request.GameId != 0)
-                whereClauses.Add($"b.GameId = (SELECT g.Id FROM [Game] g WHERE g.Id = { request.GameId })");
+                whereClauses.Add($"b.GameId = { request.GameId }");
 
             if (request.IsInGoogleDrive.HasValue)
                 whereClauses.Add($"b.GoogleDriveId { request.IsInGoogleDrive.Value.ToSqliteStringParameter() }");
@@ -78,7 +78,7 @@ namespace SavescumBuddy.Services
                 whereClauses.Add($"b.IsAutobackup = { request.IsAutobackup.Value.ToSqliteIntParameter() }");
 
             if (request.GameId != 0)
-                whereClauses.Add($"b.GameId = (SELECT g.Id FROM [Game] g WHERE g.Id = { request.GameId })");
+                whereClauses.Add($"b.GameId = { request.GameId }");
 
             if (request.IsInGoogleDrive.HasValue)
                 whereClauses.Add($"b.GoogleDriveId { request.IsInGoogleDrive.Value.ToSqliteStringParameter() }");

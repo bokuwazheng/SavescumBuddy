@@ -2,7 +2,6 @@
 using Prism.Events;
 using Prism.Mvvm;
 using SavescumBuddy.Core.Events;
-using SavescumBuddy.Data;
 using SavescumBuddy.Services.Interfaces;
 using System;
 using System.Threading;
@@ -13,26 +12,20 @@ namespace SavescumBuddy.Modules.Main.ViewModels
     public class GoogleDriveViewModel : BindableBase
     {
         private IGoogleDrive _googleDrive;
-        private ISettingsAccess _settingsAccess;
         private IEventAggregator _eventAggregator;
-        private IDataAccess _dataAccess;
 
         private CancellationTokenSource _cts;
-        private string _authorizedAs;
+        private string _userEmail;
 
-        public GoogleDriveViewModel(IGoogleDrive googleDrive, ISettingsAccess settingsAccess, IEventAggregator eventAggregator, IDataAccess dataAccess)
+        public GoogleDriveViewModel(IGoogleDrive googleDrive, IEventAggregator eventAggregator)
         {
             _googleDrive = googleDrive;
-            _settingsAccess = settingsAccess;
             _eventAggregator = eventAggregator;
-            _dataAccess = dataAccess;
 
             AuthorizeCommand = new DelegateCommand(async () => await AuthorizeAsync(Ct).ConfigureAwait(false));
             ReauthorizeCommand = new DelegateCommand(async () => await ReauthorizeAsync(Ct).ConfigureAwait(false));
+            UpdateUserEmailCommand = new DelegateCommand(async () => await UpdateUserEmailAsync(Ct).ConfigureAwait(false));
             CancelCommand = new DelegateCommand(() => _cts?.Cancel());
-
-            if (_googleDrive.CredentialExists())
-                AuthorizeCommand.Execute();
         }
 
         public CancellationToken Ct
@@ -44,7 +37,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 return _cts.Token;
             }
         }
-        public string AuthorizedAs { get => _authorizedAs; set => SetProperty(ref _authorizedAs, value); }
+        public string UserEmail { get => _userEmail; set => SetProperty(ref _userEmail, value); }
 
         private async Task AuthorizeAsync(CancellationToken ct)
         {
@@ -54,7 +47,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 if (!succeeded)
                     throw new Exception("Failed to authorize.");
 
-                AuthorizedAs = await _googleDrive.GetUserEmailAsync().ConfigureAwait(false);
+                await UpdateUserEmailAsync(ct).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -70,7 +63,19 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 if (!succeeded)
                     throw new Exception("Failed to reauthorize.");
 
-                AuthorizedAs = await _googleDrive.GetUserEmailAsync().ConfigureAwait(false);
+                await UpdateUserEmailAsync(ct).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
+            }
+        }
+
+        private async Task UpdateUserEmailAsync(CancellationToken ct)
+        {
+            try
+            {
+                UserEmail = await _googleDrive.GetUserEmailAsync(ct).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -80,6 +85,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
         public DelegateCommand AuthorizeCommand { get; }
         public DelegateCommand ReauthorizeCommand { get; }
+        public DelegateCommand UpdateUserEmailCommand { get; }
         public DelegateCommand CancelCommand { get; }
     }
 }

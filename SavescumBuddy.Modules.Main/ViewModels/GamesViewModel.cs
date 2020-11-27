@@ -50,9 +50,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                             _regionManager.Regions[RegionNames.Overlay].Deactivate(activeRegion);
 
                         if (result is null)
-                        {
                             return;
-                        }
 
                         result.Id = game.Id;
                         result.IsCurrent = game.IsCurrent;
@@ -81,7 +79,11 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             try
             {
                 var games = _dataAccess.LoadGames();
-                var gameModels = games.Select(x => new GameModel(x));
+                var gameModels = games.Select(x => new GameModel(x)).ToList();
+                foreach (var game in gameModels)
+                {
+                    game.BackupCount = _dataAccess.GetTotalNumberOfBackups(new BackupSearchRequest() { GameId = game.Id });
+                }
                 Games = new ObservableCollection<GameModel>(gameModels);
                 RaisePropertyChanged(nameof(Games));
             }

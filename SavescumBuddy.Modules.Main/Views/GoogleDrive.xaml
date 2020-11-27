@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:SavescumBuddy.Modules.Main.Views"
              xmlns:prism="http://prismlibrary.com/"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:core="clr-namespace:SavescumBuddy.Core;assembly=SavescumBuddy.Core"
              xmlns:controls="clr-namespace:SavescumBuddy.CustomControls;assembly=SavescumBuddy.CustomControls"
              xmlns:models="clr-namespace:SavescumBuddy.Modules.Main.Models"
@@ -10,6 +11,12 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              SnapsToDevicePixels="True"
              prism:ViewModelLocator.AutoWireViewModel="True">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding UpdateUserEmailCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -28,10 +35,12 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TextBlock Text="{Binding AuthorizedAs, StringFormat='Authorized as: {0}'}" Margin="20"/>
-        <Button Style="{StaticResource MaterialDesignRaisedButton}" Content="Authorize" Command="{Binding AuthorizeCommand}" Grid.Row="1"
-                Visibility="{Binding AuthorizedAs, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=False}"/>
-        <Button Style="{StaticResource MaterialDesignRaisedButton}" Content="Reauthorize" Command="{Binding ReauthorizeCommand}" Grid.Row="2"
-                Visibility="{Binding AuthorizedAs, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=True}"/>
+        <TextBlock Text="{Binding UserEmail, StringFormat='Authorized as: {0}'}" Margin="20" FontSize="14"/>
+        <Button Style="{StaticResource MaterialDesignFlatButton}" Content="Authorize" Command="{Binding AuthorizeCommand}" Grid.Row="1"
+                HorizontalAlignment="Center"
+                Visibility="{Binding UserEmail, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=False}"/>
+        <Button Style="{StaticResource MaterialDesignFlatButton}" Content="Reauthorize" Command="{Binding ReauthorizeCommand}" Grid.Row="2"
+                HorizontalAlignment="Center"
+                Visibility="{Binding UserEmail, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=True}"/>
     </Grid>
 </UserControl>
