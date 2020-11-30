@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Google.Apis.Auth.OAuth2;
+using Google.Apis.Download;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
@@ -31,6 +33,8 @@ namespace SavescumBuddy.Services
 #endif
 
         public UserCredential UserCredential { get; private set; }
+
+        public HttpClient HttpClient { get; } = new HttpClient();
 
         public GoogleDrive()
         {
@@ -159,26 +163,16 @@ namespace SavescumBuddy.Services
             return result?.User.EmailAddress;
         }
 
-        public async Task<DriveFile> GetFileById(string id, bool throwIfFails, CancellationToken ct = default)
+        public async Task<DriveFile> Get(string id, CancellationToken ct = default)
         {
-            try
-            {
-                var service = GetDriveApiService();
-                var request = service.Files.Get(id);
-                request.Fields = "*";
-                var result = await request.ExecuteAsync().ConfigureAwait(false);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                if (throwIfFails)
-                    throw ex;
-                else
-                    return null;
-            }
+            var service = GetDriveApiService();
+            var request = service.Files.Get(id);
+            request.Fields = "*";
+            var result = await request.ExecuteAsync().ConfigureAwait(false);
+            return result;
         }
 
-        public async Task<List<DriveFile>> GetFileListAsync(string parentId, string mimeType, CancellationToken ct = default)
+        public async Task<List<DriveFile>> GetFilesAsync(string parentId, string mimeType, CancellationToken ct = default)
         {
             var listRequest = GetDriveApiService().Files.List();
             listRequest.PageSize = 100;
@@ -228,6 +222,21 @@ namespace SavescumBuddy.Services
         {
             await DeleteFromCloudAsync(backup.GoogleDriveId, ct).ConfigureAwait(false);
             return true;
+        }
+
+        // TODO: only works for DOCS
+        public async Task ExportAsync(DriveFile file, string mimeType, Stream stream, Action<long?, IDownloadProgress> onProgressChanged, CancellationToken ct = default)
+        {
+            var request = GetDriveApiService().Files.Export(file.Id, mimeType);
+            request.MediaDownloader.ProgressChanged += p => onProgressChanged?.Invoke(file.Size, p);
+            await request.DownloadAsync(stream, ct);
+        }
+
+        public async Task GetAsync(DriveFile file, string mimeType, Stream stream, Action<long?, IDownloadProgress> onProgressChanged, CancellationToken ct = default)
+        {
+            var request = GetDriveApiService().Files.Get(file.Id);
+            request.MediaDownloader.ProgressChanged += p => onProgressChanged?.Invoke(file.Size, p);
+            await request.DownloadAsync(stream, ct);
         }
     }
 }

@@ -23,7 +23,7 @@
         <Grid Background="#7F000000">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseDown">
-                    <i:InvokeCommandAction Command="{Binding CloseDialogCommand}" CommandParameter="{x:Static enums:DialogResult.OK}"/>
+                    <i:InvokeCommandAction Command="{Binding CloseDialogCommand}" CommandParameter="{x:Static enums:DialogResult.None}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </Grid>
@@ -43,9 +43,14 @@
                 <TextBlock Grid.Row="0" Text="{Binding Title, FallbackValue=Title}" FontSize="16" FontWeight="Medium" Margin="10"/>
                 <TextBlock Grid.Row="1" Text="{Binding Message, FallbackValue=Message}" Margin="10" TextWrapping="Wrap"/>
 
-                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="OK" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CloseDialogCommand}" 
-                            CommandParameter="{x:Static enums:DialogResult.OK}" Margin="10" Width="80" Height="30"/>
+                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+                    <Button Content="{Binding CancelContent, FallbackValue=CANCEL}" Style="{StaticResource MaterialDesignFlatButton}" 
+                            Command="{Binding CloseDialogCommand}" 
+                            CommandParameter="{x:Static enums:DialogResult.Cancel}"
+                            Visibility="{Binding CancelContent, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=True}"/>
+                    <Button Content="{Binding OkContent, FallbackValue=ACCEPT}" Style="{StaticResource MaterialDesignFlatButton}" 
+                            Command="{Binding CloseDialogCommand}" 
+                            CommandParameter="{x:Static enums:DialogResult.OK}"/>
                 </StackPanel>
             </Grid>
         </Grid>

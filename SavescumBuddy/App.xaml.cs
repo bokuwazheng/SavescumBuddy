@@ -17,6 +17,7 @@ using SavescumBuddy.Core;
 using MaterialDesignThemes.Wpf;
 using System.Threading.Tasks;
 using System.Threading;
+using SavescumBuddy.Core.Extensions;
 
 namespace SavescumBuddy
 {
@@ -90,12 +91,13 @@ namespace SavescumBuddy
         private void OnErrorOccured(Exception ex)
         {
             var regionManager = Container.Resolve<IRegionManager>();
-            var parameters = new NavigationParameters
-            {
-                { "title", "Error" },
-                { "message", ex.Message }
-            };
-            regionManager.RequestNavigate(RegionNames.Overlay, "NotificationDialog", parameters);
+            //var parameters = new NavigationParameters
+            //{
+            //    { "title", "Error" },
+            //    { "message", ex.Message }
+            //};
+            //regionManager.RequestNavigate(RegionNames.Overlay, "NotificationDialog", parameters);
+            regionManager.ShowError(ex.Message);
         }
 
         private void OnStartProcessRequested(string path)
