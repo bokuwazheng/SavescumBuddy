@@ -267,7 +267,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                     _messageQueue.Enqueue("Undo deletion?", "UNDO", x => _cts?.Cancel(), null, true, true, countdown);
                     await Task.Delay(countdown);
 
-                    var result = await _googleDrive.DeleteBackupAsync(backup, ct).ConfigureAwait(false);
+                    await _googleDrive.DeleteBackupAsync(backup, ct).ConfigureAwait(false);
 
                     backupModel.GoogleDriveId = null;
                     _dataAccess.UpdateGoogleDriveId(backup);

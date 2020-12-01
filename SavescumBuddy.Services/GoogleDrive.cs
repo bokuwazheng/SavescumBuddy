@@ -86,10 +86,9 @@ namespace SavescumBuddy.Services
                 return false;
         }
 
-        public async Task<bool> ReauthorizeAsync(CancellationToken ct)
+        public async Task ReauthorizeAsync(CancellationToken ct)
         {
             await GoogleWebAuthorizationBroker.ReauthorizeAsync(UserCredential, ct).ConfigureAwait(false);
-            return true;
         }
 
         public async Task<string> GetAppRootFolderIdAsync(CancellationToken ct = default) =>
@@ -140,7 +139,7 @@ namespace SavescumBuddy.Services
             await request.UploadAsync(ct).ConfigureAwait(false);
         }
 
-        public async Task UplodaFilesAsync(string[] paths, string parentId, CancellationToken ct = default)
+        public async Task UploadFilesAsync(string[] paths, string parentId, CancellationToken ct = default)
         {
             var tasks = new List<Task>();
 
@@ -152,10 +151,10 @@ namespace SavescumBuddy.Services
             await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
-        public async Task<string> DeleteFromCloudAsync(string id, CancellationToken ct = default)
+        public async Task DeleteFromCloudAsync(string id, CancellationToken ct = default)
         {
             var service = GetDriveApiService();
-            return await service.Files.Delete(id).ExecuteAsync(ct).ConfigureAwait(false);
+            await service.Files.Delete(id).ExecuteAsync(ct).ConfigureAwait(false);
         }
 
         public async Task<string> GetUserEmailAsync(CancellationToken ct = default)
@@ -167,7 +166,7 @@ namespace SavescumBuddy.Services
             return result?.User.EmailAddress;
         }
 
-        public async Task<DriveFile> Get(string id, CancellationToken ct = default)
+        public async Task<DriveFile> GetAsync(string id, CancellationToken ct = default)
         {
             var service = GetDriveApiService();
             var request = service.Files.Get(id);
@@ -178,38 +177,36 @@ namespace SavescumBuddy.Services
 
         public async Task<List<DriveFile>> GetFilesAsync(string parentId, CancellationToken ct = default)
         {
-            var listRequest = GetDriveApiService().Files.List();
-            listRequest.PageSize = 100;
-            listRequest.Fields = "nextPageToken, files(id, name, mimeType)";
-            listRequest.Spaces = "drive";
-            listRequest.Q = $"(mimeType contains 'image/' or mimeType contains '/octet-stream') and '{ parentId }' in parents and trashed = false";
-            var result = await listRequest.ExecuteAsync(ct).ConfigureAwait(false);
-            var files = result.Files.ToList();
-            while (result.NextPageToken is object)
+            var request = GetDriveApiService().Files.List();
+            request.PageSize = 100;
+            request.Fields = "nextPageToken, files(id, name, mimeType)";
+            request.Spaces = "drive";
+            request.Q = $"(mimeType contains 'image/' or mimeType contains '/octet-stream') and '{ parentId }' in parents and trashed = false";
+            var result = new List<DriveFile>();
+            do
             {
-                listRequest.PageToken = result.NextPageToken;
-                result = await listRequest.ExecuteAsync(ct).ConfigureAwait(false);
-                files.AddRange(result.Files);
+                var files = await request.ExecuteAsync(ct).ConfigureAwait(false);
+                result.AddRange(files.Files);
+                request.PageToken = files.NextPageToken;
             }
+            while (!string.IsNullOrEmpty(request.PageToken));
 
-            return files;
+            return result;
         }
 
         public async Task<string> GetIdByNameAsync(string name, string parentId, string mimeType, CancellationToken ct = default)
         {
-            var listRequest = GetDriveApiService().Files.List();
-            listRequest.Fields = "nextPageToken, files(id, name)";
-            listRequest.Spaces = "drive";
-            listRequest.Q = $"mimeType = '{ mimeType }' and '{ parentId }' in parents and trashed = false";
+            var request = GetDriveApiService().Files.List();
+            request.Fields = "nextPageToken, files(id, name)";
+            request.Spaces = "drive";
+            request.Q = $"mimeType = '{ mimeType }' and '{ parentId }' in parents and trashed = false";
 
-            var list = await listRequest.ExecuteAsync(ct).ConfigureAwait(false);
+            var list = await request.ExecuteAsync(ct).ConfigureAwait(false);
             var result = list.Files.FirstOrDefault(x => x.Name == name);
             return result?.Id;
         }
 
-        // TODO:
-        // Define a separate class for backups
-        // Transaction-like method
+        // TODO: Transaction-like method?
         public async Task<string> UploadBackupAsync(Backup backup, string gameTitle, CancellationToken ct = default)
         {
             var rootId = await GetAppRootFolderIdAsync(ct).ConfigureAwait(false);
@@ -222,10 +219,9 @@ namespace SavescumBuddy.Services
             return backupCloudFolderId;
         }
 
-        public async Task<bool> DeleteBackupAsync(Backup backup, CancellationToken ct = default)
+        public async Task DeleteBackupAsync(Backup backup, CancellationToken ct = default)
         {
             await DeleteFromCloudAsync(backup.GoogleDriveId, ct).ConfigureAwait(false);
-            return true;
         }
 
         // TODO: only works for DOCS
