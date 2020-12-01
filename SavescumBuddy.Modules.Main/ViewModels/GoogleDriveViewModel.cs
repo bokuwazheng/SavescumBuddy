@@ -59,10 +59,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         {
             try
             {
-                var succeeded = await _googleDrive.ReauthorizeAsync(ct).ConfigureAwait(false);
-                if (!succeeded)
-                    throw new Exception("Failed to reauthorize.");
-
+                await _googleDrive.ReauthorizeAsync(ct).ConfigureAwait(false);
                 await UpdateUserEmailAsync(ct).ConfigureAwait(false);
             }
             catch (Exception ex)

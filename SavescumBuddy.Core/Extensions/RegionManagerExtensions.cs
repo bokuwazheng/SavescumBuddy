@@ -16,11 +16,11 @@ namespace SavescumBuddy.Core.Extensions
             regionManager.RequestNavigate(RegionNames.Overlay, "NotificationDialog", parameters);
         }
 
-        public static void PromptAction(this IRegionManager regionManager, string message, string okContent, string cancelContent, Action<DialogResult> callback)
+        public static void PromptAction(this IRegionManager regionManager, string title, string message, string okContent, string cancelContent, Action<DialogResult> callback)
         {
             var parameters = new NavigationParameters
             {
-                { "title", "!" },
+                { "title", title },
                 { "message", message },
                 { "okContent", okContent },
                 { "cancelContent", cancelContent },

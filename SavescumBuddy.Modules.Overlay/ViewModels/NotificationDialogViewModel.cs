@@ -37,17 +37,15 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
                 _requestClose?.Invoke(result.Value);
             }
 
-            //if (_navigationService.Journal.CanGoBack)
-            //    _navigationService.Journal.GoBack();
-            //else
-            //{
- 
-            //}
+            if (_navigationService.Journal.CanGoBack)
+                _navigationService.Journal.GoBack();
+            else
+            {
+                var activeRegion = _regionManager.Regions[RegionNames.Overlay].ActiveViews.FirstOrDefault();
 
-            var activeRegion = _regionManager.Regions[RegionNames.Overlay].ActiveViews.FirstOrDefault();
-
-            if (activeRegion is object)
-                _regionManager.Regions[RegionNames.Overlay].Deactivate(activeRegion);
+                if (activeRegion is object)
+                    _regionManager.Regions[RegionNames.Overlay].Deactivate(activeRegion);
+            }
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)

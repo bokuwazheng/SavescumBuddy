@@ -147,7 +147,6 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             }
         }
 
-        // TODO: If in Google Drive -- promtp user to delete files from clould (leave the backup in DB and adjust context menu accordingly)
         private void Remove(BackupModel backup)
         {
             try
@@ -157,7 +156,8 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 else if (backup.GoogleDriveId is object)
                 {
                     _regionManager.PromptAction(
-                        "Would you also like to delete the backup from Google Drive? If you leave the backup in Google Drive you'll be able to recover it later.",
+                        "Delete from Google Drive too?",
+                        "If you leave the backup in Google Drive you'll be able to recover it later.",
                         "DELETE",
                         "LEAVE BACKUP IN GOOGLE DRIVE",
                         r =>
