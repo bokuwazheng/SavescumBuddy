@@ -1,6 +1,4 @@
-﻿using Google.Apis.Download;
-using DriveFile = Google.Apis.Drive.v3.Data.File;
-using MaterialDesignThemes.Wpf;
+﻿using MaterialDesignThemes.Wpf;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
@@ -37,7 +35,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         private BackupModel _selectedBackup;
         private int _currentPageIndex;
 
-        public BackupsViewModel(IRegionManager regionManager, IDataAccess dataAccess, ISettingsAccess settingsAccess, IEventAggregator eventAggregator, 
+        public BackupsViewModel(IRegionManager regionManager, IDataAccess dataAccess, ISettingsAccess settingsAccess, IEventAggregator eventAggregator,
             IBackupService backupService, IBackupFactory backupFactory, IGoogleDrive googleDrive, ISnackbarMessageQueue messageQueue)
         {
             _regionManager = regionManager;
@@ -65,7 +63,8 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             UpdateNoteCommand = new DelegateCommand<BackupModel>(x => _dataAccess.UpdateNote(x.Backup));
             UpdateIsLikedCommand = new DelegateCommand<BackupModel>(x => _dataAccess.UpdateIsLiked(x.Backup));
             ExecuteDriveActionCommand = new DelegateCommand<BackupModel>(async x => await ExecuteCloudAction(x, Ct).ConfigureAwait(false), x => _googleDrive.UserCredential is object);
-            RecoverCommand = new DelegateCommand<BackupModel>(async x => await RecoverAsync(x, Ct).ConfigureAwait(false), x => x.GoogleDriveId is object && !File.Exists(x.SavefilePath) && _googleDrive.UserCredential is object);
+            // TODO: figure out why x is null sometimes
+            RecoverCommand = new DelegateCommand<BackupModel>(async x => await RecoverAsync(x, Ct).ConfigureAwait(false), x => x is object && x.GoogleDriveId is object && !File.Exists(x.SavefilePath) && _googleDrive.UserCredential is object);
 
             Filter.PropertyChanged += (s, e) => OnFilterPropertyChanged(e.PropertyName);
             UpdateBackups();
@@ -204,7 +203,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                         {
                             RaisePropertyChanged(nameof(IsAllItemsSelected));
                             RemoveSelectedCommand.RaiseCanExecuteChanged();
-                        }    
+                        }
                     };
 
                     model.GameTitle = _dataAccess.GetGame(model.GameId).Title;
@@ -293,40 +292,12 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             }
         }
 
+        // TODO: update recovered backup (show image)
         private async Task RecoverAsync(BackupModel backup, CancellationToken ct)
         {
             try
             {
-                var files = await _googleDrive.GetFilesAsync(backup.GoogleDriveId, IGoogleDrive.MimeType.Backup, ct).ConfigureAwait(false);
-                if (files.Count > 0)
-                {
-                    if (!Directory.Exists(Path.GetDirectoryName(backup.SavefilePath)))
-                    {
-                        Directory.CreateDirectory(Path.GetDirectoryName(backup.SavefilePath));
-                    }
-
-                    //using var savefile = new FileStream(backup.SavefilePath, FileMode.Create, FileAccess.Write);
-                    //using var picture = new FileStream(backup.PicturePath, FileMode.Create, FileAccess.Write);
-                    //using var savefile = File.Create(backup.SavefilePath);
-                    using var picture = File.Create(backup.PicturePath);
-
-                    Action<long?, IDownloadProgress> callback = (l, p) =>
-                    {
-                        var message = p.Status switch
-                        {
-                            DownloadStatus.NotStarted => "Not Started",
-                            DownloadStatus.Downloading when l.HasValue => $"Downloading ({ p.BytesDownloaded } out of { l.Value } bytes)",
-                            DownloadStatus.Downloading => $"Downloading",
-                            DownloadStatus.Completed => "Completed",
-                            DownloadStatus.Failed => "Failed",
-                            _ => ""
-                        };
-                        _messageQueue.Enqueue(message, "", () => { }, true);
-                    };
-
-                    //await _googleDrive.ExportAsync(files[0], IGoogleDrive.MimeType.File, savefile, callback, ct).ConfigureAwait(false);
-                    await _googleDrive.ExportAsync(files[0], IGoogleDrive.MimeType.Image, picture, callback, ct).ConfigureAwait(false);
-                }
+                await _googleDrive.RecoverAsync(backup.Backup, () => _messageQueue.Enqueue($"Download completed!"), ct).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

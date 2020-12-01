@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Download;
 using Google.Apis.Drive.v3;
+using Google.Apis.Drive.v3.Data;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
 using SavescumBuddy.Data;
@@ -33,8 +34,6 @@ namespace SavescumBuddy.Services
 #endif
 
         public UserCredential UserCredential { get; private set; }
-
-        public HttpClient HttpClient { get; } = new HttpClient();
 
         public GoogleDrive()
         {
@@ -102,11 +101,16 @@ namespace SavescumBuddy.Services
             var fileMetadata = new DriveFile()
             {
                 Name = _applicationName,
-                MimeType = "application/vnd.google-apps.folder",
+                MimeType = IGoogleDrive.MimeType.Folder
             };
             var request = GetDriveApiService().Files.Create(fileMetadata);
             request.Fields = "id";
             var folder = await request.ExecuteAsync(ct).ConfigureAwait(false);
+
+            var permission = new Permission() { Type = "anyone", Role = "reader" };
+            var service = GetDriveApiService();
+            service.Permissions.Create(permission, folder.Id).Execute();
+
             return folder.Id;
         }
 
@@ -115,8 +119,8 @@ namespace SavescumBuddy.Services
             var fileMetadata = new DriveFile()
             {
                 Name = folderName,
-                MimeType = "application/vnd.google-apps.folder",
-                Parents = new List<string> { parentId }
+                MimeType = IGoogleDrive.MimeType.Folder,
+                Parents = new List<string> { parentId },
             };
             var request = GetDriveApiService().Files.Create(fileMetadata);
             request.Fields = "id";
@@ -172,13 +176,13 @@ namespace SavescumBuddy.Services
             return result;
         }
 
-        public async Task<List<DriveFile>> GetFilesAsync(string parentId, string mimeType, CancellationToken ct = default)
+        public async Task<List<DriveFile>> GetFilesAsync(string parentId, CancellationToken ct = default)
         {
             var listRequest = GetDriveApiService().Files.List();
             listRequest.PageSize = 100;
-            listRequest.Fields = "nextPageToken, files(id, name)";
+            listRequest.Fields = "nextPageToken, files(id, name, mimeType)";
             listRequest.Spaces = "drive";
-            listRequest.Q = mimeType + $" and '{ parentId }' in parents and trashed = false";
+            listRequest.Q = $"(mimeType contains 'image/' or mimeType contains '/octet-stream') and '{ parentId }' in parents and trashed = false";
             var result = await listRequest.ExecuteAsync(ct).ConfigureAwait(false);
             var files = result.Files.ToList();
             while (result.NextPageToken is object)
@@ -196,7 +200,7 @@ namespace SavescumBuddy.Services
             var listRequest = GetDriveApiService().Files.List();
             listRequest.Fields = "nextPageToken, files(id, name)";
             listRequest.Spaces = "drive";
-            listRequest.Q = mimeType + $" and '{ parentId }' in parents and trashed = false";
+            listRequest.Q = $"mimeType = '{ mimeType }' and '{ parentId }' in parents and trashed = false";
 
             var list = await listRequest.ExecuteAsync(ct).ConfigureAwait(false);
             var result = list.Files.FirstOrDefault(x => x.Name == name);
@@ -232,11 +236,30 @@ namespace SavescumBuddy.Services
             await request.DownloadAsync(stream, ct);
         }
 
-        public async Task GetAsync(DriveFile file, string mimeType, Stream stream, Action<long?, IDownloadProgress> onProgressChanged, CancellationToken ct = default)
+        public async Task RecoverAsync(Backup backup, Action callback, CancellationToken ct = default)
         {
-            var request = GetDriveApiService().Files.Get(file.Id);
-            request.MediaDownloader.ProgressChanged += p => onProgressChanged?.Invoke(file.Size, p);
-            await request.DownloadAsync(stream, ct);
+            var files = await GetFilesAsync(backup.GoogleDriveId, ct).ConfigureAwait(false);
+            if (files.Count == 2)
+            {
+                var dirName = Path.GetDirectoryName(backup.SavefilePath);
+                if (!Directory.Exists(dirName))
+                    Directory.CreateDirectory(dirName);
+
+                using var client = new WebClient();
+                client.DownloadFileCompleted += (s, e) => callback.Invoke();
+
+                foreach (var file in files)
+                {
+                    var path = file.MimeType switch
+                    {
+                        IGoogleDrive.MimeType.Image => backup.PicturePath,
+                        IGoogleDrive.MimeType.Binary => backup.SavefilePath,
+                        _ => throw new Exception("Unsupported MIME type")
+                    };
+
+                    await client.DownloadFileTaskAsync($"https://drive.google.com/uc?export=download&id={ file.Id }", path);
+                }
+            }
         }
     }
 }
