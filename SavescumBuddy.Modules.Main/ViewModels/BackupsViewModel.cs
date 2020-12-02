@@ -183,6 +183,8 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                     UpdateBackups();
                 }
                 RaiseDriveActionCanExecute();
+                backup.RaisePropertyChanged2();
+                //backup.PicturePath = backup.PicturePath;
             }
             catch (Exception ex)
             {
@@ -304,7 +306,8 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             try
             {
                 await _googleDrive.RecoverAsync(backup.Backup, () => _messageQueue.Enqueue($"Download completed!"), ct).ConfigureAwait(false);
-                RaisePropertyChanged(nameof(Backups));
+                //backup.PicturePath = backup.PicturePath;
+                backup.RaisePropertyChanged2();
             }
             catch (Exception ex)
             {

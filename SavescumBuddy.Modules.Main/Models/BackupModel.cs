@@ -28,5 +28,10 @@ namespace SavescumBuddy.Modules.Main.Models
         public string OriginPath { get => Backup.OriginPath; set { Backup.OriginPath = value; RaisePropertyChanged(); } }
         public string SavefilePath { get => Backup.SavefilePath; set { Backup.SavefilePath = value; RaisePropertyChanged(); } }
         public string PicturePath { get => Backup.PicturePath; set { Backup.PicturePath = value; RaisePropertyChanged(); } }
+
+        public void RaisePropertyChanged2()
+        {
+            RaisePropertyChanged();
+        }
     }
 }
