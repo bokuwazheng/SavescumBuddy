@@ -107,6 +107,7 @@
                             CommandParameter="{x:Static enums:DialogResult.Cancel}"/>
                     <!--Save button-->
                     <Button Content="SAVE"
+                            IsDefault="True"
                             Command="{Binding CloseDialogCommand}" 
                             CommandParameter="{x:Static enums:DialogResult.OK}">
                         <Button.Style>

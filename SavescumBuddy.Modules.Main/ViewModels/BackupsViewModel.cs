@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
-    public class BackupsViewModel : BindableBase
+    public class BackupsViewModel : BindableBase, INavigationAware
     {
         private readonly IRegionManager _regionManager;
         private readonly IDataAccess _dataAccess;
@@ -100,7 +100,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             }
         }
         public ObservableCollection<BackupModel> Backups { get; private set; }
-        public ObservableCollection<Game> Games => GetGames();
+        public ObservableCollection<Game> Games { get; } = new ObservableCollection<Game>();
         public bool CurrentGameIsSet => _dataAccess.GetCurrentGame() is object;
         public int CurrentPageIndex { get => _currentPageIndex; private set => SetProperty(ref _currentPageIndex, value, () => Filter.Offset = value * PageSize); }
         public BackupModel SelectedBackup { get => _selectedBackup; set => SetProperty(ref _selectedBackup, value, RaiseDriveActionCanExecute); }
@@ -173,6 +173,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                             }
 
                             _backupService.DeleteFiles(backup.Backup);
+                            RaisePropertyChanged(nameof(Backups));
                         });
                 }
                 else
@@ -181,6 +182,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                     _backupService.DeleteFiles(backup.Backup);
                     UpdateBackups();
                 }
+                RaiseDriveActionCanExecute();
             }
             catch (Exception ex)
             {
@@ -222,20 +224,24 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             }
         }
 
-        // TODO: list doesn't not get updated after a new game is added
-        public ObservableCollection<Game> GetGames()
+        public void GetGames()
         {
             try
             {
+                var selected = Filter.GameId;
+                
                 var games = _dataAccess.LoadGames();
                 games.Add(new Game() { Title = "ALL" });
-                return new ObservableCollection<Game>(games);
+                Games.Clear();
+                Games.AddRange(games);
+
+                Filter.GameId = -1;
+                Filter.GameId = selected;
             }
             catch (Exception ex)
             {
                 _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
             }
-            return null;
         }
 
         // TODO: lock?
@@ -298,12 +304,19 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             try
             {
                 await _googleDrive.RecoverAsync(backup.Backup, () => _messageQueue.Enqueue($"Download completed!"), ct).ConfigureAwait(false);
+                RaisePropertyChanged(nameof(Backups));
             }
             catch (Exception ex)
             {
                 _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
             }
         }
+
+        public void OnNavigatedTo(NavigationContext navigationContext) => GetGames();
+
+        public bool IsNavigationTarget(NavigationContext navigationContext) => true;
+
+        public void OnNavigatedFrom(NavigationContext navigationContext) { }
 
         public DelegateCommand AddCommand { get; }
         public DelegateCommand<BackupModel> RemoveCommand { get; }

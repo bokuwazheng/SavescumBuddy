@@ -1,8 +1,10 @@
 ﻿using Prism.Commands;
+using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
 using SavescumBuddy.Core;
 using SavescumBuddy.Core.Enums;
+using SavescumBuddy.Core.Events;
 using System;
 using System.Linq;
 
@@ -12,39 +14,48 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
     {
         private string _title;
         private string _message;
-        private string _action;
-        private string _action2;
+        private string _okContent;
+        private string _cancelContent;
         private event Action<DialogResult> _requestClose;
         private IRegionNavigationService _navigationService;
         private IRegionManager _regionManager;
+        private IEventAggregator _eventAggregator;
 
-        public NotificationDialogViewModel(IRegionManager regionManager)
+        public NotificationDialogViewModel(IRegionManager regionManager, IEventAggregator eventAggregator)
         {
             _regionManager = regionManager;
-            
+            _eventAggregator = eventAggregator;
+
             CloseDialogCommand = new DelegateCommand<DialogResult?>(CloseDialog);
         }
 
         public string Title { get => _title; set => SetProperty(ref _title, value); }
         public string Message { get => _message; set => SetProperty(ref _message, value); }
-        public string OkContent { get => _action; set => SetProperty(ref _action, value); }
-        public string CancelContent { get => _action2; set => SetProperty(ref _action2, value); }
+        public string OkContent { get => _okContent; set => SetProperty(ref _okContent, value); }
+        public string CancelContent { get => _cancelContent; set => SetProperty(ref _cancelContent, value); }
 
         private void CloseDialog(DialogResult? result)
         {
-            if (result.HasValue)
+            try
             {
-                _requestClose?.Invoke(result.Value);
+                if (result.HasValue)
+                {
+                    _requestClose?.Invoke(result.Value);
+                }
+
+                if (_navigationService.Journal.CanGoBack)
+                    _navigationService.Journal.GoBack();
+                else
+                {
+                    var activeRegion = _regionManager.Regions[RegionNames.Overlay].ActiveViews.FirstOrDefault();
+
+                    if (activeRegion is object)
+                        _regionManager.Regions[RegionNames.Overlay].Deactivate(activeRegion);
+                }
             }
-
-            if (_navigationService.Journal.CanGoBack)
-                _navigationService.Journal.GoBack();
-            else
+            catch (Exception ex)
             {
-                var activeRegion = _regionManager.Regions[RegionNames.Overlay].ActiveViews.FirstOrDefault();
-
-                if (activeRegion is object)
-                    _regionManager.Regions[RegionNames.Overlay].Deactivate(activeRegion);
+                _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
             }
         }
 
@@ -61,20 +72,11 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
             _requestClose = (Action<DialogResult>)navigationContext.Parameters["callback"];
         }
 
-        public bool IsNavigationTarget(NavigationContext navigationContext)
-        {
-            return true;
-        }
+        public bool IsNavigationTarget(NavigationContext navigationContext) => true;
 
-        public void OnNavigatedFrom(NavigationContext navigationContext)
-        {
+        public void OnNavigatedFrom(NavigationContext navigationContext) { }
 
-        }
-
-        public bool PersistInHistory()
-        {
-            return false;
-        }
+        public bool PersistInHistory() => false;
 
         public DelegateCommand<DialogResult?> CloseDialogCommand { get; }
     }

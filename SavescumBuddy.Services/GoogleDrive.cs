@@ -14,6 +14,7 @@ using Google.Apis.Util.Store;
 using SavescumBuddy.Data;
 using SavescumBuddy.Services.Interfaces;
 using DriveFile = Google.Apis.Drive.v3.Data.File;
+using File = System.IO.File;
 
 namespace SavescumBuddy.Services
 {
@@ -181,7 +182,7 @@ namespace SavescumBuddy.Services
             request.PageSize = 100;
             request.Fields = "nextPageToken, files(id, name, mimeType)";
             request.Spaces = "drive";
-            request.Q = $"(mimeType contains 'image/' or mimeType contains '/octet-stream') and '{ parentId }' in parents and trashed = false";
+            request.Q = $"'{ parentId }' in parents and trashed = false";
             var result = new List<DriveFile>();
             do
             {
@@ -209,6 +210,9 @@ namespace SavescumBuddy.Services
         // TODO: Transaction-like method?
         public async Task<string> UploadBackupAsync(Backup backup, string gameTitle, CancellationToken ct = default)
         {
+            if (!File.Exists(backup.SavefilePath))
+                throw new ArgumentException("Savefile does not exist.");
+
             var rootId = await GetAppRootFolderIdAsync(ct).ConfigureAwait(false);
             var gameFolderId = await GetIdByNameAsync(gameTitle, rootId, IGoogleDrive.MimeType.Folder, ct).ConfigureAwait(false);
             if (gameFolderId is null)
@@ -250,6 +254,7 @@ namespace SavescumBuddy.Services
                     {
                         IGoogleDrive.MimeType.Image => backup.PicturePath,
                         IGoogleDrive.MimeType.Binary => backup.SavefilePath,
+                        IGoogleDrive.MimeType.File => backup.SavefilePath,
                         _ => throw new Exception("Unsupported MIME type")
                     };
 
