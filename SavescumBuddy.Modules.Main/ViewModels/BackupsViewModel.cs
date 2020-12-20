@@ -49,22 +49,24 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
             _eventAggregator.GetEvent<BackupListUpdateRequestedEvent>().Subscribe(UpdateBackups);
 
+            RefreshCommand = new DelegateCommand(UpdateBackups);
             AddCommand = new DelegateCommand(Add);
-            RemoveCommand = new DelegateCommand<BackupModel>(Remove);
+            RemoveCommand = new DelegateCommand<BackupModel>(Remove, x => x is object).ObservesProperty(() => SelectedBackup);
             RemoveSelectedCommand = new DelegateCommand(RemoveSelected, () => IsAllItemsSelected.HasValue ? IsAllItemsSelected.Value != false : true);
-            RestoreCommand = new DelegateCommand<BackupModel>(x => _backupService.RestoreBackup(x.Backup));
+            RestoreCommand = new DelegateCommand<BackupModel>(Restore, x => x is object).ObservesProperty(() => SelectedBackup);
 
             NavigateForwardCommand = new DelegateCommand(() => ++CurrentPageIndex, () => To < TotalNumberOfBackups);
             NavigateBackwardCommand = new DelegateCommand(() => --CurrentPageIndex, () => From > 1);
             NavigateToStartCommand = new DelegateCommand(() => CurrentPageIndex = 0, () => From > 1);
             NavigateToEndCommand = new DelegateCommand(() => CurrentPageIndex = TotalNumberOfBackups / PageSize, () => To < TotalNumberOfBackups);
 
-            ShowInExplorerCommand = new DelegateCommand<BackupModel>(x => _eventAggregator.GetEvent<StartProcessRequestedEvent>().Publish(Path.GetDirectoryName(x.SavefilePath)));
+            ShowInExplorerCommand = new DelegateCommand<BackupModel>(ShowInExplorer, x => x is object).ObservesProperty(() => SelectedBackup);
             UpdateNoteCommand = new DelegateCommand<BackupModel>(x => _dataAccess.UpdateNote(x.Backup));
             UpdateIsLikedCommand = new DelegateCommand<BackupModel>(x => _dataAccess.UpdateIsLiked(x.Backup));
-            ExecuteDriveActionCommand = new DelegateCommand<BackupModel>(async x => await ExecuteCloudAction(x, Ct).ConfigureAwait(false), x => _googleDrive.UserCredential is object);
-            // TODO: figure out why x is null sometimes
-            RecoverCommand = new DelegateCommand<BackupModel>(async x => await RecoverAsync(x, Ct).ConfigureAwait(false), x => x is object && x.GoogleDriveId is object && !File.Exists(x.SavefilePath) && _googleDrive.UserCredential is object);
+            ExecuteDriveActionCommand = new DelegateCommand<BackupModel>(async x => await ExecuteCloudAction(x, Ct).ConfigureAwait(false), 
+                x => x is object && _googleDrive.UserCredential is object).ObservesProperty(() => SelectedBackup);
+            RecoverCommand = new DelegateCommand<BackupModel>(async x => await RecoverAsync(x, Ct).ConfigureAwait(false), 
+                x => x is object && x.GoogleDriveId is object && !File.Exists(x.SavefilePath) && _googleDrive.UserCredential is object).ObservesProperty(() => SelectedBackup);
 
             Filter.PropertyChanged += (s, e) => OnFilterPropertyChanged(e.PropertyName);
             UpdateBackups();
@@ -103,7 +105,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         public ObservableCollection<Game> Games { get; } = new ObservableCollection<Game>();
         public bool CurrentGameIsSet => _dataAccess.GetCurrentGame() is object;
         public int CurrentPageIndex { get => _currentPageIndex; private set => SetProperty(ref _currentPageIndex, value, () => Filter.Offset = value * PageSize); }
-        public BackupModel SelectedBackup { get => _selectedBackup; set => SetProperty(ref _selectedBackup, value, RaiseDriveActionCanExecute); }
+        public BackupModel SelectedBackup { get => _selectedBackup; set => SetProperty(ref _selectedBackup, value); }
         public FilterModel Filter { get => _filter ??= new FilterModel(); private set => SetProperty(ref _filter, value); }
         public int TotalNumberOfBackups => _dataAccess.GetTotalNumberOfBackups(Filter);
         public int PageSize => 10; // _settingsAccess.BackupsPerPage
@@ -183,7 +185,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                     UpdateBackups();
                 }
                 RaiseDriveActionCanExecute();
-                backup.RaisePropertyChanged2();
+                //backup.RaisePropertyChanged2();
                 //backup.PicturePath = backup.PicturePath;
             }
             catch (Exception ex)
@@ -224,6 +226,18 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             {
                 _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
             }
+        }
+
+        private void ShowInExplorer(BackupModel backup)
+        {
+            var dirName = Path.GetDirectoryName(backup.SavefilePath);
+            _eventAggregator.GetEvent<StartProcessRequestedEvent>().Publish(dirName);
+        }
+
+        private void Restore(BackupModel backup)
+        {
+            _backupService.RestoreBackup(backup.Backup);
+            _messageQueue.Enqueue("Backup was restored!");
         }
 
         public void GetGames()
@@ -321,6 +335,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
         public void OnNavigatedFrom(NavigationContext navigationContext) { }
 
+        public DelegateCommand RefreshCommand { get; }
         public DelegateCommand AddCommand { get; }
         public DelegateCommand<BackupModel> RemoveCommand { get; }
         public DelegateCommand RemoveSelectedCommand { get; }

@@ -18,41 +18,28 @@
 
         </ResourceDictionary>
     </UserControl.Resources>
-    
-    <Grid>
-        <Grid Background="#7F000000">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="MouseDown">
-                    <i:InvokeCommandAction Command="{Binding CloseDialogCommand}" CommandParameter="{x:Static enums:DialogResult.None}"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-        </Grid>
-        <Grid VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="400">
-            <Border CornerRadius="3" Background="White">
-                <Border.Effect>
-                    <DropShadowEffect BlurRadius="30" Opacity=".3" ShadowDepth="0" Direction="0" RenderingBias="Quality"/>
-                </Border.Effect>
-            </Border>
-            <Grid Margin="10">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Text="{Binding Title, FallbackValue=Title}" FontSize="16" FontWeight="Medium" Margin="10"/>
-                <TextBlock Grid.Row="1" Text="{Binding Message, FallbackValue=Message}" FontSize="14" Margin="10" TextWrapping="Wrap"/>
+    <ContentControl Style="{StaticResource DialogBackground}">
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
-                    <Button Content="{Binding CancelContent, FallbackValue=CANCEL}" Style="{StaticResource MaterialDesignFlatButton}" 
+            <TextBlock Grid.Row="0" Text="{Binding Title, FallbackValue=Title}" FontSize="16" FontWeight="Medium" Margin="10"/>
+            <TextBlock Grid.Row="1" Text="{Binding Message, FallbackValue=Message}" FontSize="14" Margin="10" TextWrapping="Wrap"/>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+                <Button Content="{Binding CancelContent, FallbackValue=CANCEL}" Style="{StaticResource MaterialDesignFlatButton}" 
                             Command="{Binding CloseDialogCommand}" 
                             CommandParameter="{x:Static enums:DialogResult.Cancel}"
                             Visibility="{Binding CancelContent, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=True}"/>
-                    <Button Content="{Binding OkContent, FallbackValue=ACCEPT}" Style="{StaticResource MaterialDesignFlatButton}" 
+                <Button Content="{Binding OkContent, FallbackValue=ACCEPT}" Style="{StaticResource MaterialDesignFlatButton}" 
                             Command="{Binding CloseDialogCommand}" 
                             CommandParameter="{x:Static enums:DialogResult.OK}"/>
-                </StackPanel>
-            </Grid>
+            </StackPanel>
         </Grid>
-    </Grid>
+    </ContentControl>
+
 </UserControl>
