@@ -9,7 +9,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SavescumBuddy.Core\SavescumBuddy.Core.csproj" />
-    <ProjectReference Include="..\SavescumBuddy.CustomControls\SavescumBuddy.CustomControls.csproj" />
+    <ProjectReference Include="..\SavescumBuddy.Wpf\SavescumBuddy.Wpf.csproj" />
     <ProjectReference Include="..\SavescumBuddy.Services.Interfaces\SavescumBuddy.Services.Interfaces.csproj" />
   </ItemGroup>
 </Project>

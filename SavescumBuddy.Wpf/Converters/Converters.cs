@@ -6,7 +6,7 @@ using System.Windows.Data;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 
-namespace SavescumBuddy.CustomControls.Converters
+namespace SavescumBuddy.Wpf.Converters
 {
     public class ExistsToVisibilityConverter : IValueConverter
     {

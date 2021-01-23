@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace SavescumBuddy.CustomControls.Domain
+namespace SavescumBuddy.Wpf.Domain
 {
     public class BindingProxy : Freezable
     {

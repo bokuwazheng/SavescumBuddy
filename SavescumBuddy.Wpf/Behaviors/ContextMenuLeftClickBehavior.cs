@@ -5,7 +5,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using Microsoft.Xaml.Behaviors;
 
-namespace SavescumBuddy.CustomControls.Behaviors
+namespace SavescumBuddy.Wpf.Behaviors
 {
     public class ContextMenuLeftClickBehavior : Behavior<Button>
     {

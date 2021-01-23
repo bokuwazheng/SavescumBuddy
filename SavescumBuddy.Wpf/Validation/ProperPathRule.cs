@@ -3,7 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Windows.Controls;
 
-namespace SavescumBuddy.CustomControls.Validation
+namespace SavescumBuddy.Wpf.Validation
 {
     public class ProperPathRule : ValidationRule
     {

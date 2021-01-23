@@ -5,10 +5,10 @@
              xmlns:prism="http://prismlibrary.com/"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:core="clr-namespace:SavescumBuddy.Core;assembly=SavescumBuddy.Core"
-             xmlns:controls="clr-namespace:SavescumBuddy.CustomControls;assembly=SavescumBuddy.CustomControls"
-             xmlns:domain="clr-namespace:SavescumBuddy.CustomControls.Domain;assembly=SavescumBuddy.CustomControls"
+             xmlns:controls="clr-namespace:SavescumBuddy.Wpf;assembly=SavescumBuddy.Wpf"
+             xmlns:domain="clr-namespace:SavescumBuddy.Wpf.Domain;assembly=SavescumBuddy.Wpf"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:behaviors="clr-namespace:SavescumBuddy.CustomControls.Behaviors;assembly=SavescumBuddy.CustomControls"
+             xmlns:behaviors="clr-namespace:SavescumBuddy.Wpf.Behaviors;assembly=SavescumBuddy.Wpf"
              SnapsToDevicePixels="True"
              prism:ViewModelLocator.AutoWireViewModel="True">
 
@@ -17,7 +17,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="DeepPurple" SecondaryColor="Lime"/>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.CustomControls;component/DefaultTheme.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.Wpf;component/DefaultTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <!--TextBox Style Flat-->

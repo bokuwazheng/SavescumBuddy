@@ -11,8 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{35
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SavescumBuddy.Modules.Main", "SavescumBuddy.Modules.Main\SavescumBuddy.Modules.Main.csproj", "{CC8A9A81-3B87-4B1E-9ECD-68AE1197346D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SavescumBuddy.CustomControls", "SavescumBuddy.CustomControls\SavescumBuddy.CustomControls.csproj", "{4147FAAF-BD36-4915-AA7F-09554223B1A4}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SavescumBuddy.Services.Tests", "SavescumBuddy.Services.Tests\SavescumBuddy.Services.Tests.csproj", "{44594AD9-8F23-4405-9A80-AFBB6B18CEA5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SavescumBuddy", "SavescumBuddy\SavescumBuddy.csproj", "{9ED88335-7778-4473-A6BA-337C760232A7}"
@@ -25,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SavescumBuddy.Services.Inte
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SavescumBuddy.Data", "SavescumBuddy.Data\SavescumBuddy.Data.csproj", "{73097BAE-DC16-4E3F-84F4-3058C1EA60A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SavescumBuddy.Modules.Overlay", "SavescumBuddy.Modules.Overlay\SavescumBuddy.Modules.Overlay.csproj", "{6B124F92-40E2-4601-AC07-E971942B6B2B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SavescumBuddy.Modules.Overlay", "SavescumBuddy.Modules.Overlay\SavescumBuddy.Modules.Overlay.csproj", "{6B124F92-40E2-4601-AC07-E971942B6B2B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SavescumBuddy.Wpf", "SavescumBuddy.Wpf\SavescumBuddy.Wpf.csproj", "{B492B19C-27BF-4367-A82E-BFE647902D5D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,10 +37,6 @@ Global
 		{CC8A9A81-3B87-4B1E-9ECD-68AE1197346D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC8A9A81-3B87-4B1E-9ECD-68AE1197346D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC8A9A81-3B87-4B1E-9ECD-68AE1197346D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4147FAAF-BD36-4915-AA7F-09554223B1A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4147FAAF-BD36-4915-AA7F-09554223B1A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4147FAAF-BD36-4915-AA7F-09554223B1A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4147FAAF-BD36-4915-AA7F-09554223B1A4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{44594AD9-8F23-4405-9A80-AFBB6B18CEA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{44594AD9-8F23-4405-9A80-AFBB6B18CEA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44594AD9-8F23-4405-9A80-AFBB6B18CEA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -69,6 +65,10 @@ Global
 		{6B124F92-40E2-4601-AC07-E971942B6B2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B124F92-40E2-4601-AC07-E971942B6B2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6B124F92-40E2-4601-AC07-E971942B6B2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B492B19C-27BF-4367-A82E-BFE647902D5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B492B19C-27BF-4367-A82E-BFE647902D5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B492B19C-27BF-4367-A82E-BFE647902D5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B492B19C-27BF-4367-A82E-BFE647902D5D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

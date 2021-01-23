@@ -11,7 +11,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace SavescumBuddy.CustomControls
+namespace SavescumBuddy.Wpf
 {
     /// <summary>
     /// Interaction logic for Backup.xaml
