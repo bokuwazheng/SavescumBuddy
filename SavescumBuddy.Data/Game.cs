@@ -7,5 +7,6 @@
         public string SavefilePath { get; set; }
         public string BackupFolder { get; set; }
         public int IsCurrent { get; set; }
+        public int BackupCount { get; set; }
     }
 }

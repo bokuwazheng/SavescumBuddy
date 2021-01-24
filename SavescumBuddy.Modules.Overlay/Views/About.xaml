@@ -18,7 +18,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <ContentControl Style="{StaticResource DialogBackground}">
+    <ContentControl Style="{StaticResource DialogPlaceholder}">
         <Grid Width="340" Margin="20">
             <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" >
                 <TextBlock Text="Savescum Buddy" TextAlignment="Left" Style="{StaticResource Header}" />

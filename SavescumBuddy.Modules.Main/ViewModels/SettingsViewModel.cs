@@ -6,8 +6,8 @@ using SavescumBuddy.Core.Enums;
 using SavescumBuddy.Services.Interfaces;
 using SavescumBuddy.Modules.Main.Models;
 using SavescumBuddy.Core.Events;
-using SavescumBuddy.Core;
 using MaterialDesignThemes.Wpf;
+using SavescumBuddy.Core.Constants;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
@@ -36,7 +36,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             Settings.PropertyChanged += (s, e) => OnSettingsPropertyChanged(e.PropertyName);
 
             RegisterHotkeyCommand = new DelegateCommand<HotkeyAction?>(ToggleKeyboardHook);
-            NavigateToBackupsCommand = new DelegateCommand(() => _regionManager.RequestNavigate(RegionNames.ContentRegion, "Backups"));
+            NavigateToBackupsCommand = new DelegateCommand(() => _regionManager.RequestNavigate(RegionNames.Content, ViewNames.Backups));
         }
 
         private void OnSettingsPropertyChanged(string propertyName)
@@ -62,7 +62,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             _eventAggregator.GetEvent<HookChangedEvent>().Publish(SelectedHotkeyAction.HasValue);
         }
 
-        private void keyboardHook_KeyDown((int Key, int Modifier) keys)
+        private void keyboardHook_KeyDown((int Key, int Modifier) keys) // TODO: SHOULDN'T KNOW ANYTHING ABOUT KEYS
         {
             if (keys.Key == 27) // Keys.Escape
             {
@@ -70,7 +70,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 return;
             }
 
-            if (keys.Key == 13 || keys.Key == 32) // Keys.Enter or Keys.Space
+            if (keys.Key == 13 || keys.Key == 32 || keys.Key == 8) // Keys.Enter or Keys.Space or Keys.Back
                 return;
 
             if (SelectedHotkeyAction == HotkeyAction.Backup)
@@ -93,13 +93,10 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
             _eventAggregator.GetEvent<HookEnabledChangedEvent>().Publish(false);
-            _messageQueue.Enqueue("Hotkeys are disabled when Settings tab is open.");
+            _messageQueue.Enqueue("Hotkeys are disabled while this tab is open.");
         }
 
-        public bool IsNavigationTarget(NavigationContext navigationContext)
-        {
-            return true;
-        }
+        public bool IsNavigationTarget(NavigationContext navigationContext) => true;
 
         public void OnNavigatedFrom(NavigationContext navigationContext)
         {

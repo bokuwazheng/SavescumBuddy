@@ -451,9 +451,10 @@
                 <DataGridTextColumn Binding="{Binding GameTitle}" ElementStyle="{StaticResource TextElementStyle}">
                     <DataGridTextColumn.HeaderTemplate>
                         <DataTemplate>
-                            <ComboBox ItemsSource="{Binding Data.Games, Source={StaticResource DataContextProxy}, UpdateSourceTrigger=PropertyChanged}"
-                                      SelectedValue="{Binding Data.Filter.GameId, Source={StaticResource DataContextProxy}, UpdateSourceTrigger=PropertyChanged}"
-                                      SelectedValuePath="Id">
+                            <ComboBox 
+                                ItemsSource="{Binding Data.Games, Source={StaticResource DataContextProxy}, UpdateSourceTrigger=PropertyChanged}"
+                                SelectedValue="{Binding Data.Filter.GameId, Source={StaticResource DataContextProxy}, UpdateSourceTrigger=PropertyChanged}"
+                                SelectedValuePath="Id">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
@@ -479,11 +480,12 @@
                 <DataGridTemplateColumn>
                     <DataGridTemplateColumn.HeaderTemplate>
                         <DataTemplate>
-                            <TextBox x:Name="SearchBox" 
-                                     Text="{Binding Data.Filter.Note, Source={StaticResource DataContextProxy}, UpdateSourceTrigger=PropertyChanged}"
-                                     HorizontalAlignment="Stretch" Height="34" VerticalAlignment="Center"
-                                     BorderBrush="Transparent" Background="Transparent" Foreground="{StaticResource Dark}" Padding="6,1,10,0" 
-                                     FontWeight="Normal" FontSize="14">
+                            <TextBox 
+                                x:Name="SearchBox" 
+                                Text="{Binding Data.Filter.Note, Source={StaticResource DataContextProxy}, UpdateSourceTrigger=PropertyChanged}"
+                                HorizontalAlignment="Stretch" Height="34" VerticalAlignment="Center"
+                                BorderBrush="Transparent" Background="Transparent" Foreground="{StaticResource Dark}" Padding="6,1,10,0" 
+                                FontWeight="Normal" FontSize="14">
                                 <TextBox.Style>
                                     <Style TargetType="{x:Type TextBox}">
                                         <Setter Property="Template">

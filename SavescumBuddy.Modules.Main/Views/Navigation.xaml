@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:core="clr-namespace:SavescumBuddy.Core;assembly=SavescumBuddy.Core"
+             xmlns:core="clr-namespace:SavescumBuddy.Core.Constants;assembly=SavescumBuddy.Core"
              xmlns:controls="clr-namespace:SavescumBuddy.Wpf;assembly=SavescumBuddy.Wpf"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              SnapsToDevicePixels="True"
@@ -31,29 +31,32 @@
                     <i:InvokeCommandAction Command="{Binding NavigateCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type TabControl}}, Path=SelectedItem.Tag}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
-            <TabItem Style="{StaticResource MaterialDesignNavigationRailTabItem}" Tag="Backups">
+            <TabItem Style="{StaticResource MaterialDesignNavigationRailTabItem}" Tag="{x:Static core:ViewNames.Backups}">
                 <TabItem.Header>
                     <materialDesign:PackIcon Kind="ViewList" Width="24" Height="24"/>
                 </TabItem.Header>
             </TabItem>
-            <TabItem Style="{StaticResource MaterialDesignNavigationRailTabItem}" Tag="Games">
+            <TabItem Style="{StaticResource MaterialDesignNavigationRailTabItem}" Tag="{x:Static core:ViewNames.Games}">
                 <TabItem.Header>
                     <materialDesign:PackIcon Kind="GamepadVariantOutline" Width="24" Height="24"/>
                 </TabItem.Header>
             </TabItem>
-            <TabItem Style="{StaticResource MaterialDesignNavigationRailTabItem}" Tag="GoogleDrive">
+            <TabItem Style="{StaticResource MaterialDesignNavigationRailTabItem}" Tag="{x:Static core:ViewNames.GoogleDrive}">
                 <TabItem.Header>
                     <materialDesign:PackIcon Kind="GoogleDrive" Width="24" Height="24"/>
                 </TabItem.Header>
             </TabItem>
-            <TabItem Style="{StaticResource MaterialDesignNavigationRailTabItem}" Tag="Settings">
+            <TabItem Style="{StaticResource MaterialDesignNavigationRailTabItem}" Tag="{x:Static core:ViewNames.Settings}">
                 <TabItem.Header>
                     <materialDesign:PackIcon Kind="Cog" Width="24" Height="24"/>
                 </TabItem.Header>
             </TabItem>
         </TabControl>
-        <Button Style="{StaticResource TextButton}" Grid.Row="1"
-                Command="{Binding OpenAboutDialogCommand}">
+        <Button 
+            Style="{StaticResource TextButton}" 
+            Grid.Row="1"
+            Margin="5"
+            Command="{Binding OpenAboutDialogCommand}">
             <materialDesign:PackIcon Kind="InformationOutline" Width="24" Height="24" Margin="5"/>
         </Button>
     </Grid>

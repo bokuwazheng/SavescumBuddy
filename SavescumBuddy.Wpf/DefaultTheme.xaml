@@ -64,7 +64,7 @@
     <SolidColorBrush x:Key="Background.Selected" Color="#f5f5f5"/>
     <SolidColorBrush x:Key="Background.MouseOver" Color="#e6e6e6"/>
 
-    <Style x:Key="DialogBackground" TargetType="{x:Type ContentControl}">
+    <Style x:Key="DialogPlaceholder" TargetType="{x:Type ContentControl}">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ContentControl}">
@@ -72,7 +72,7 @@
                         <Grid Background="#7F000000">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="MouseDown">
-                                    <i:InvokeCommandAction Command="{Binding CloseDialogCommand}" CommandParameter="{x:Static enums:DialogResult.Cancel}"/>
+                                    <i:InvokeCommandAction Command="{Binding CloseDialogCommand}" CommandParameter="{x:Static enums:DialogResult.Abort}"/>
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                         </Grid>
@@ -668,15 +668,27 @@
 
     <!--Record hotkey toggle button-->
     <Style x:Key="RecordHotkeyToggleButton" TargetType="ToggleButton">
-        <Setter Property="Margin" Value="10,0,0,0"/>
-        <Setter Property="Content" Value="Record Hotkey"/>
-        <Setter Property="Background" Value="{StaticResource Grayish}"/>
-        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Margin" Value="8"/>
+        <Setter Property="Background" Value="{StaticResource Bright}"/>
+        <Setter Property="Foreground" Value="{StaticResource Dark}"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ToggleButton">
-                    <Border Background="{TemplateBinding Background}" CornerRadius="3">
+                    <Border Background="{TemplateBinding Background}" CornerRadius="3" BorderThickness="1">
+                        <Border.Style>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}" Value="True">
+                                        <Setter Property="BorderBrush" Value="White"/>
+                                        <DataTrigger.EnterActions>
+                                            <BeginStoryboard Storyboard="{StaticResource Pulse}"/>
+                                        </DataTrigger.EnterActions>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                 </ControlTemplate>
@@ -684,8 +696,7 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsChecked" Value="True">
-                <Setter Property="Content" Value="Stop Recording"/>
-                <Setter Property="Background" Value="IndianRed"/>
+                <Setter Property="Background" Value="#edf1f7"/>
             </Trigger>
         </Style.Triggers>
     </Style>

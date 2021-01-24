@@ -2,13 +2,13 @@
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
-using SavescumBuddy.Core;
+using SavescumBuddy.Core.Constants;
 using SavescumBuddy.Core.Events;
-using System.Linq;
+using SavescumBuddy.Core.Extensions;
 
 namespace SavescumBuddy.Modules.Overlay.ViewModels
 {
-    public class AboutViewModel : BindableBase
+    public class AboutViewModel : BindableBase, INavigationAware
     {
         private IEventAggregator _eventAggregator;
         private IRegionManager _regionManager;
@@ -19,17 +19,18 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
             _regionManager = regionManager;
 
             StartProcessCommand = new DelegateCommand<string>(s => _eventAggregator.GetEvent<StartProcessRequestedEvent>().Publish(s));
-            CloseDialogCommand = new DelegateCommand(CloseDialog);
+            CloseDialogCommand = new DelegateCommand(() => _regionManager.Deactivate(RegionNames.Overlay));
         }
 
         public string Version => System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-        private void CloseDialog()
-        {
-            var activeRegion = _regionManager.Regions[RegionNames.Overlay].ActiveViews.FirstOrDefault();
+        public bool IsNavigationTarget(NavigationContext navigationContext) => true;
 
-            if (activeRegion is object)
-                _regionManager.Regions[RegionNames.Overlay].Deactivate(activeRegion);
+        public void OnNavigatedFrom(NavigationContext navigationContext) { }
+
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            navigationContext.NavigationService.Journal.Clear();
         }
 
         public DelegateCommand CloseDialogCommand { get; }

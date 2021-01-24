@@ -30,7 +30,7 @@ namespace SavescumBuddy
             base.OnInitialized();
 
             var ea = Container.Resolve<IEventAggregator>();
-            ea.GetEvent<ErrorOccuredEvent>().Subscribe(OnErrorOccured);
+            ea.GetEvent<ErrorOccuredEvent>().Subscribe(OnErrorOccured, ThreadOption.UIThread);
             ea.GetEvent<HookChangedEvent>().Subscribe(OnHookChanged);
             ea.GetEvent<HookEnabledChangedEvent>().Subscribe(OnHookEnabledChanged);
             ea.GetEvent<StartProcessRequestedEvent>().Subscribe(OnStartProcessRequested);
@@ -208,7 +208,7 @@ namespace SavescumBuddy
                 key == Keys.LControlKey || key == Keys.RControlKey)
                 mod = Keys.None;
 
-            var ea = Container.Resolve<IEventAggregator>();
+          var ea = Container.Resolve<IEventAggregator>();
             ea.GetEvent<HookKeyDownEvent>().Publish(((int)key, (int)mod));
         }
     }

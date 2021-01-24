@@ -23,7 +23,7 @@ namespace SavescumBuddy.Services
             var game = _dataAccess.GetCurrentGame()
                 ?? throw new NullReferenceException("Failed to create a backup: no game is set as current yet.");
             var timeStamp = DateTime.Now.Ticks;
-            var folderName = timeStamp.ToString();
+            var fileName = timeStamp.ToString();
 
             var backup = new Backup()
             {
@@ -31,8 +31,8 @@ namespace SavescumBuddy.Services
                 GameId = game.Id,
                 OriginPath = game.SavefilePath,
                 TimeStamp = timeStamp,
-                PicturePath = Path.Combine(game.BackupFolder, folderName, folderName + ".jpg"),
-                SavefilePath = Path.Combine(game.BackupFolder, folderName, Path.GetFileName(game.SavefilePath))
+                PicturePath = Path.Combine(game.BackupFolder, fileName + ".jpg"),
+                SavefilePath = Path.Combine(game.BackupFolder, fileName + Path.GetExtension(game.SavefilePath))
             };
 
             return backup;

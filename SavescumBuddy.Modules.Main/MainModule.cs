@@ -2,7 +2,7 @@
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Regions;
-using SavescumBuddy.Core;
+using SavescumBuddy.Core.Constants;
 
 namespace SavescumBuddy.Modules.Main
 {
@@ -17,10 +17,9 @@ namespace SavescumBuddy.Modules.Main
         
         public void OnInitialized(IContainerProvider containerProvider)
         {
-            _regionManager.RequestNavigate(RegionNames.ContentRegion, "Backups");
-            _regionManager.RequestNavigate(RegionNames.Navigation, "Navigation");
-            _regionManager.RequestNavigate(RegionNames.Autobackuper, "Autobackups");
-            _regionManager.RequestNavigate(RegionNames.GoogleDrive, "GoogleDrive");
+            _regionManager.RequestNavigate(RegionNames.Content, ViewNames.Backups);
+            _regionManager.RequestNavigate(RegionNames.Navigation, ViewNames.Navigation);
+            _regionManager.RequestNavigate(RegionNames.Autobackups, ViewNames.Autobackups);
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)

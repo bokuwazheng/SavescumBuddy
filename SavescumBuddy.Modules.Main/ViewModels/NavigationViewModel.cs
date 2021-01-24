@@ -1,7 +1,7 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Regions;
-using SavescumBuddy.Core;
+using SavescumBuddy.Core.Constants;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
@@ -13,8 +13,8 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         {
             _regionManager = regionManager;
 
-            NavigateCommand = new DelegateCommand<string>(s => _regionManager.RequestNavigate(RegionNames.ContentRegion, s));
-            OpenAboutDialogCommand = new DelegateCommand(() => _regionManager.RequestNavigate(RegionNames.Overlay, "About"));
+            NavigateCommand = new DelegateCommand<string>(s => _regionManager.RequestNavigate(RegionNames.Content, s));
+            OpenAboutDialogCommand = new DelegateCommand(() => _regionManager.RequestNavigate(RegionNames.Overlay, ViewNames.About));
         }
 
         public DelegateCommand<string> NavigateCommand { get; }

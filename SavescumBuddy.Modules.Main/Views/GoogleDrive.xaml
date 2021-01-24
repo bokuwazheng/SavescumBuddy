@@ -36,11 +36,13 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <TextBlock Text="{Binding UserEmail, StringFormat='Authorized as: {0}'}" Margin="20" FontSize="14"/>
-        <Button Style="{StaticResource MaterialDesignFlatButton}" Content="Authorize" Command="{Binding AuthorizeCommand}" Grid.Row="1"
-                HorizontalAlignment="Center"
-                Visibility="{Binding UserEmail, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=False}"/>
-        <Button Style="{StaticResource MaterialDesignFlatButton}" Content="Reauthorize" Command="{Binding ReauthorizeCommand}" Grid.Row="2"
-                HorizontalAlignment="Center"
-                Visibility="{Binding UserEmail, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=True}"/>
+        <Button 
+            Style="{StaticResource MaterialDesignRaisedButton}" Content="AUTHORIZE" Command="{Binding AuthorizeCommand}" Grid.Row="1"
+            HorizontalAlignment="Center"
+            Visibility="{Binding UserEmail, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=False}"/>
+        <Button 
+            Style="{StaticResource MaterialDesignFlatButton}" Content="REAUTHORIZE" Command="{Binding ReauthorizeCommand}" Grid.Row="2"
+            HorizontalAlignment="Center"
+            Visibility="{Binding UserEmail, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=True}"/>
     </Grid>
 </UserControl>

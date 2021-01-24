@@ -2,8 +2,9 @@
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
-using SavescumBuddy.Core;
+using SavescumBuddy.Core.Constants;
 using SavescumBuddy.Core.Events;
+using SavescumBuddy.Core.Extensions;
 using SavescumBuddy.Data;
 using SavescumBuddy.Modules.Main.Models;
 using SavescumBuddy.Services.Interfaces;
@@ -44,10 +45,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 {
                     "callback", new Action<Game>(result =>
                     {
-                        var activeRegion = _regionManager.Regions[RegionNames.Overlay].ActiveViews.FirstOrDefault();
-                     
-                        if (activeRegion is object)
-                            _regionManager.Regions[RegionNames.Overlay].Deactivate(activeRegion);
+                        _regionManager.Deactivate(RegionNames.Overlay);
 
                         if (result is null)
                             return;
@@ -69,7 +67,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                     })
                 }
             };
-            _regionManager.RequestNavigate(RegionNames.Overlay, "Game", parameters);
+            _regionManager.RequestNavigate(RegionNames.Overlay, ViewNames.Game, parameters);
         }
 
         public ObservableCollection<GameModel> Games { get; private set; }
@@ -80,10 +78,6 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             {
                 var games = _dataAccess.LoadGames();
                 var gameModels = games.Select(x => new GameModel(x)).ToList();
-                foreach (var game in gameModels)
-                {
-                    game.BackupCount = _dataAccess.GetTotalNumberOfBackups(new BackupSearchRequest() { GameId = game.Id });
-                }
                 Games = new ObservableCollection<GameModel>(gameModels);
                 RaisePropertyChanged(nameof(Games));
             }
@@ -106,6 +100,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             }
         }
 
+        // TODO: Doesn't update UI on first click!
         private void MakeCurrent(GameModel game)
         {
             try

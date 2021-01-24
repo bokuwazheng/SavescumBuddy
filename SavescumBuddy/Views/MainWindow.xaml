@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:prism="http://prismlibrary.com/"
         prism:ViewModelLocator.AutoWireViewModel="True"
-        xmlns:core="clr-namespace:SavescumBuddy.Core;assembly=SavescumBuddy.Core"
+        xmlns:core="clr-namespace:SavescumBuddy.Core.Constants;assembly=SavescumBuddy.Core"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         Title="{Binding Title}" Height="700" Width="1200">
 
@@ -20,10 +20,10 @@
     <Grid>
         <DockPanel>
             <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Navigation}"/>
-            <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.ContentRegion}"/>
+            <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Content}"/>
         </DockPanel>
         <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Overlay}"/>
-        <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Autobackuper}" VerticalAlignment="Bottom"/>
+        <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Autobackups}" VerticalAlignment="Bottom"/>
         <materialDesign:Snackbar MessageQueue="{Binding MessageQueue}"/>
     </Grid>
 </Window>

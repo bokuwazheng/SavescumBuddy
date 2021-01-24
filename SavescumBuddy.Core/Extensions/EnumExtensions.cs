@@ -1,31 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Windows.Markup;
 
 namespace SavescumBuddy.Core.Extensions
 {
-    public static class StringExtensions
-    {
-        public static bool IsDirectoryWritable(this string value, bool throwIfFails = false)
-        {
-            try
-            {
-                using var fs = File.Create(Path.Combine(value, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose);
-                return true;
-            }
-            catch
-            {
-                if (throwIfFails)
-                    throw new Exception($"Selected directory ({ value }) is read-only. Please select other directory.");
-                else
-                    return false;
-            }
-        }
-    }
-
     public static class EnumExtensions
     {
         public static string ToDescriptionOrString(this Enum value)

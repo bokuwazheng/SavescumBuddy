@@ -48,6 +48,7 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
                         BackupFolder = BackupFolder
                     };
                 }
+                _navigationService.Journal.Clear();
                 _requestClose?.Invoke(game);
             }
         }
@@ -78,9 +79,7 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
                 _openFileService.ShowHiddenItems = true;
 
                 if (_openFileService.OpenFile())
-                {
                     BackupFolder = _openFileService.FileName;
-                }
             }
             catch (Exception ex)
             {
@@ -88,14 +87,11 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
             }
         }
 
-        public bool IsNavigationTarget(NavigationContext navigationContext)
-        {
-            return true;
-        }
+        public bool IsNavigationTarget(NavigationContext navigationContext) => true;
 
         public void OnNavigatedFrom(NavigationContext navigationContext)
         {
-            _requestClose = null;
+            //_requestClose = null;
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)

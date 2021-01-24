@@ -151,25 +151,26 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
         private void Remove(BackupModel backup)
         {
+            if (backup is null)
+                return;
+
             try
             {
-                if (backup is null)
-                    return;
-                else if (backup.GoogleDriveId is object)
+                if (backup.GoogleDriveId is object)
                 {
                     _regionManager.PromptAction(
                         "Delete from Google Drive too?",
                         "If you leave the backup in Google Drive you'll be able to recover it later.",
                         "DELETE",
                         "LEAVE BACKUP IN GOOGLE DRIVE",
-                        r =>
+                        async r => 
                         {
-                            if (r == DialogResult.None)
+                            if (r == DialogResult.Abort)
                                 return;
 
                             if (r == DialogResult.OK)
                             {
-                                _googleDrive.DeleteBackupAsync(backup.Backup);
+                                await _googleDrive.DeleteBackupAsync(backup.Backup);
                                 _dataAccess.RemoveBackup(backup.Backup);
                                 UpdateBackups();
                             }
@@ -212,7 +213,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                         }
                     };
 
-                    model.GameTitle = _dataAccess.GetGame(model.GameId).Title;
+                    model.GameTitle = _dataAccess.GetGame(model.GameId)?.Title;
                 }
 
                 Backups = new ObservableCollection<BackupModel>(backupModels);

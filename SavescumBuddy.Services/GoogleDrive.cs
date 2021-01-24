@@ -236,7 +236,7 @@ namespace SavescumBuddy.Services
             await request.DownloadAsync(stream, ct);
         }
 
-        public async Task RecoverAsync(Backup backup, Action callback, CancellationToken ct = default)
+        public async Task RecoverAsync(Backup backup, Action onDownloadCompleted, CancellationToken ct = default)
         {
             var files = await GetFilesAsync(backup.GoogleDriveId, ct).ConfigureAwait(false);
             if (files.Count == 2)
@@ -246,7 +246,7 @@ namespace SavescumBuddy.Services
                     Directory.CreateDirectory(dirName);
 
                 using var client = new WebClient();
-                client.DownloadFileCompleted += (s, e) => callback.Invoke();
+                var tasks = new List<Task>();
 
                 foreach (var file in files)
                 {
@@ -258,8 +258,12 @@ namespace SavescumBuddy.Services
                         _ => throw new Exception("Unsupported MIME type")
                     };
 
-                    await client.DownloadFileTaskAsync($"https://drive.google.com/uc?export=download&id={ file.Id }", path);
+                    var task = client.DownloadFileTaskAsync($"https://drive.google.com/uc?export=download&id={ file.Id }", path);
+                    tasks.Add(task);
                 }
+
+                await Task.WhenAll(tasks);
+                onDownloadCompleted.Invoke();
             }
         }
     }

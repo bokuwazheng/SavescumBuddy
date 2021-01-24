@@ -2,24 +2,25 @@
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
-using SavescumBuddy.Core;
+using SavescumBuddy.Core.Constants;
 using SavescumBuddy.Core.Enums;
 using SavescumBuddy.Core.Events;
+using SavescumBuddy.Core.Extensions;
 using System;
-using System.Linq;
 
 namespace SavescumBuddy.Modules.Overlay.ViewModels
 {
     public class NotificationDialogViewModel : BindableBase, INavigationAware, IJournalAware
     {
+        private IRegionNavigationService _navigationService;
+        private IRegionManager _regionManager;
+        private IEventAggregator _eventAggregator;
+
         private string _title;
         private string _message;
         private string _okContent;
         private string _cancelContent;
         private event Action<DialogResult> _requestClose;
-        private IRegionNavigationService _navigationService;
-        private IRegionManager _regionManager;
-        private IEventAggregator _eventAggregator;
 
         public NotificationDialogViewModel(IRegionManager regionManager, IEventAggregator eventAggregator)
         {
@@ -39,19 +40,12 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
             try
             {
                 if (result.HasValue)
-                {
                     _requestClose?.Invoke(result.Value);
-                }
 
                 if (_navigationService.Journal.CanGoBack)
                     _navigationService.Journal.GoBack();
                 else
-                {
-                    var activeRegion = _regionManager.Regions[RegionNames.Overlay].ActiveViews.FirstOrDefault();
-
-                    if (activeRegion is object)
-                        _regionManager.Regions[RegionNames.Overlay].Deactivate(activeRegion);
-                }
+                    _regionManager.Deactivate(RegionNames.Overlay);
             }
             catch (Exception ex)
             {
@@ -65,9 +59,10 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
 
             if (navigationContext.Parameters.Count == 0)
                 return;
+
             Message = navigationContext.Parameters["message"].ToString();
             Title = navigationContext.Parameters["title"].ToString();
-            OkContent = navigationContext.Parameters["okContent"]?.ToString() ?? "OK";
+            OkContent = navigationContext.Parameters["okContent"]?.ToString();
             CancelContent = navigationContext.Parameters["cancelContent"]?.ToString();
             _requestClose = (Action<DialogResult>)navigationContext.Parameters["callback"];
         }
