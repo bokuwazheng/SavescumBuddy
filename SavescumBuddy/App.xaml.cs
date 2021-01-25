@@ -9,14 +9,14 @@ using SavescumBuddy.Modules.Overlay;
 using System;
 using DryIoc;
 using Prism.Events;
-using SavescumBuddy.Core.Events;
+using SavescumBuddy.Wpf.Events;
 using System.Windows.Forms;
 using System.Diagnostics;
 using Prism.Regions;
 using MaterialDesignThemes.Wpf;
 using System.Threading.Tasks;
 using System.Threading;
-using SavescumBuddy.Core.Extensions;
+using SavescumBuddy.Wpf.Extensions;
 
 namespace SavescumBuddy
 {
@@ -64,7 +64,6 @@ namespace SavescumBuddy
                 .RegisterInstance<ISettingsAccess>(new SqliteSettingsAccess(new SqliteDbService(LoadConnectionString())))
                 .Register<IOpenFileService, OpenFileService>()
                 .Register<IBackupService, BackupService>()
-                .Register<IBackupFactory, BackupFactory>()
                 .RegisterInstance(new GlobalKeyboardHook(), "Settings")
                 .RegisterInstance(new GlobalKeyboardHook(), "Application")
                 .RegisterSingleton<IGoogleDrive, GoogleDrive>()
@@ -116,7 +115,6 @@ namespace SavescumBuddy
         {
             var settings = Container.Resolve<ISettingsAccess>();
             var ea = Container.Resolve<IEventAggregator>();
-            var factory = Container.Resolve<IBackupFactory>();
             var data = Container.Resolve<IDataAccess>();
             var backuper = Container.Resolve<IBackupService>();
 
@@ -124,10 +122,9 @@ namespace SavescumBuddy
             {
                 if (e.KeyValue == settings.BackupKey && (int)e.Modifiers == settings.BackupModifier)
                 {
-                    var backup = factory.CreateBackup();
+                    var backup = data.CreateBackup(isAutobackup: false);
                     backuper.BackupSavefile(backup);
                     backuper.SaveScreenshot(backup.PicturePath);
-                    data.SaveBackup(backup);
                     ea.GetEvent<BackupListUpdateRequestedEvent>().Publish();
                     return;
                 }
@@ -146,12 +143,12 @@ namespace SavescumBuddy
                     if (latest is object)
                     {
                         backuper.DeleteFiles(latest);
-                        data.RemoveBackup(latest);
+                        data.DeleteBackup(latest.Id);
                     }
-                    var backup = factory.CreateBackup();
+
+                    var backup = data.CreateBackup(isAutobackup: false);
                     backuper.BackupSavefile(backup);
                     backuper.SaveScreenshot(backup.PicturePath);
-                    data.SaveBackup(backup);
                     ea.GetEvent<BackupListUpdateRequestedEvent>().Publish();
                 }
             }

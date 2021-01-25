@@ -1,4 +1,4 @@
-﻿using SavescumBuddy.Data;
+﻿using SavescumBuddy.Lib;
 
 namespace SavescumBuddy.Services.Interfaces
 {

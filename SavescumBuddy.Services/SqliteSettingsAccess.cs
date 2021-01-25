@@ -12,76 +12,86 @@ namespace SavescumBuddy.Services
             _sqlService = sqlService ?? throw new ArgumentNullException(nameof(sqlService));
         }
 
-        public int AutobackupInterval 
+        public int AutobackupInterval
         {
-            get => _sqlService.ExecuteScalar<int>($"SELECT { nameof(AutobackupInterval) } FROM Settings WHERE Id = 1;");
-            set => _sqlService.Execute($"UPDATE Settings SET { nameof(AutobackupInterval) } = @{ nameof(AutobackupInterval) } WHERE Id = 1;", new { AutobackupInterval = value });
+            get => Get<int>(nameof(AutobackupInterval));
+            set => Set(nameof(AutobackupInterval), ref value);
         }
 
         public int AutobackupOverwriteType
         {
-            get => _sqlService.ExecuteScalar<int>($"SELECT { nameof(AutobackupOverwriteType) } FROM Settings WHERE Id = 1;");
-            set => _sqlService.Execute($"UPDATE Settings SET { nameof(AutobackupOverwriteType) } = @{ nameof(AutobackupOverwriteType) } WHERE Id = 1;", new { AutobackupOverwriteType = value });
+            get => Get<int>(nameof(AutobackupOverwriteType));
+            set => Set(nameof(AutobackupOverwriteType), ref value);
         }
 
         public bool AutobackupsEnabled
         {
-            get => _sqlService.ExecuteScalar<bool>($"SELECT { nameof(AutobackupsEnabled) } FROM Settings WHERE Id = 1;");
-            set => _sqlService.Execute($"UPDATE Settings SET { nameof(AutobackupsEnabled) } = @{ nameof(AutobackupsEnabled) } WHERE Id = 1;", new { AutobackupsEnabled = value });
+            get => Get<bool>(nameof(AutobackupsEnabled));
+            set => Set(nameof(AutobackupsEnabled), ref value);
         }
 
         public int AutobackupSkipType
         {
-            get => _sqlService.ExecuteScalar<int>($"SELECT { nameof(AutobackupSkipType) } FROM Settings WHERE Id = 1;");
-            set => _sqlService.Execute($"UPDATE Settings SET { nameof(AutobackupSkipType) } = @{ nameof(AutobackupSkipType) } WHERE Id = 1;", new { AutobackupSkipType = value });
+            get => Get<int>(nameof(AutobackupSkipType));
+            set => Set(nameof(AutobackupSkipType), ref value);
         }
 
         public int BackupKey
         {
-            get => _sqlService.ExecuteScalar<int>($"SELECT { nameof(BackupKey) } FROM Settings WHERE Id = 1;");
-            set => _sqlService.Execute($"UPDATE Settings SET { nameof(BackupKey) } = @{ nameof(BackupKey) } WHERE Id = 1;", new { BackupKey = value });
+            get => Get<int>(nameof(BackupKey));
+            set => Set(nameof(BackupKey), ref value);
         }
 
         public int BackupModifier
         {
-            get => _sqlService.ExecuteScalar<int>($"SELECT { nameof(BackupModifier) } FROM Settings WHERE Id = 1;");
-            set => _sqlService.Execute($"UPDATE Settings SET { nameof(BackupModifier) } = @{ nameof(BackupModifier) } WHERE Id = 1;", new { BackupModifier = value });
+            get => Get<int>(nameof(BackupModifier));
+            set => Set(nameof(BackupModifier), ref value);
         }
 
         public bool HotkeysEnabled
         {
-            get => _sqlService.ExecuteScalar<bool>($"SELECT { nameof(HotkeysEnabled) } FROM Settings WHERE Id = 1;");
-            set => _sqlService.Execute($"UPDATE Settings SET { nameof(HotkeysEnabled) } = @{ nameof(HotkeysEnabled) } WHERE Id = 1;", new { HotkeysEnabled = value });
+            get => Get<bool>(nameof(HotkeysEnabled));
+            set => Set(nameof(HotkeysEnabled), ref value);
         }
 
         public int OverwriteKey
         {
-            get => _sqlService.ExecuteScalar<int>($"SELECT { nameof(OverwriteKey) } FROM Settings WHERE Id = 1;");
-            set => _sqlService.Execute($"UPDATE Settings SET { nameof(OverwriteKey) } = @{ nameof(OverwriteKey) } WHERE Id = 1;", new { OverwriteKey = value });
+            get => Get<int>(nameof(OverwriteKey));
+            set => Set(nameof(OverwriteKey), ref value);
         }
 
         public int OverwriteModifier
         {
-            get => _sqlService.ExecuteScalar<int>($"SELECT { nameof(OverwriteModifier) } FROM Settings WHERE Id = 1;");
-            set => _sqlService.Execute($"UPDATE Settings SET { nameof(OverwriteModifier) } = @{ nameof(OverwriteModifier) } WHERE Id = 1;", new { OverwriteModifier = value });
+            get => Get<int>(nameof(OverwriteModifier));
+            set => Set(nameof(OverwriteModifier), ref value);
         }
 
         public int RestoreKey
         {
-            get => _sqlService.ExecuteScalar<int>($"SELECT { nameof(RestoreKey) } FROM Settings WHERE Id = 1;");
-            set => _sqlService.Execute($"UPDATE Settings SET { nameof(RestoreKey) } = @{ nameof(RestoreKey) } WHERE Id = 1;", new { RestoreKey = value });
+            get => Get<int>(nameof(RestoreKey));
+            set => Set(nameof(RestoreKey), ref value);
         }
 
         public int RestoreModifier
         {
-            get => _sqlService.ExecuteScalar<int>($"SELECT { nameof(RestoreModifier) } FROM Settings WHERE Id = 1;");
-            set => _sqlService.Execute($"UPDATE Settings SET { nameof(RestoreModifier) } = @{ nameof(RestoreModifier) } WHERE Id = 1;", new { RestoreModifier = value });
+            get => Get<int>(nameof(RestoreModifier));
+            set => Set(nameof(RestoreModifier), ref value);
         }
 
         public bool SoundCuesEnabled
         {
-            get => _sqlService.ExecuteScalar<bool>($"SELECT { nameof(SoundCuesEnabled) } FROM Settings WHERE Id = 1;");
-            set => _sqlService.Execute($"UPDATE Settings SET { nameof(SoundCuesEnabled) } = @{ nameof(SoundCuesEnabled) } WHERE Id = 1;", new { SoundCuesEnabled = value });
+            get => Get<bool>(nameof(SoundCuesEnabled));
+            set => Set(nameof(SoundCuesEnabled), ref value);
+        }
+
+        private T Get<T>(string propertyName)
+        {
+            return _sqlService.ExecuteScalar<T>($"SELECT { propertyName } FROM Settings WHERE Id = 1;");
+        }
+
+        private void Set<T>(string propertyName, ref T value)
+        {
+            _sqlService.Execute($"UPDATE Settings SET { propertyName } = @Value WHERE Id = 1;", new { Value = value });
         }
     }
 }

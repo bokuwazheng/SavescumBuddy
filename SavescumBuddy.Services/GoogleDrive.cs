@@ -11,7 +11,7 @@ using Google.Apis.Drive.v3;
 using Google.Apis.Drive.v3.Data;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
-using SavescumBuddy.Data;
+using SavescumBuddy.Lib;
 using SavescumBuddy.Services.Interfaces;
 using DriveFile = Google.Apis.Drive.v3.Data.File;
 using File = System.IO.File;
@@ -208,11 +208,12 @@ namespace SavescumBuddy.Services
         }
 
         // TODO: Transaction-like method?
-        public async Task<string> UploadBackupAsync(Backup backup, string gameTitle, CancellationToken ct = default)
+        public async Task<string> UploadBackupAsync(Backup backup, CancellationToken ct = default)
         {
             if (!File.Exists(backup.SavefilePath))
                 throw new ArgumentException("Savefile does not exist.");
 
+            var gameTitle = backup.GameTitle;
             var rootId = await GetAppRootFolderIdAsync(ct).ConfigureAwait(false);
             var gameFolderId = await GetIdByNameAsync(gameTitle, rootId, IGoogleDrive.MimeType.Folder, ct).ConfigureAwait(false);
             if (gameFolderId is null)

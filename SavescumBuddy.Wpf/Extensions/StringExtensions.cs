@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace SavescumBuddy.Core.Extensions
+namespace SavescumBuddy.Wpf.Extensions
 {
     public static class StringExtensions
     {

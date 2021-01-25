@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Markup;
 
-namespace SavescumBuddy.Core.Extensions
+namespace SavescumBuddy.Wpf.Extensions
 {
     public static class EnumExtensions
     {

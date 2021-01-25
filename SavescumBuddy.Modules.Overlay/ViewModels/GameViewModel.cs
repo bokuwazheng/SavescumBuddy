@@ -2,9 +2,9 @@
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
-using SavescumBuddy.Core.Enums;
-using SavescumBuddy.Core.Events;
-using SavescumBuddy.Data;
+using SavescumBuddy.Lib.Enums;
+using SavescumBuddy.Wpf.Events;
+using SavescumBuddy.Lib;
 using SavescumBuddy.Services.Interfaces;
 using System;
 
@@ -12,7 +12,7 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
 {
     public class GameViewModel : BindableBase, INavigationAware
     {
-        private event Action<Game> _requestClose;
+        private Action<Game> _requestClose;
         private string _title;
         private string _savefilePath;
         private string _backupFolder;

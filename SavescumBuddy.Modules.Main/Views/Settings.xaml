@@ -4,9 +4,9 @@
              xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              xmlns:local="clr-namespace:SavescumBuddy.Modules.Main.Views"
              xmlns:prism="http://prismlibrary.com/"
-             xmlns:core="clr-namespace:SavescumBuddy.Core;assembly=SavescumBuddy.Core"
-             xmlns:enums="clr-namespace:SavescumBuddy.Core.Enums;assembly=SavescumBuddy.Core"
-             xmlns:ext="clr-namespace:SavescumBuddy.Core.Extensions;assembly=SavescumBuddy.Core"
+
+             xmlns:enums="clr-namespace:SavescumBuddy.Lib.Enums;assembly=SavescumBuddy.Lib"
+             xmlns:ext="clr-namespace:SavescumBuddy.Wpf.Extensions;assembly=SavescumBuddy.Wpf"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:controls="clr-namespace:SavescumBuddy.Wpf;assembly=SavescumBuddy.Wpf"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"

@@ -2,10 +2,10 @@
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
-using SavescumBuddy.Core.Constants;
-using SavescumBuddy.Core.Events;
-using SavescumBuddy.Core.Extensions;
-using SavescumBuddy.Data;
+using SavescumBuddy.Wpf.Constants;
+using SavescumBuddy.Wpf.Events;
+using SavescumBuddy.Wpf.Extensions;
+using SavescumBuddy.Lib;
 using SavescumBuddy.Modules.Main.Models;
 using SavescumBuddy.Services.Interfaces;
 using System;
@@ -55,7 +55,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
                         if (result.Id == 0)
                         {
-                            _dataAccess.SaveGame(result);
+                            _dataAccess.CreateGame(result);
                             Games.Add(new GameModel(result));
                         }
                         else
@@ -76,7 +76,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         {
             try
             {
-                var games = _dataAccess.LoadGames();
+                var games = _dataAccess.GetGames();
                 var gameModels = games.Select(x => new GameModel(x)).ToList();
                 Games = new ObservableCollection<GameModel>(gameModels);
                 RaisePropertyChanged(nameof(Games));
@@ -92,7 +92,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             try
             {
                 Games.Remove(game);
-                _dataAccess.RemoveGame(game.Game);
+                _dataAccess.DeleteGame(game.Game);
             }
             catch (Exception ex)
             {

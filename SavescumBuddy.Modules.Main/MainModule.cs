@@ -2,7 +2,7 @@
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Regions;
-using SavescumBuddy.Core.Constants;
+using SavescumBuddy.Wpf.Constants;
 
 namespace SavescumBuddy.Modules.Main
 {

@@ -8,7 +8,6 @@
     <PackageReference Include="Prism.Wpf" Version="8.0.0.1909" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SavescumBuddy.Core\SavescumBuddy.Core.csproj" />
     <ProjectReference Include="..\SavescumBuddy.Wpf\SavescumBuddy.Wpf.csproj" />
     <ProjectReference Include="..\SavescumBuddy.Services.Interfaces\SavescumBuddy.Services.Interfaces.csproj" />
   </ItemGroup>

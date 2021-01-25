@@ -1,7 +1,7 @@
 ﻿using Google.Apis.Auth.OAuth2;
 using Google.Apis.Download;
 using Google.Apis.Drive.v3;
-using SavescumBuddy.Data;
+using SavescumBuddy.Lib;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,7 +31,7 @@ namespace SavescumBuddy.Services.Interfaces
         Task<string> GetUserEmailAsync(CancellationToken ct = default);
         Task RecoverAsync(Backup backup, Action callback, CancellationToken ct = default);
         Task ReauthorizeAsync(CancellationToken ct);
-        Task<string> UploadBackupAsync(Backup backup, string gameTitle, CancellationToken ct = default);
+        Task<string> UploadBackupAsync(Backup backup, CancellationToken ct = default);
         Task UploadFileAsync(string path, string parentId, CancellationToken ct = default);
         Task UploadFilesAsync(string[] paths, string parentId, CancellationToken ct = default);
 

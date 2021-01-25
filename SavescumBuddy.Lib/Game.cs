@@ -1,4 +1,4 @@
-﻿namespace SavescumBuddy.Data
+﻿namespace SavescumBuddy.Lib
 {
     public class Game : IDbEntity
     {

@@ -1,4 +1,4 @@
-﻿using SavescumBuddy.Data;
+﻿using SavescumBuddy.Lib;
 using SavescumBuddy.Services.Interfaces;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -11,14 +11,13 @@ namespace SavescumBuddy.Services
     {
         public void BackupSavefile(Backup backup)
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(backup.SavefilePath));
             File.Copy(backup.OriginPath, backup.SavefilePath);
         }
 
         public void DeleteFiles(Backup backup)
         {
-            var dirName = Path.GetDirectoryName(backup.SavefilePath);
-            Directory.Delete(dirName, true);
+            File.Delete(backup.SavefilePath);
+            File.Delete(backup.PicturePath);
         }
 
         public void RestoreBackup(Backup backup)

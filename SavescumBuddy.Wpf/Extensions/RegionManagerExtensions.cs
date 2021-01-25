@@ -1,10 +1,10 @@
 ﻿using Prism.Regions;
-using SavescumBuddy.Core.Constants;
-using SavescumBuddy.Core.Enums;
+using SavescumBuddy.Wpf.Constants;
+using SavescumBuddy.Lib.Enums;
 using System;
 using System.Linq;
 
-namespace SavescumBuddy.Core.Extensions
+namespace SavescumBuddy.Wpf.Extensions
 {
     public static class RegionManagerExtensions
     {

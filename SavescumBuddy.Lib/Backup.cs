@@ -1,9 +1,10 @@
-﻿namespace SavescumBuddy.Data
+﻿namespace SavescumBuddy.Lib
 {
     public class Backup : IDbEntity
     {
         public int Id { get; set; }
         public int GameId { get; set; }
+        public string GameTitle { get; set; }
         public string GoogleDriveId { get; set; }
         public string Note { get; set; }
         public int IsLiked { get; set; }

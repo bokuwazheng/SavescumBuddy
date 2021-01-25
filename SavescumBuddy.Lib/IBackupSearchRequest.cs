@@ -1,7 +1,8 @@
-﻿namespace SavescumBuddy.Data
+﻿namespace SavescumBuddy.Lib
 {
     public interface IBackupSearchRequest
     {
+        public int? Id { get; set; }
         public int? Offset { get; set; }
         public int? Limit { get; set; }
         public bool Descending { get; set; }

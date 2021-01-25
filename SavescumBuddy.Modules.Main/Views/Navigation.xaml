@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:core="clr-namespace:SavescumBuddy.Core.Constants;assembly=SavescumBuddy.Core"
+             xmlns:core="clr-namespace:SavescumBuddy.Wpf.Constants;assembly=SavescumBuddy.Wpf"
              xmlns:controls="clr-namespace:SavescumBuddy.Wpf;assembly=SavescumBuddy.Wpf"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              SnapsToDevicePixels="True"

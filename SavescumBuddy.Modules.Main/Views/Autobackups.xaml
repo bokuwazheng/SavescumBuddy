@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SavescumBuddy.Modules.Main.Views"
              xmlns:prism="http://prismlibrary.com/"
-             xmlns:core="clr-namespace:SavescumBuddy.Core;assembly=SavescumBuddy.Core"
              xmlns:controls="clr-namespace:SavescumBuddy.Wpf;assembly=SavescumBuddy.Wpf"
              xmlns:models="clr-namespace:SavescumBuddy.Modules.Main.Models"
              xmlns:validation="clr-namespace:SavescumBuddy.Wpf.Validation;assembly=SavescumBuddy.Wpf"
@@ -23,8 +22,9 @@
     <!--ProgressBar-->
     <Grid>
         <Border Height="1" Background="{StaticResource Grayish}" VerticalAlignment="Bottom"/>
-        <ProgressBar Minimum="0" Maximum="{Binding Interval, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                     Value="{Binding Progress, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=20}" 
-                     Height="2" Foreground="{StaticResource Ash}" BorderBrush="Transparent"/>
+        <ProgressBar 
+            Minimum="0" Maximum="{Binding Interval, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+            Value="{Binding Progress, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=20}" 
+            Height="2" Foreground="{StaticResource Ash}" BorderBrush="Transparent"/>
     </Grid>
 </UserControl>

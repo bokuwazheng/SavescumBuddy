@@ -3,10 +3,10 @@ using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
-using SavescumBuddy.Core.Enums;
-using SavescumBuddy.Core.Events;
-using SavescumBuddy.Core.Extensions;
-using SavescumBuddy.Data;
+using SavescumBuddy.Lib.Enums;
+using SavescumBuddy.Wpf.Events;
+using SavescumBuddy.Wpf.Extensions;
+using SavescumBuddy.Lib;
 using SavescumBuddy.Modules.Main.Models;
 using SavescumBuddy.Services.Interfaces;
 using System;
@@ -25,7 +25,6 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         private readonly ISettingsAccess _settingsAccess;
         private readonly IEventAggregator _eventAggregator;
         private readonly IBackupService _backupService;
-        private readonly IBackupFactory _backupFactory;
         private readonly IGoogleDrive _googleDrive;
         private readonly ISnackbarMessageQueue _messageQueue;
 
@@ -34,16 +33,16 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         private FilterModel _filter;
         private BackupModel _selectedBackup;
         private int _currentPageIndex;
+        private int _totalCount;
 
         public BackupsViewModel(IRegionManager regionManager, IDataAccess dataAccess, ISettingsAccess settingsAccess, IEventAggregator eventAggregator,
-            IBackupService backupService, IBackupFactory backupFactory, IGoogleDrive googleDrive, ISnackbarMessageQueue messageQueue)
+            IBackupService backupService, IGoogleDrive googleDrive, ISnackbarMessageQueue messageQueue)
         {
             _regionManager = regionManager;
             _dataAccess = dataAccess;
             _settingsAccess = settingsAccess;
             _eventAggregator = eventAggregator;
             _backupService = backupService;
-            _backupFactory = backupFactory;
             _googleDrive = googleDrive;
             _messageQueue = messageQueue;
 
@@ -66,7 +65,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             ExecuteDriveActionCommand = new DelegateCommand<BackupModel>(async x => await ExecuteCloudAction(x, Ct).ConfigureAwait(false), 
                 x => x is object && _googleDrive.UserCredential is object).ObservesProperty(() => SelectedBackup);
             RecoverCommand = new DelegateCommand<BackupModel>(async x => await RecoverAsync(x, Ct).ConfigureAwait(false), 
-                x => x is object && x.GoogleDriveId is object && !File.Exists(x.SavefilePath) && _googleDrive.UserCredential is object).ObservesProperty(() => SelectedBackup);
+                x => x is object && x.GoogleDriveId is object && !File.Exists(x.Backup.SavefilePath) && _googleDrive.UserCredential is object).ObservesProperty(() => SelectedBackup);
 
             Filter.PropertyChanged += (s, e) => OnFilterPropertyChanged(e.PropertyName);
             UpdateBackups();
@@ -101,13 +100,12 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 }
             }
         }
-        public ObservableCollection<BackupModel> Backups { get; private set; }
+        public ObservableCollection<BackupModel> Backups { get; } = new ObservableCollection<BackupModel>();
         public ObservableCollection<Game> Games { get; } = new ObservableCollection<Game>();
-        public bool CurrentGameIsSet => _dataAccess.GetCurrentGame() is object;
         public int CurrentPageIndex { get => _currentPageIndex; private set => SetProperty(ref _currentPageIndex, value, () => Filter.Offset = value * PageSize); }
         public BackupModel SelectedBackup { get => _selectedBackup; set => SetProperty(ref _selectedBackup, value); }
         public FilterModel Filter { get => _filter ??= new FilterModel(); private set => SetProperty(ref _filter, value); }
-        public int TotalNumberOfBackups => _dataAccess.GetTotalNumberOfBackups(Filter);
+        public int TotalNumberOfBackups { get => _totalCount; set => SetProperty(ref _totalCount, value); }
         public int PageSize => 10; // _settingsAccess.BackupsPerPage
         public int From => Backups.Count > 0 ? Filter.Offset.Value + 1 : 0;
         public int To => Filter.Offset.Value + Backups.Count;
@@ -137,8 +135,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         {
             try
             {
-                var backup = _backupFactory.CreateBackup();
-                _dataAccess.SaveBackup(backup);
+                var backup = _dataAccess.CreateBackup(isAutobackup: false);
                 _backupService.BackupSavefile(backup);
                 _backupService.SaveScreenshot(backup.PicturePath);
                 UpdateBackups();
@@ -168,10 +165,20 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                             if (r == DialogResult.Abort)
                                 return;
 
+                            // TODO: HANDLE POSSIBLE EXCEPTIONS SOMEWHERE?
+                            try
+                            {
+
+                            }
+                            catch (Exception ex)
+                            {
+                                _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
+                            }
+
                             if (r == DialogResult.OK)
                             {
                                 await _googleDrive.DeleteBackupAsync(backup.Backup);
-                                _dataAccess.RemoveBackup(backup.Backup);
+                                _dataAccess.DeleteBackup(backup.Backup.Id);
                                 UpdateBackups();
                             }
 
@@ -181,13 +188,13 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 }
                 else
                 {
-                    _dataAccess.RemoveBackup(backup.Backup);
+                    _dataAccess.DeleteBackup(backup.Backup.Id);
                     _backupService.DeleteFiles(backup.Backup);
                     UpdateBackups();
                 }
-                RaiseDriveActionCanExecute();
-                //backup.RaisePropertyChanged2();
-                //backup.PicturePath = backup.PicturePath;
+
+                // TODO: Not exactly right place to call this method, cuz above code is asynchronous.
+                //RaiseDriveActionCanExecute();
             }
             catch (Exception ex)
             {
@@ -199,8 +206,8 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         {
             try
             {
-                var backups = _dataAccess.SearchBackups(Filter);
-                var backupModels = backups.Select(x => new BackupModel(x)).ToList();
+                var response = _dataAccess.SearchBackups(Filter);
+                var backupModels = response.Backups.Select(x => new BackupModel(x)).ToList();
 
                 foreach (var model in backupModels)
                 {
@@ -212,13 +219,12 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                             RemoveSelectedCommand.RaiseCanExecuteChanged();
                         }
                     };
-
-                    model.GameTitle = _dataAccess.GetGame(model.GameId)?.Title;
                 }
 
-                Backups = new ObservableCollection<BackupModel>(backupModels);
-                RaisePropertyChanged(nameof(Backups));
-                RaisePropertyChanged(nameof(TotalNumberOfBackups));
+                Backups.Clear();
+                Backups.AddRange(backupModels);
+                TotalNumberOfBackups = response.TotalCount;
+
                 RaisePropertyChanged(nameof(From));
                 RaisePropertyChanged(nameof(To));
                 RaiseNavigateCanExecute();
@@ -231,7 +237,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
         private void ShowInExplorer(BackupModel backup)
         {
-            var dirName = Path.GetDirectoryName(backup.SavefilePath);
+            var dirName = Path.GetDirectoryName(backup.Backup.SavefilePath);
             _eventAggregator.GetEvent<StartProcessRequestedEvent>().Publish(dirName);
         }
 
@@ -247,7 +253,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             {
                 var selected = Filter.GameId;
                 
-                var games = _dataAccess.LoadGames();
+                var games = _dataAccess.GetGames();
                 games.Add(new Game() { Title = "ALL" });
                 Games.Clear();
                 Games.AddRange(games);
@@ -273,8 +279,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 {
                     _messageQueue.Enqueue("Upload started...", "CANCEL", x => _cts?.Cancel(), null, true, true);
 
-                    var gameTitle = _dataAccess.GetGame(backup.GameId).Title;
-                    var backupCloudFolderId = await _googleDrive.UploadBackupAsync(backup, gameTitle, ct).ConfigureAwait(true);
+                    var backupCloudFolderId = await _googleDrive.UploadBackupAsync(backup, ct).ConfigureAwait(true);
 
                     _messageQueue.Enqueue("Upload finished!", "", () => { }, true);
 
@@ -315,14 +320,12 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             }
         }
 
-        // TODO: update recovered backup (show image)
         private async Task RecoverAsync(BackupModel backup, CancellationToken ct)
         {
             try
             {
                 await _googleDrive.RecoverAsync(backup.Backup, () => _messageQueue.Enqueue($"Download completed!"), ct).ConfigureAwait(false);
-                //backup.PicturePath = backup.PicturePath;
-                backup.RaisePropertyChanged2();
+                // TODO: Update PicturePath binding.
             }
             catch (Exception ex)
             {

@@ -1,9 +1,8 @@
 ﻿using Prism.Events;
-using SavescumBuddy.Core.Enums;
-using SavescumBuddy.Data;
+using SavescumBuddy.Lib;
 using System;
 
-namespace SavescumBuddy.Core.Events
+namespace SavescumBuddy.Wpf.Events
 {
     public class BackupCreatedEvent : PubSubEvent<Backup> { }
     public class BackupDeletedEvent : PubSubEvent<Backup> { }

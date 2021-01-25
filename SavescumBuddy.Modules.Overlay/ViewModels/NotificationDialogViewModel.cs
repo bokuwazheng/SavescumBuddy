@@ -2,10 +2,10 @@
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
-using SavescumBuddy.Core.Constants;
-using SavescumBuddy.Core.Enums;
-using SavescumBuddy.Core.Events;
-using SavescumBuddy.Core.Extensions;
+using SavescumBuddy.Wpf.Constants;
+using SavescumBuddy.Lib.Enums;
+using SavescumBuddy.Wpf.Events;
+using SavescumBuddy.Wpf.Extensions;
 using System;
 
 namespace SavescumBuddy.Modules.Overlay.ViewModels
@@ -20,7 +20,7 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
         private string _message;
         private string _okContent;
         private string _cancelContent;
-        private event Action<DialogResult> _requestClose;
+        private Action<DialogResult> _requestClose;
 
         public NotificationDialogViewModel(IRegionManager regionManager, IEventAggregator eventAggregator)
         {
@@ -40,7 +40,30 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
             try
             {
                 if (result.HasValue)
-                    _requestClose?.Invoke(result.Value);
+                {
+                    _requestClose?.BeginInvoke(result.Value, res =>
+                    {
+                        try
+                        {
+                            _requestClose.EndInvoke(res);
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+                    }, null);
+                }
+
+                //try
+                //{
+                //    _requestClose.Invoke(result.Value);
+                //}
+                //catch (Exception ex)
+                //{
+                //    _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
+                //}
+
+                //_requestClose.Invoke(result.Value);
 
                 if (_navigationService.Journal.CanGoBack)
                     _navigationService.Journal.GoBack();

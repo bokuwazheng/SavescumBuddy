@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:enums="clr-namespace:SavescumBuddy.Core.Enums;assembly=SavescumBuddy.Core"
+             xmlns:enums="clr-namespace:SavescumBuddy.Lib.Enums;assembly=SavescumBuddy.Lib"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              SnapsToDevicePixels="True"
              prism:ViewModelLocator.AutoWireViewModel="True">

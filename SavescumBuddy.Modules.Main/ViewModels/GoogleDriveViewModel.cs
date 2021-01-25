@@ -1,7 +1,7 @@
 ﻿using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
-using SavescumBuddy.Core.Events;
+using SavescumBuddy.Wpf.Events;
 using SavescumBuddy.Services.Interfaces;
 using System;
 using System.Threading;

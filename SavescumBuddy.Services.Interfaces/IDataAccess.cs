@@ -1,26 +1,25 @@
-﻿using SavescumBuddy.Data;
+﻿using SavescumBuddy.Lib;
+using System;
 using System.Collections.Generic;
 
 namespace SavescumBuddy.Services.Interfaces
 {
     public interface IDataAccess
     {
-        int GetTotalNumberOfBackups(IBackupSearchRequest request);
-        List<Backup> SearchBackups(IBackupSearchRequest request);
-        void SaveBackup(Backup backup);
-        void RemoveBackup(Backup backup);
+        BackupSearchResponse SearchBackups(IBackupSearchRequest request);
+        Backup CreateBackup(bool isAutobackup);
+        void DeleteBackup(int id);
         Backup GetLatestBackup();
         Backup GetLatestAutobackup();
         void UpdateNote(Backup backup);
         void UpdateIsLiked(Backup backup);
         void UpdateGoogleDriveId(Backup backup);
-        void UpdateFilePaths(Backup backup);
-        List<Game> LoadGames();
-        int SaveGame(Game game);
-        void RemoveGame(Game game);
-        Game GetCurrentGame();
+        List<Game> GetGames();
+        void CreateGame(Game game);
+        void DeleteGame(Game game);
         void SetGameAsCurrent(Game game);
         void UpdateGame(Game game);
-        Game GetGame(int gameId);
+        bool ScheduledBackupMustBeSkipped();
+        void OverwriteScheduledBackup(Action<Backup> action);
     }
 }

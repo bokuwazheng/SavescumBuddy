@@ -18,7 +18,6 @@
     <PackageReference Include="Prism.DryIoc" Version="8.0.0.1909" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SavescumBuddy.Core\SavescumBuddy.Core.csproj" />
     <ProjectReference Include="..\SavescumBuddy.Modules.Main\SavescumBuddy.Modules.Main.csproj" />
     <ProjectReference Include="..\SavescumBuddy.Modules.Overlay\SavescumBuddy.Modules.Overlay.csproj" />
     <ProjectReference Include="..\SavescumBuddy.Services\SavescumBuddy.Services.csproj" />

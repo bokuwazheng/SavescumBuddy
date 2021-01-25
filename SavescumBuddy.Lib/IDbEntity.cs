@@ -1,4 +1,4 @@
-﻿namespace SavescumBuddy.Data
+﻿namespace SavescumBuddy.Lib
 {
     interface IDbEntity { }
 }

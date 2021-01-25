@@ -1,4 +1,4 @@
-﻿namespace SavescumBuddy.Core.Constants
+﻿namespace SavescumBuddy.Wpf.Constants
 {
     public class RegionNames
     {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace SavescumBuddy.Core.Enums
+namespace SavescumBuddy.Lib.Enums
 {
     public enum HotkeyAction
     {

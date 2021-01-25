@@ -1,5 +1,5 @@
 ﻿using Prism.Mvvm;
-using SavescumBuddy.Data;
+using SavescumBuddy.Lib;
 using System;
 
 namespace SavescumBuddy.Modules.Main.Models

@@ -9,11 +9,12 @@
   <ItemGroup>
     <PackageReference Include="MaterialDesignColors" Version="1.2.7" />
     <PackageReference Include="MaterialDesignThemes" Version="3.2.0" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
+    <PackageReference Include="Prism.Wpf" Version="8.0.0.1909" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SavescumBuddy.Core\SavescumBuddy.Core.csproj" />
+    <ProjectReference Include="..\SavescumBuddy.Lib\SavescumBuddy.Lib.csproj" />
   </ItemGroup>
 
   <ItemGroup>

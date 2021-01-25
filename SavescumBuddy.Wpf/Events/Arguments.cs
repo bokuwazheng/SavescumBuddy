@@ -1,7 +1,7 @@
-﻿using SavescumBuddy.Data;
+﻿using SavescumBuddy.Lib;
 using System;
 
-namespace SavescumBuddy.Core.Events
+namespace SavescumBuddy.Wpf.Events
 {
     public class CallbackArgs
     {

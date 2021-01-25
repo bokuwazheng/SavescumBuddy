@@ -2,9 +2,9 @@
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
-using SavescumBuddy.Core.Constants;
-using SavescumBuddy.Core.Events;
-using SavescumBuddy.Core.Extensions;
+using SavescumBuddy.Wpf.Constants;
+using SavescumBuddy.Wpf.Events;
+using SavescumBuddy.Wpf.Extensions;
 
 namespace SavescumBuddy.Modules.Overlay.ViewModels
 {

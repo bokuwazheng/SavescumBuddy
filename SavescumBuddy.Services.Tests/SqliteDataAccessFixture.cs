@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Xunit;
-using SavescumBuddy.Data;
+using SavescumBuddy.Lib;
 using System.IO;
 
 namespace SavescumBuddy.Services.Tests

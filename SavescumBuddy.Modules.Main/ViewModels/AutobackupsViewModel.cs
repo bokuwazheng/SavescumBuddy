@@ -1,9 +1,9 @@
 ﻿using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
-using SavescumBuddy.Core.Enums;
-using SavescumBuddy.Core.Events;
-using SavescumBuddy.Data;
+using SavescumBuddy.Lib.Enums;
+using SavescumBuddy.Wpf.Events;
+using SavescumBuddy.Lib;
 using SavescumBuddy.Services.Interfaces;
 using System;
 using System.Windows.Threading;
@@ -17,7 +17,6 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         private readonly ISettingsAccess _settingsAccess;
         private readonly IEventAggregator _eventAggregator;
         private readonly IBackupService _backupService;
-        private readonly IBackupFactory _backupFactory;
 
         private int _progress;
         private DispatcherTimer _backupTimer;
@@ -26,14 +25,13 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         public int Progress { get => _progress; private set => SetProperty(ref _progress, value); }
         public int Interval => _settingsAccess.AutobackupInterval * 60;
 
-        public AutobackupsViewModel(IRegionManager regionManager, IDataAccess dataAccess, ISettingsAccess settingsAccess, IEventAggregator eventAggregator, IBackupService backupService, IBackupFactory backupFactory)
+        public AutobackupsViewModel(IRegionManager regionManager, IDataAccess dataAccess, ISettingsAccess settingsAccess, IEventAggregator eventAggregator, IBackupService backupService)
         {
             _regionManager = regionManager;
             _dataAccess = dataAccess;
             _settingsAccess = settingsAccess;
             _eventAggregator = eventAggregator;
             _backupService = backupService;
-            _backupFactory = backupFactory;
 
             _backupTimer = new DispatcherTimer();
             _backupTimer.Interval = TimeSpan.FromMinutes(Interval);
@@ -89,58 +87,16 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
         private void Autobackup()
         {
-            if (_dataAccess.GetCurrentGame() is null || ItIsTimeToSkip())
-                return;
-
-            var backup = _dataAccess.GetLatestAutobackup();
-
-            if (backup is object && PreviousAutobackupShouldBeDeleted(backup))
+            if (!_dataAccess.ScheduledBackupMustBeSkipped())
             {
-                _dataAccess.RemoveBackup(backup);
-                _backupService.DeleteFiles(backup);
+                _dataAccess.OverwriteScheduledBackup(x => _backupService.DeleteFiles(x));
+
+                var newBackup = _dataAccess.CreateBackup(isAutobackup: true);
+                _backupService.BackupSavefile(newBackup);
+                _backupService.SaveScreenshot(newBackup.PicturePath);
+
+                _eventAggregator.GetEvent<BackupListUpdateRequestedEvent>().Publish();
             }
-
-            var newBackup = _backupFactory.CreateBackup();
-            _dataAccess.SaveBackup(newBackup);
-            _backupService.BackupSavefile(newBackup);
-            _backupService.SaveScreenshot(newBackup.PicturePath);
-
-            _eventAggregator.GetEvent<BackupListUpdateRequestedEvent>().Publish();
-        }
-
-        private bool ItIsTimeToSkip()
-        {
-            var lastBackup = _dataAccess.GetLatestBackup();
-
-            if (lastBackup is object)
-            {
-                var timeSinceLastBackup = DateTime.Now - new DateTime(lastBackup.TimeStamp);
-
-                if (_settingsAccess.AutobackupSkipType == (int)SkipOption.FiveMin)
-                {
-                    return timeSinceLastBackup > TimeSpan.FromMinutes(5d);
-                }
-                else if (_settingsAccess.AutobackupSkipType == (int)SkipOption.TenMin)
-                {
-                    return timeSinceLastBackup > TimeSpan.FromMinutes(10d);
-                }
-            }
-
-            return false;
-        }
-
-        private bool PreviousAutobackupShouldBeDeleted(Backup previous)
-        {
-            if (_settingsAccess.AutobackupOverwriteType == (int)OverwriteOption.Always)
-            {
-                return true;
-            }
-            else if (_settingsAccess.AutobackupOverwriteType == (int)OverwriteOption.KeepLiked)
-            {
-                return !previous.IsLiked.Equals(1);
-            }
-
-            return false;
         }
     }
 }

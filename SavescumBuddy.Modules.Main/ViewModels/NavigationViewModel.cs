@@ -1,7 +1,7 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Regions;
-using SavescumBuddy.Core.Constants;
+using SavescumBuddy.Wpf.Constants;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {

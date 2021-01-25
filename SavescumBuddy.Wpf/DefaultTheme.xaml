@@ -3,7 +3,7 @@
                     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
                     xmlns:converters="clr-namespace:SavescumBuddy.Wpf.Converters;assembly=SavescumBuddy.Wpf" 
                     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-                    xmlns:enums="clr-namespace:SavescumBuddy.Core.Enums;assembly=SavescumBuddy.Core">
+                    xmlns:enums="clr-namespace:SavescumBuddy.Lib.Enums;assembly=SavescumBuddy.Lib">
     
     <!--Sorting buttons brushes-->
     <LinearGradientBrush x:Key="HeartButtonBrush" StartPoint="0,0.5" EndPoint="1,0.5">

@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:prism="http://prismlibrary.com/"
         prism:ViewModelLocator.AutoWireViewModel="True"
-        xmlns:core="clr-namespace:SavescumBuddy.Core.Constants;assembly=SavescumBuddy.Core"
+        xmlns:core="clr-namespace:SavescumBuddy.Wpf.Constants;assembly=SavescumBuddy.Wpf"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         Title="{Binding Title}" Height="700" Width="1200">
 

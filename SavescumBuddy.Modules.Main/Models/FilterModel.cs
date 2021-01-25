@@ -1,10 +1,11 @@
 ﻿using Prism.Mvvm;
-using SavescumBuddy.Data;
+using SavescumBuddy.Lib;
 
 namespace SavescumBuddy.Modules.Main.Models
 {
     public class FilterModel : BindableBase, IBackupSearchRequest
     {
+        private int? _id;
         private int? _offset;
         private int? _limit;
         private bool _descending;
@@ -21,6 +22,7 @@ namespace SavescumBuddy.Modules.Main.Models
             _limit = 10;
         }
 
+        public int? Id { get => _id; set => SetProperty(ref _id, value); }
         public int? Offset { get => _offset; set => SetProperty(ref _offset, value); }
         public int? Limit { get => _limit; set => SetProperty(ref _limit, value); }
         public bool Descending { get => _descending ; set => SetProperty(ref _descending, value); }

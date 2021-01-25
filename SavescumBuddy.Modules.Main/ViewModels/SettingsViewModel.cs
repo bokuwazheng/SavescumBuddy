@@ -2,12 +2,12 @@
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
-using SavescumBuddy.Core.Enums;
+using SavescumBuddy.Lib.Enums;
 using SavescumBuddy.Services.Interfaces;
 using SavescumBuddy.Modules.Main.Models;
-using SavescumBuddy.Core.Events;
+using SavescumBuddy.Wpf.Events;
 using MaterialDesignThemes.Wpf;
-using SavescumBuddy.Core.Constants;
+using SavescumBuddy.Wpf.Constants;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
