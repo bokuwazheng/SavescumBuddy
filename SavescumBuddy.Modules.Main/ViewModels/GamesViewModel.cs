@@ -29,12 +29,34 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             Games = new ObservableCollection<GameModel>();
 
             LoadGamesCommand = new DelegateCommand(LoadGames);
-            AddCommand = new DelegateCommand(() => Edit(new GameModel(new Game())));
+            AddCommand = new DelegateCommand(Add);
             EditCommand = new DelegateCommand<GameModel>(Edit);
             MakeCurrentCommand = new DelegateCommand<GameModel>(MakeCurrent);
             RemoveCommand = new DelegateCommand<GameModel>(Remove);
 
             LoadGamesCommand.Execute();
+        }
+
+        private void Add()
+        {
+            var parameters = new NavigationParameters
+            {
+                { "game", new Game() },
+                {
+                    "callback", new Action<Game>(game =>
+                    {
+                        _regionManager.Deactivate(RegionNames.Overlay);
+
+                        if (game is null)
+                            return;
+
+                        // TODO: Pass Action<DialogResult> and update games list accordingly, do everything else in game VM 
+                        _dataAccess.CreateGame(game);
+                        Games.Add(new GameModel(game));
+                    })
+                }
+            };
+            _regionManager.RequestNavigate(RegionNames.Overlay, ViewNames.Game, parameters);
         }
 
         private void Edit(GameModel game)
@@ -53,17 +75,10 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                         result.Id = game.Id;
                         result.IsCurrent = game.IsCurrent;
 
-                        if (result.Id == 0)
-                        {
-                            _dataAccess.CreateGame(result);
-                            Games.Add(new GameModel(result));
-                        }
-                        else
-                        {
-                            _dataAccess.UpdateGame(result);
-                            var g = Games.IndexOf(game);
-                            Games[g] = new GameModel(result);
-                        }
+                        // TODO: Pass Action<DialogResult> and update games list accordingly, do everything else in game VM 
+                        _dataAccess.UpdateGame(result);
+                        var g = Games.IndexOf(game);
+                        Games[g] = new GameModel(result);
                     })
                 }
             };
@@ -91,8 +106,23 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         {
             try
             {
-                Games.Remove(game);
-                _dataAccess.DeleteGame(game.Game);
+                if (game.BackupCount != 0)
+                {
+                    _regionManager.PromptAction(
+                        "Are you sure?",
+                        "NOTE: all associated backups will also be deleted. Are you sure you wish to proceed?",
+                        $"DELETE GAME AND { game.BackupCount } ASSOCIATED BACKUP(S)",
+                        "CANCEL",
+                        r =>
+                        {
+                            // TODO: Find and try to delete backuped files with GameId = game.Id
+                        });
+                }
+                else
+                {
+                    Games.Remove(game);
+                    _dataAccess.DeleteGame(game.Game);
+                }
             }
             catch (Exception ex)
             {

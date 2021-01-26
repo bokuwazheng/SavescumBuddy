@@ -263,7 +263,7 @@ namespace SavescumBuddy.Services
 
         public void DeleteGame(Game game)
         {
-            _sqlService.Execute("delete from Game where Id = @Id;", new { Id = game.Id });
+            _sqlService.Execute("DELETE FROM Game WHERE Id = @Id;", new { Id = game.Id });
         }
 
         public void SetGameAsCurrent(Game game)
