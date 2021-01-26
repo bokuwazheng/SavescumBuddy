@@ -47,7 +47,7 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <TextBox.Text>
-                    <Binding Path="SavefilePath" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
+                    <Binding Path="Game.SavefilePath" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
                         <Binding.ValidationRules>
                             <validation:DirectoryExistsRule/>
                             <validation:DirectoryIsNotReadOnlyRule/>
@@ -73,7 +73,7 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <TextBox.Text>
-                    <Binding Path="BackupFolder" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
+                    <Binding Path="Game.BackupFolder" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
                         <Binding.ValidationRules>
                             <validation:DirectoryExistsRule/>
                             <validation:DirectoryIsNotReadOnlyRule/>
@@ -85,7 +85,7 @@
             <!--Game title-->
             <TextBox 
                 x:Name="TitleTextBox" 
-                Text="{Binding Title, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                Text="{Binding Game.Title, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 Style="{StaticResource MaterialDesignOutlinedTextFieldTextBox}"
                 materialDesign:HintAssist.Hint="Game title"
                 materialDesign:HintAssist.FloatingScale=".9"

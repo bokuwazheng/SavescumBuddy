@@ -5,12 +5,12 @@ using Prism.Regions;
 using SavescumBuddy.Wpf.Constants;
 using SavescumBuddy.Wpf.Events;
 using SavescumBuddy.Wpf.Extensions;
-using SavescumBuddy.Lib;
-using SavescumBuddy.Modules.Main.Models;
+using SavescumBuddy.Wpf.Models;
 using SavescumBuddy.Services.Interfaces;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using SavescumBuddy.Lib.Enums;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
@@ -41,18 +41,12 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         {
             var parameters = new NavigationParameters
             {
-                { "game", new Game() },
+                { "gameId", 0 },
                 {
-                    "callback", new Action<Game>(game =>
+                    "callback", new Action<DialogResult>(result =>
                     {
-                        _regionManager.Deactivate(RegionNames.Overlay);
-
-                        if (game is null)
-                            return;
-
-                        // TODO: Pass Action<DialogResult> and update games list accordingly, do everything else in game VM 
-                        _dataAccess.CreateGame(game);
-                        Games.Add(new GameModel(game));
+                        if (result == DialogResult.OK)
+                            LoadGamesCommand.Execute();
                     })
                 }
             };
@@ -63,22 +57,12 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         {
             var parameters = new NavigationParameters
             {
-                { "game", game.Game },
+                { "gameId", game.Id },
                 {
-                    "callback", new Action<Game>(result =>
+                    "callback", new Action<DialogResult>(result =>
                     {
-                        _regionManager.Deactivate(RegionNames.Overlay);
-
-                        if (result is null)
-                            return;
-
-                        result.Id = game.Id;
-                        result.IsCurrent = game.IsCurrent;
-
-                        // TODO: Pass Action<DialogResult> and update games list accordingly, do everything else in game VM 
-                        _dataAccess.UpdateGame(result);
-                        var g = Games.IndexOf(game);
-                        Games[g] = new GameModel(result);
+                        if (result == DialogResult.OK)
+                            LoadGamesCommand.Execute();
                     })
                 }
             };
@@ -93,7 +77,8 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             {
                 var games = _dataAccess.GetGames();
                 var gameModels = games.Select(x => new GameModel(x)).ToList();
-                Games = new ObservableCollection<GameModel>(gameModels);
+                Games.Clear();
+                Games.AddRange(gameModels);
                 RaisePropertyChanged(nameof(Games));
             }
             catch (Exception ex)
@@ -135,7 +120,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         {
             try
             {
-                _dataAccess.SetGameAsCurrent(game.Game);
+                _dataAccess.SetGameAsCurrent(game.Id);
                 LoadGamesCommand.Execute();
             }
             catch (Exception ex)

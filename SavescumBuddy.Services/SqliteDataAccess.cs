@@ -256,6 +256,11 @@ namespace SavescumBuddy.Services
             return _sqlService.Query<Game>("SELECT * FROM Game ORDER BY Id ASC");
         }
 
+        public Game GetGame(int id)
+        {
+            return _sqlService.QueryFirstOrDefault<Game>("SELECT * FROM Game WHERE Id = @Id", new { Id = id });
+        }
+
         public void CreateGame(Game game)
         {
             _sqlService.Execute("INSERT INTO Game (Title, SavefilePath, BackupFolder) values (@Title, @SavefilePath, @BackupFolder);", game);
@@ -266,13 +271,13 @@ namespace SavescumBuddy.Services
             _sqlService.Execute("DELETE FROM Game WHERE Id = @Id;", new { Id = game.Id });
         }
 
-        public void SetGameAsCurrent(Game game)
+        public void SetGameAsCurrent(int id)
         {
             var sql = @"
                 UPDATE Game SET IsCurrent = 0 WHERE IsCurrent = 1;
                 UPDATE Game SET IsCurrent = 1 WHERE Id = @Id;";
 
-            _sqlService.Execute(sql, new { Id = game.Id });
+            _sqlService.Execute(sql, new { Id = id });
         }
 
         public void UpdateGame(Game game)

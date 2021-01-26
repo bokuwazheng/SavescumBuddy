@@ -4,10 +4,10 @@ using Prism.Mvvm;
 using Prism.Regions;
 using SavescumBuddy.Lib.Enums;
 using SavescumBuddy.Services.Interfaces;
-using SavescumBuddy.Modules.Main.Models;
 using SavescumBuddy.Wpf.Events;
 using MaterialDesignThemes.Wpf;
 using SavescumBuddy.Wpf.Constants;
+using SavescumBuddy.Modules.Main.Models;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {

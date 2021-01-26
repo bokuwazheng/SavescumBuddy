@@ -6,7 +6,6 @@
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
 
              xmlns:controls="clr-namespace:SavescumBuddy.Wpf;assembly=SavescumBuddy.Wpf"
-             xmlns:models="clr-namespace:SavescumBuddy.Modules.Main.Models"
              xmlns:validation="clr-namespace:SavescumBuddy.Wpf.Validation;assembly=SavescumBuddy.Wpf"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              SnapsToDevicePixels="True"

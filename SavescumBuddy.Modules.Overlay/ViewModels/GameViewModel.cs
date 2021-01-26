@@ -4,52 +4,54 @@ using Prism.Mvvm;
 using Prism.Regions;
 using SavescumBuddy.Lib.Enums;
 using SavescumBuddy.Wpf.Events;
+using SavescumBuddy.Wpf.Extensions;
 using SavescumBuddy.Lib;
 using SavescumBuddy.Services.Interfaces;
 using System;
+using SavescumBuddy.Wpf.Models;
+using SavescumBuddy.Wpf.Constants;
 
 namespace SavescumBuddy.Modules.Overlay.ViewModels
 {
     public class GameViewModel : BindableBase, INavigationAware
     {
-        private Action<Game> _requestClose;
-        private string _title;
-        private string _savefilePath;
-        private string _backupFolder;
+        private GameModel _game;
+        private Action<DialogResult> _requestClose;
+        private readonly IRegionManager _regionManager;
         private readonly IEventAggregator _eventAggregator;
         private readonly IOpenFileService _openFileService;
+        private readonly IDataAccess _dataAccess;
         private IRegionNavigationService _navigationService;
 
-        public GameViewModel(IEventAggregator eventAggregator, IOpenFileService openFileService)
+        public GameViewModel(IRegionManager regionManager, IEventAggregator eventAggregator, IOpenFileService openFileService, IDataAccess dataAccess)
         {
+            _regionManager = regionManager;
             _eventAggregator = eventAggregator;
             _openFileService = openFileService;
+            _dataAccess = dataAccess;
 
             CloseDialogCommand = new DelegateCommand<DialogResult?>(CloseDialog);
             OpenFilePickerCommand = new DelegateCommand(GetSavefilePath);
             OpenFolderPickerCommand = new DelegateCommand(GetBackupFolderPath);
         }
 
-        public string Title { get => _title; set => SetProperty(ref _title, value); }
-        public string SavefilePath { get => _savefilePath; set => SetProperty(ref _savefilePath, value); }
-        public string BackupFolder { get => _backupFolder; set => SetProperty(ref _backupFolder, value); }
+        public GameModel Game { get => _game; set => SetProperty(ref _game, value); }
 
         private void CloseDialog(DialogResult? result)
         {
             if (result.HasValue)
             {
-                Game game = null;
-                if (result == DialogResult.OK)
+                if (result.Value == DialogResult.OK)
                 {
-                    game = new Game
-                    {
-                        Title = Title,
-                        SavefilePath = SavefilePath,
-                        BackupFolder = BackupFolder
-                    };
+                    if (Game.Id == 0)
+                        _dataAccess.CreateGame(Game.Game);
+                    else
+                        _dataAccess.UpdateGame(Game.Game);
                 }
+
+                _regionManager.Deactivate(RegionNames.Overlay);
                 _navigationService.Journal.Clear();
-                _requestClose?.Invoke(game);
+                _requestClose?.Invoke(result.Value);
             }
         }
 
@@ -62,7 +64,7 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
                 _openFileService.ShowHiddenItems = true;
 
                 if (_openFileService.OpenFile())
-                    SavefilePath = _openFileService.FileName;
+                    Game.SavefilePath = _openFileService.FileName;
             }
             catch (Exception ex)
             {
@@ -79,7 +81,7 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
                 _openFileService.ShowHiddenItems = true;
 
                 if (_openFileService.OpenFile())
-                    BackupFolder = _openFileService.FileName;
+                    Game.BackupFolder = _openFileService.FileName;
             }
             catch (Exception ex)
             {
@@ -100,11 +102,18 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
 
             if (navigationContext.Parameters.Count == 0)
                 return;
-            var game = (Game)navigationContext.Parameters["game"];
-            Title = game.Title;
-            SavefilePath = game.SavefilePath;
-            BackupFolder = game.BackupFolder;
-            _requestClose = (Action<Game>)navigationContext.Parameters["callback"];
+
+            var id = (int)navigationContext.Parameters["gameId0"];
+
+            if (id == 0)
+                Game = new GameModel(new Game());
+            else
+            {
+                var game = _dataAccess.GetGame(id) ?? throw new Exception($"Couldn't file game with id { id }");
+                Game = new GameModel(game);
+            }
+
+            _requestClose = (Action<DialogResult>)navigationContext.Parameters["callback"];
         }
 
         public DelegateCommand<DialogResult?> CloseDialogCommand { get; }

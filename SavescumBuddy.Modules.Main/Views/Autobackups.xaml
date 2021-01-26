@@ -6,7 +6,6 @@
              xmlns:local="clr-namespace:SavescumBuddy.Modules.Main.Views"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:controls="clr-namespace:SavescumBuddy.Wpf;assembly=SavescumBuddy.Wpf"
-             xmlns:models="clr-namespace:SavescumBuddy.Modules.Main.Models"
              xmlns:validation="clr-namespace:SavescumBuddy.Wpf.Validation;assembly=SavescumBuddy.Wpf"
              SnapsToDevicePixels="True"
              prism:ViewModelLocator.AutoWireViewModel="True">

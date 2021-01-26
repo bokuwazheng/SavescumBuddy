@@ -2,7 +2,7 @@
 using SavescumBuddy.Lib;
 using System;
 
-namespace SavescumBuddy.Modules.Main.Models
+namespace SavescumBuddy.Wpf.Models
 {
     public class BackupModel : BindableBase
     {

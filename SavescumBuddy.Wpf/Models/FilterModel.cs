@@ -1,7 +1,7 @@
 ﻿using Prism.Mvvm;
 using SavescumBuddy.Lib;
 
-namespace SavescumBuddy.Modules.Main.Models
+namespace SavescumBuddy.Wpf.Models
 {
     public class FilterModel : BindableBase, IBackupSearchRequest
     {

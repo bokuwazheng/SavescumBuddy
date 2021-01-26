@@ -7,7 +7,7 @@ using SavescumBuddy.Lib.Enums;
 using SavescumBuddy.Wpf.Events;
 using SavescumBuddy.Wpf.Extensions;
 using SavescumBuddy.Lib;
-using SavescumBuddy.Modules.Main.Models;
+using SavescumBuddy.Wpf.Models;
 using SavescumBuddy.Services.Interfaces;
 using System;
 using System.Collections.ObjectModel;

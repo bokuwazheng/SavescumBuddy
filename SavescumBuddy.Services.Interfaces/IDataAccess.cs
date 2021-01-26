@@ -14,10 +14,11 @@ namespace SavescumBuddy.Services.Interfaces
         void UpdateNote(Backup backup);
         void UpdateIsLiked(Backup backup);
         void UpdateGoogleDriveId(Backup backup);
+        Game GetGame(int id);
         List<Game> GetGames();
         void CreateGame(Game game);
         void DeleteGame(Game game);
-        void SetGameAsCurrent(Game game);
+        void SetGameAsCurrent(int id);
         void UpdateGame(Game game);
         bool ScheduledBackupMustBeSkipped();
         void OverwriteScheduledBackup(Action<Backup> action);
