@@ -103,7 +103,7 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
             if (navigationContext.Parameters.Count == 0)
                 return;
 
-            var id = (int)navigationContext.Parameters["gameId0"];
+            var id = (int)navigationContext.Parameters["gameId"];
 
             if (id == 0)
                 Game = new GameModel(new Game());

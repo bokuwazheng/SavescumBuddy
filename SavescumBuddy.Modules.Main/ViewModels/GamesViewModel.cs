@@ -11,20 +11,23 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using SavescumBuddy.Lib.Enums;
+using SavescumBuddy.Lib;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
-    public class GamesViewModel : BindableBase
+    public class GamesViewModel : BindableBase, INavigationAware
     {
         private readonly IRegionManager _regionManager;
         private readonly IDataAccess _dataAccess;
         private readonly IEventAggregator _eventAggregator;
+        private readonly IBackupService _backupService;
 
-        public GamesViewModel(IRegionManager regionManager, IDataAccess dataAccess, IEventAggregator eventAggregator)
+        public GamesViewModel(IRegionManager regionManager, IDataAccess dataAccess, IEventAggregator eventAggregator, IBackupService backupService)
         {
             _regionManager = regionManager;
             _dataAccess = dataAccess;
             _eventAggregator = eventAggregator;
+            _backupService = backupService;
 
             Games = new ObservableCollection<GameModel>();
 
@@ -100,7 +103,21 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                         "CANCEL",
                         r =>
                         {
-                            // TODO: Find and try to delete backuped files with GameId = game.Id
+                            if (r == DialogResult.OK)
+                            {
+                                var backups = _dataAccess.SearchBackups(new BackupSearchRequest() { GameId = game.Id });
+                                backups.Backups.ForEach(x =>
+                                {
+                                    try
+                                    {
+                                        _backupService.DeleteFiles(x); // TODO: Fix operation is not supported Exception when trying to delete unexisting files.
+                                    }
+                                    catch { }
+                                });
+
+                                Games.Remove(game);
+                                _dataAccess.DeleteGame(game.Game);
+                            }
                         });
                 }
                 else
@@ -115,7 +132,6 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             }
         }
 
-        // TODO: Doesn't update UI on first click!
         private void MakeCurrent(GameModel game)
         {
             try
@@ -128,6 +144,12 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
             }
         }
+
+        public void OnNavigatedTo(NavigationContext navigationContext) => LoadGamesCommand.Execute();
+
+        public bool IsNavigationTarget(NavigationContext navigationContext) => true;
+
+        public void OnNavigatedFrom(NavigationContext navigationContext) { }
 
         public DelegateCommand LoadGamesCommand { get; }
         public DelegateCommand AddCommand { get; }
