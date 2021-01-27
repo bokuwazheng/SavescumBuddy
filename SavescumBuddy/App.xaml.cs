@@ -52,10 +52,7 @@ namespace SavescumBuddy
             });
         }
 
-        protected override Window CreateShell()
-        {
-            return Container.Resolve<MainWindow>();
-        }
+        protected override Window CreateShell() => Container.Resolve<MainWindow>();
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
@@ -139,7 +136,7 @@ namespace SavescumBuddy
 
                 if (e.KeyValue == settings.OverwriteKey && (int)e.Modifiers == settings.OverwriteModifier)
                 {
-                    var latest = data.GetLatestBackup();
+                    var latest = data.GetLatestBackup(); 
                     if (latest is object)
                     {
                         backuper.DeleteFiles(latest);
@@ -169,7 +166,7 @@ namespace SavescumBuddy
             }
             else
             {
-                hook.Hook();
+                hook.Unhook();
                 hook.KeyDown -= ApplicationHook_KeyDown;
             }
         }
@@ -200,12 +197,16 @@ namespace SavescumBuddy
             var key = Keys.None;
             if (e.KeyValue > 0) key = e.KeyCode;
 
-            if (key == Keys.LMenu || key == Keys.RMenu ||
-                key == Keys.LShiftKey || key == Keys.RShiftKey ||
-                key == Keys.LControlKey || key == Keys.RControlKey)
+            if (key is 
+                Keys.LMenu or Keys.RMenu or 
+                Keys.LShiftKey or Keys.RShiftKey or 
+                Keys.LControlKey or Keys.RControlKey)
                 mod = Keys.None;
 
-          var ea = Container.Resolve<IEventAggregator>();
+            if (key is Keys.Enter or Keys.Space or Keys.Back)
+                return;
+
+            var ea = Container.Resolve<IEventAggregator>();
             ea.GetEvent<HookKeyDownEvent>().Publish(((int)key, (int)mod));
         }
     }

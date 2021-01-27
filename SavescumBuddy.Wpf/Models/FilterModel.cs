@@ -15,6 +15,7 @@ namespace SavescumBuddy.Wpf.Models
         private bool? _isInGoogleDrive;
         private string _note;
         private int _gameId;
+        private bool _currentGame;
 
         public FilterModel()
         {
@@ -32,5 +33,6 @@ namespace SavescumBuddy.Wpf.Models
         public bool? IsInGoogleDrive { get => _isInGoogleDrive; set => SetProperty(ref _isInGoogleDrive, value); }
         public string Note { get => _note; set => SetProperty(ref _note, value); }
         public int GameId { get => _gameId; set => SetProperty(ref _gameId, value); }
+        public bool CurrentGame { get => _currentGame; set => SetProperty(ref _currentGame, value); }
     }
 }

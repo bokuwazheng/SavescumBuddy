@@ -10,7 +10,6 @@ namespace SavescumBuddy.Services.Interfaces
         Backup CreateBackup(bool isAutobackup);
         void DeleteBackup(int id);
         Backup GetLatestBackup();
-        Backup GetLatestAutobackup();
         void UpdateNote(Backup backup);
         void UpdateIsLiked(Backup backup);
         void UpdateGoogleDriveId(Backup backup);

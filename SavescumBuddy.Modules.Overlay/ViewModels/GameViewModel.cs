@@ -41,9 +41,9 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
         {
             if (result.HasValue)
             {
-                if (result.Value == DialogResult.OK)
+                if (result.Value is DialogResult.OK)
                 {
-                    if (Game.Id == 0)
+                    if (Game.Id is 0)
                         _dataAccess.CreateGame(Game.Game);
                     else
                         _dataAccess.UpdateGame(Game.Game);
@@ -105,7 +105,7 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
 
             var id = (int)navigationContext.Parameters["gameId"];
 
-            if (id == 0)
+            if (id is 0)
                 Game = new GameModel(new Game());
             else
             {

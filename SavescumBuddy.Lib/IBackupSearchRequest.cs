@@ -10,6 +10,7 @@
         public bool? IsLiked { get; set; }
         public bool? IsAutobackup { get; set; }
         public int GameId { get; set; }
+        public bool CurrentGame { get; set; }
         public bool? IsInGoogleDrive { get; set; }
         public string Note { get; set; }
     }

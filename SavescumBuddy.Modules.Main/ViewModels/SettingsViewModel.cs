@@ -6,14 +6,12 @@ using SavescumBuddy.Lib.Enums;
 using SavescumBuddy.Services.Interfaces;
 using SavescumBuddy.Wpf.Events;
 using MaterialDesignThemes.Wpf;
-using SavescumBuddy.Wpf.Constants;
 using SavescumBuddy.Modules.Main.Models;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
     public class SettingsViewModel : BindableBase, INavigationAware
     {
-        private readonly IRegionManager _regionManager;
         private readonly ISettingsAccess _settingsAccess;
         private readonly IEventAggregator _eventAggregator;
         private readonly ISnackbarMessageQueue _messageQueue;
@@ -23,9 +21,8 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         public SettingsModel Settings { get; }
         public HotkeyAction? SelectedHotkeyAction { get => _recordedHotkeyType; set => SetProperty(ref _recordedHotkeyType, value); }
 
-        public SettingsViewModel(IRegionManager regionManager, ISettingsAccess settingsAccess, IEventAggregator eventAggregator, ISnackbarMessageQueue messageQueue)
+        public SettingsViewModel(ISettingsAccess settingsAccess, IEventAggregator eventAggregator, ISnackbarMessageQueue messageQueue)
         {
-            _regionManager = regionManager;
             _settingsAccess = settingsAccess;
             _eventAggregator = eventAggregator;
             _messageQueue = messageQueue;
@@ -36,7 +33,6 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             Settings.PropertyChanged += (s, e) => OnSettingsPropertyChanged(e.PropertyName);
 
             RegisterHotkeyCommand = new DelegateCommand<HotkeyAction?>(ToggleKeyboardHook);
-            NavigateToBackupsCommand = new DelegateCommand(() => _regionManager.RequestNavigate(RegionNames.Content, ViewNames.Backups));
         }
 
         private void OnSettingsPropertyChanged(string propertyName)
@@ -104,6 +100,5 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         }
 
         public DelegateCommand<HotkeyAction?> RegisterHotkeyCommand { get; }
-        public DelegateCommand NavigateToBackupsCommand { get; }
     }
 }

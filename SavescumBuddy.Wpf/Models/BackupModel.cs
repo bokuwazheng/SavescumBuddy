@@ -16,7 +16,7 @@ namespace SavescumBuddy.Wpf.Models
         public bool IsSelected { get => _isSelected; set => SetProperty(ref _isSelected, value); }
         public Backup Backup { get; }
 
-        public int Id { get => Backup.Id; set { Backup.Id = value; RaisePropertyChanged(); } }
+        public int Id => Backup.Id;
         public string GameTitle => Backup.GameTitle;
         public string GoogleDriveId { get => Backup.GoogleDriveId; set { Backup.GoogleDriveId = value; RaisePropertyChanged(); } }
         public string Note { get => Backup.Note; set { Backup.Note = value; RaisePropertyChanged(); } }

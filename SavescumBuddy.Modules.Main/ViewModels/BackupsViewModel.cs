@@ -162,7 +162,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                         "LEAVE BACKUP IN GOOGLE DRIVE",
                         async r => 
                         {
-                            if (r == DialogResult.Abort)
+                            if (r is DialogResult.Abort)
                                 return;
 
                             // TODO: HANDLE POSSIBLE EXCEPTIONS SOMEWHERE?
@@ -175,7 +175,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                                 _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
                             }
 
-                            if (r == DialogResult.OK)
+                            if (r is DialogResult.OK)
                             {
                                 await _googleDrive.DeleteBackupAsync(backup.Backup);
                                 _dataAccess.DeleteBackup(backup.Backup.Id);
@@ -309,7 +309,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
         private void RemoveSelected()
         {
-            var selected = Backups.Where(item => item.IsSelected);
+            var selected = Backups.Where(item => item.IsSelected).ToList();
 
             if (selected.Any())
             {
@@ -325,7 +325,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             try
             {
                 await _googleDrive.RecoverAsync(backup.Backup, () => _messageQueue.Enqueue($"Download completed!"), ct).ConfigureAwait(false);
-                // TODO: Update PicturePath binding.
+                RefreshCommand.Execute();
             }
             catch (Exception ex)
             {

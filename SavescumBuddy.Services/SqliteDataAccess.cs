@@ -3,6 +3,7 @@ using SavescumBuddy.Lib.Enums;
 using SavescumBuddy.Services.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace SavescumBuddy.Services
@@ -43,13 +44,19 @@ namespace SavescumBuddy.Services
                 LEFT JOIN Game ON Backup.GameId = Game.Id
                 {0} ORDER BY Backup.Id {1} {2}";
 
+            if (request.Id.HasValue)
+                whereClauses.Add($"Backup.Id = { request.Id.Value }");
+
             if (request.IsLiked.HasValue)
                 whereClauses.Add($"IsLiked = { request.IsLiked.Value.ToSqliteBoolean() }");
 
             if (request.IsAutobackup.HasValue)
                 whereClauses.Add($"IsAutobackup = { request.IsAutobackup.Value.ToSqliteBoolean() }");
 
-            if (request.GameId != 0)
+            if (request.CurrentGame)
+                whereClauses.Add($"GameId = (SELECT Id FROM Game WHERE IsCurrent = 1)");
+
+            if (request is { CurrentGame: false, GameId: > 0 })
                 whereClauses.Add($"GameId = { request.GameId }");
 
             if (request.IsInGoogleDrive.HasValue)
@@ -141,7 +148,7 @@ namespace SavescumBuddy.Services
 
             var id = _sqlService.ExecuteScalar<int>(query, args);
 
-            return GetBackup(id);
+            return SearchBackups(new BackupSearchRequest() { Id = id }).Backups.First();
         }
 
         public void DeleteBackup(int id)
@@ -151,12 +158,16 @@ namespace SavescumBuddy.Services
 
         public Backup GetLatestBackup()
         {
-            return _sqlService.QueryFirstOrDefault<Backup>("select * from [Backup] b where b.GameId = (select g.Id from [Game] g where g.IsCurrent = 1) and b.IsAutobackup = 0 order by b.Id desc");
-        }
-
-        public Backup GetLatestAutobackup()
-        {
-            return _sqlService.QueryFirstOrDefault<Backup>("select * from [Backup] b where b.GameId = (select g.Id from [Game] g where g.IsCurrent = 1) and b.IsAutobackup = 1 order by b.Id desc");
+            return _sqlService.QueryFirstOrDefault<Backup>(@"
+                SELECT 
+                Id,
+                Game.BackupFolder || '\' || TimeStamp AS SavefilePath,
+                Game.BackupFolder || '\' || TimeStamp || '.jpg' AS PicturePath
+                FROM Backup
+                WHERE GameId = (SELECT Id FROM Game WHERE IsCurrent = 1)
+                AND 
+                IsAutobackup = 0 
+                ORDER BY Id DESC");
         }
 
         public bool ScheduledBackupMustBeSkipped()
@@ -166,7 +177,7 @@ namespace SavescumBuddy.Services
                 TimeStamp
                 FROM Backup 
                 WHERE 
-                GameId = (SELECT Id from Game WHERE IsCurrent = 1) 
+                GameId = (SELECT Id FROM Game WHERE IsCurrent = 1) 
                 AND 
                 IsAutobackup = 0 
                 ORDER BY Id DESC
@@ -175,7 +186,7 @@ namespace SavescumBuddy.Services
             var timeStamp = DateTime.Now - new DateTime(_sqlService.ExecuteScalar<long>(sql));
 
             sql = "SELECT AutobackupSkipType FROM Settings WHERE Id = 1;";
-            var skipOption = (SkipOption)_sqlService.ExecuteScalar<long>(sql);
+            var skipOption = (SkipOption)_sqlService.ExecuteScalar<int>(sql);
 
             return skipOption switch
             {
@@ -192,7 +203,7 @@ namespace SavescumBuddy.Services
                 throw new ArgumentNullException(nameof(action));
             
             var sql = "SELECT AutobackupOverwriteType FROM Settings WHERE Id = 1;";
-            var overwriteOption = (OverwriteOption)_sqlService.ExecuteScalar<long>(sql);
+            var overwriteOption = (OverwriteOption)_sqlService.ExecuteScalar<int>(sql);
 
             sql = @"
                 SELECT

@@ -48,7 +48,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 {
                     "callback", new Action<DialogResult>(result =>
                     {
-                        if (result == DialogResult.OK)
+                        if (result is DialogResult.OK)
                             LoadGamesCommand.Execute();
                     })
                 }
@@ -64,7 +64,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 {
                     "callback", new Action<DialogResult>(result =>
                     {
-                        if (result == DialogResult.OK)
+                        if (result is DialogResult.OK)
                             LoadGamesCommand.Execute();
                     })
                 }
