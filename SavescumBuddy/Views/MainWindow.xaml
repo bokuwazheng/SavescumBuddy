@@ -5,6 +5,7 @@
         prism:ViewModelLocator.AutoWireViewModel="True"
         xmlns:core="clr-namespace:SavescumBuddy.Wpf.Constants;assembly=SavescumBuddy.Wpf"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Icon="/SavescumBuddy;component/Resources/icon.ico"
         Title="{Binding Title}" Height="700" Width="1200">
 
     <Window.Resources>

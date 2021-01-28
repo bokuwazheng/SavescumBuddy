@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using SavescumBuddy.Wpf.Extensions;
 using SavescumBuddy.Wpf.Services;
+using System.Media;
 
 namespace SavescumBuddy
 {
@@ -26,6 +27,9 @@ namespace SavescumBuddy
     /// </summary>
     public partial class App
     {
+        private SoundPlayer _backupPlayer;
+        private SoundPlayer _restorePlayer;
+
         protected override void OnInitialized()
         {
             base.OnInitialized();
@@ -46,6 +50,16 @@ namespace SavescumBuddy
                 if (gd.CredentialExists())
                     await gd.AuthorizeAsync(CancellationToken.None);
             });
+
+            try
+            {
+                _backupPlayer = new(".\\Resources\\backup.wav");
+                _restorePlayer = new(".\\Resources\\restore.wav");
+            }
+            catch (Exception ex)
+            {
+                OnErrorOccured(ex);
+            }
         }
 
         protected override Window CreateShell() => Container.Resolve<MainWindow>();
@@ -118,6 +132,10 @@ namespace SavescumBuddy
                     backuper.BackupSavefile(backup);
                     backuper.SaveScreenshot(backup.PicturePath);
                     ea.GetEvent<BackupListUpdateRequestedEvent>().Publish();
+
+                    if (settings.SoundCuesEnabled)
+                        _backupPlayer.Play();
+
                     return;
                 }
 
@@ -125,7 +143,12 @@ namespace SavescumBuddy
                 {
                     var backup = data.GetLatestBackup();
                     if (backup is object)
+                    {
                         backuper.RestoreBackup(backup);
+
+                        if (settings.SoundCuesEnabled)
+                            _restorePlayer.Play();
+                    }
                     return;
                 }
 

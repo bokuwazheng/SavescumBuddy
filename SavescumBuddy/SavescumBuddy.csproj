@@ -8,6 +8,9 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="DB.db" />
+    <None Remove="Resources\backup.wav" />
+    <None Remove="Resources\icon.ico" />
+    <None Remove="Resources\restore.wav" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="DB.db">
@@ -26,5 +29,16 @@
     <None Update="sb_credentials.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\backup.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="Resources\icon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Content Include="Resources\restore.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

@@ -160,14 +160,15 @@ namespace SavescumBuddy.Services
         {
             return _sqlService.QueryFirstOrDefault<Backup>(@"
                 SELECT 
-                Id,
+                Backup.Id,
                 Game.BackupFolder || '\' || TimeStamp AS SavefilePath,
-                Game.BackupFolder || '\' || TimeStamp || '.jpg' AS PicturePath
+                Game.SavefilePath AS OriginPath
                 FROM Backup
+                LEFT JOIN Game ON Backup.GameId = Game.Id
                 WHERE GameId = (SELECT Id FROM Game WHERE IsCurrent = 1)
                 AND 
                 IsAutobackup = 0 
-                ORDER BY Id DESC");
+                ORDER BY Backup.Id DESC");
         }
 
         public bool ScheduledBackupMustBeSkipped()
