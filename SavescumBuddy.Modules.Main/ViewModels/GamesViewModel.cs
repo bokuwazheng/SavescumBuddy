@@ -104,20 +104,20 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                         "CANCEL",
                         r =>
                         {
-                            if (r == DialogResult.OK)
+                            try
                             {
-                                var backups = _dataAccess.SearchBackups(new BackupSearchRequest() { GameId = game.Id });
-                                backups.Backups.ForEach(x =>
+                                if (r == DialogResult.OK)
                                 {
-                                    try
-                                    {
-                                        _backupService.DeleteFiles(x); // TODO: Fix operation is not supported Exception when trying to delete unexisting files.
-                                    }
-                                    catch { }
-                                });
+                                    var backups = _dataAccess.SearchBackups(new BackupSearchRequest() { GameId = game.Id });
+                                    backups.Backups.ForEach(x => _backupService.DeleteFiles(x));
 
-                                Games.Remove(game);
-                                _dataAccess.DeleteGame(game.Game);
+                                    Games.Remove(game);
+                                    _dataAccess.DeleteGame(game.Game);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
                             }
                         });
                 }

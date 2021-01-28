@@ -40,30 +40,7 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
             try
             {
                 if (result.HasValue)
-                {
-                    _requestClose?.BeginInvoke(result.Value, res =>
-                    {
-                        try
-                        {
-                            _requestClose.EndInvoke(res);
-                        }
-                        catch (Exception ex)
-                        {
-
-                        }
-                    }, null);
-                }
-
-                //try
-                //{
-                //    _requestClose.Invoke(result.Value);
-                //}
-                //catch (Exception ex)
-                //{
-                //    _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
-                //}
-
-                //_requestClose.Invoke(result.Value);
+                    _requestClose?.Invoke(result.Value);
 
                 if (_navigationService.Journal.CanGoBack)
                     _navigationService.Journal.GoBack();

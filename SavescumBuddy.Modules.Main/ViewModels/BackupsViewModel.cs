@@ -154,7 +154,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
             try
             {
-                if (backup.GoogleDriveId is object)
+                if (backup.GoogleDriveId is object) // TODO: TEST UI UPDATES
                 {
                     _regionManager.PromptAction(
                         "Delete from Google Drive too?",
@@ -166,25 +166,25 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                             if (r is DialogResult.Abort)
                                 return;
 
-                            // TODO: HANDLE POSSIBLE EXCEPTIONS SOMEWHERE?
                             try
                             {
+                                if (r is DialogResult.OK)
+                                {
+                                    await _googleDrive.DeleteBackupAsync(backup.Backup);
+                                    _dataAccess.DeleteBackup(backup.Backup.Id);
+                                    RaiseDriveActionCanExecute();
+                                }
+                                else if (r is DialogResult.Cancel)
+                                {
+                                    _backupService.DeleteFiles(backup.Backup);
 
+                                }
+                                UpdateBackups();
                             }
                             catch (Exception ex)
                             {
                                 _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
                             }
-
-                            if (r is DialogResult.OK)
-                            {
-                                await _googleDrive.DeleteBackupAsync(backup.Backup);
-                                _dataAccess.DeleteBackup(backup.Backup.Id);
-                                UpdateBackups();
-                            }
-
-                            _backupService.DeleteFiles(backup.Backup);
-                            RaisePropertyChanged(nameof(Backups));
                         });
                 }
                 else
@@ -193,9 +193,6 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                     _backupService.DeleteFiles(backup.Backup);
                     UpdateBackups();
                 }
-
-                // TODO: Not exactly right place to call this method, cuz above code is asynchronous.
-                //RaiseDriveActionCanExecute();
             }
             catch (Exception ex)
             {
