@@ -25,7 +25,6 @@ namespace SavescumBuddy.Wpf.Events
     public class BackupListUpdateRequestedEvent : PubSubEvent { }
     public class ErrorOccuredEvent : PubSubEvent<Exception> { }
     public class HookChangedEvent : PubSubEvent<bool> { }
-    public class HookKeyDownEvent : PubSubEvent<(int Key, int Modifier)> { }
     public class HookEnabledChangedEvent : PubSubEvent<bool> { }
     public class StartProcessRequestedEvent : PubSubEvent<string> { }
     public class GoogleDriveUploadRequestedEvent : PubSubEvent<Backup> { }

@@ -10,6 +10,7 @@ using SavescumBuddy.Services.Interfaces;
 using System;
 using SavescumBuddy.Wpf.Models;
 using SavescumBuddy.Wpf.Constants;
+using SavescumBuddy.Wpf.Services;
 
 namespace SavescumBuddy.Modules.Overlay.ViewModels
 {

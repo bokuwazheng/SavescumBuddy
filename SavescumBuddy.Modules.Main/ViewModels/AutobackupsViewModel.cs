@@ -1,12 +1,11 @@
 ﻿using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
-using SavescumBuddy.Lib.Enums;
 using SavescumBuddy.Wpf.Events;
-using SavescumBuddy.Lib;
 using SavescumBuddy.Services.Interfaces;
 using System;
 using System.Windows.Threading;
+using SavescumBuddy.Wpf.Services;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
@@ -41,7 +40,6 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             _progressBarTimer.Interval = TimeSpan.FromSeconds(1);
             _progressBarTimer.Tick += (s, e) => Progress++;
 
-            // If false puts the timer on pause.
             var isEnabled = _settingsAccess.AutobackupsEnabled;
             if (isEnabled)
             {

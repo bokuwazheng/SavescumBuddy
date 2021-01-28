@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SavescumBuddy.Services.Interfaces
+namespace SavescumBuddy.Wpf.Services
 {
     public interface IOpenFileService
     {

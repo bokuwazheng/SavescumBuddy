@@ -7,6 +7,8 @@ using SavescumBuddy.Services.Interfaces;
 using SavescumBuddy.Wpf.Events;
 using MaterialDesignThemes.Wpf;
 using SavescumBuddy.Modules.Main.Models;
+using SavescumBuddy.Wpf.Services;
+using System.Windows.Forms;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
@@ -15,24 +17,48 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         private readonly ISettingsAccess _settingsAccess;
         private readonly IEventAggregator _eventAggregator;
         private readonly ISnackbarMessageQueue _messageQueue;
+        private readonly IGlobalKeyboardHook _keyboardHook;
 
-        private HotkeyAction? _recordedHotkeyType = null;
+        private HotkeyAction _selectedHotkeyAction;
 
-        public SettingsModel Settings { get; }
-        public HotkeyAction? SelectedHotkeyAction { get => _recordedHotkeyType; set => SetProperty(ref _recordedHotkeyType, value); }
-
-        public SettingsViewModel(ISettingsAccess settingsAccess, IEventAggregator eventAggregator, ISnackbarMessageQueue messageQueue)
+        public SettingsViewModel(ISettingsAccess settingsAccess, IEventAggregator eventAggregator, ISnackbarMessageQueue messageQueue, IGlobalKeyboardHook keyboardHook)
         {
             _settingsAccess = settingsAccess;
             _eventAggregator = eventAggregator;
             _messageQueue = messageQueue;
-
-            _eventAggregator.GetEvent<HookKeyDownEvent>().Subscribe(keyboardHook_KeyDown);
+            _keyboardHook = keyboardHook;
 
             Settings = new SettingsModel(_settingsAccess);
             Settings.PropertyChanged += (s, e) => OnSettingsPropertyChanged(e.PropertyName);
 
-            RegisterHotkeyCommand = new DelegateCommand<HotkeyAction?>(ToggleKeyboardHook);
+            RegisterHotkeyCommand = new DelegateCommand<HotkeyAction?>(x => { if (x.HasValue) SelectedHotkeyAction = x.Value; });
+        }
+
+        public SettingsModel Settings { get; }
+        public HotkeyAction SelectedHotkeyAction
+        {
+            get => _selectedHotkeyAction;
+            set
+            {
+                _selectedHotkeyAction = _selectedHotkeyAction == value
+                    ? HotkeyAction.None
+                    : value;
+                RaisePropertyChanged(nameof(SelectedHotkeyAction));
+
+                if (_selectedHotkeyAction is HotkeyAction.None)
+                {
+                    _keyboardHook.Unhook();
+                    _keyboardHook.KeyDown -= OnKeyDown;
+                }
+                else
+                {
+                    if (!_keyboardHook.HookActive)
+                    {
+                        _keyboardHook.Hook();
+                        _keyboardHook.KeyDown += OnKeyDown;
+                    }
+                }
+            }
         }
 
         private void OnSettingsPropertyChanged(string propertyName)
@@ -47,42 +73,45 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 _eventAggregator.GetEvent<HookEnabledChangedEvent>().Publish(Settings.HotkeysEnabled);
         }
 
-        // TODO: better way to unhook cuz passing SelectedHotkeyAction is kinda tricky
-        private void ToggleKeyboardHook(HotkeyAction? actionType)
+        private void OnKeyDown(object sender, KeyEventArgs e)
         {
-            if (actionType != SelectedHotkeyAction)
-                SelectedHotkeyAction = actionType;
-            else
-                SelectedHotkeyAction = null;
+            var key = Keys.None;
+            if (e.KeyValue > 0) key = e.KeyCode;
 
-            _eventAggregator.GetEvent<HookChangedEvent>().Publish(SelectedHotkeyAction.HasValue);
-        }
-
-        private void keyboardHook_KeyDown((int Key, int Modifier) keys) // TODO: SHOULDN'T KNOW ANYTHING ABOUT KEYS
-        {
-            if (keys.Key == 27) // Keys.Escape
+            if (key is Keys.Escape)
             {
-                ToggleKeyboardHook(SelectedHotkeyAction);
+                SelectedHotkeyAction = HotkeyAction.None;
                 return;
             }
 
-            if (keys.Key == 13 || keys.Key == 32 || keys.Key == 8) // Keys.Enter or Keys.Space or Keys.Back
+            if (key is Keys.Enter or Keys.Space or Keys.Back)
                 return;
+
+            var mod = Keys.None;
+            if (e.Alt) mod = Keys.Alt;
+            if (e.Shift) mod = Keys.Shift;
+            if (e.Control) mod = Keys.Control;
+
+            if (key is
+                Keys.LMenu or Keys.RMenu or
+                Keys.LShiftKey or Keys.RShiftKey or
+                Keys.LControlKey or Keys.RControlKey)
+                mod = Keys.None;
 
             if (SelectedHotkeyAction == HotkeyAction.Backup)
             {
-                Settings.BackupKey = keys.Key;
-                Settings.BackupModifier = keys.Modifier;
+                Settings.BackupKey = (int)key;
+                Settings.BackupModifier = (int)mod;
             }
             else if (SelectedHotkeyAction == HotkeyAction.Restore)
             {
-                Settings.RestoreKey = keys.Key;
-                Settings.RestoreModifier = keys.Modifier;
+                Settings.RestoreKey = (int)key;
+                Settings.RestoreModifier = (int)mod;
             }
             else if (SelectedHotkeyAction == HotkeyAction.Overwrite)
             {
-                Settings.OverwriteKey = keys.Key;
-                Settings.OverwriteModifier = keys.Modifier;
+                Settings.OverwriteKey = (int)key;
+                Settings.OverwriteModifier = (int)mod;
             }
         }
 
@@ -96,6 +125,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
         public void OnNavigatedFrom(NavigationContext navigationContext)
         {
+            SelectedHotkeyAction = HotkeyAction.None;
             _eventAggregator.GetEvent<HookEnabledChangedEvent>().Publish(_settingsAccess.HotkeysEnabled);
         }
 

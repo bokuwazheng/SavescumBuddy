@@ -5,20 +5,19 @@
  * Elem: CLASS GlobalKeyboardHook - -"-
  * Auth: © Johannes Nestler 2009 */
 
-
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace SavescumBuddy.Services
+namespace SavescumBuddy.Wpf.Services
 {
     #region CLASS GlobalKeyboardHook
 
     /// <summary>
     /// Helper class for global (system-wide) keyboard hooks.
     /// </summary>        
-    public class GlobalKeyboardHook
+    public class GlobalKeyboardHook : IGlobalKeyboardHook
     {
         #region TYPES
 

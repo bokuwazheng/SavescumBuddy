@@ -1,11 +1,10 @@
 ﻿using SavescumBuddy.Lib;
-using SavescumBuddy.Services.Interfaces;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Forms;
 
-namespace SavescumBuddy.Services
+namespace SavescumBuddy.Wpf.Services
 {
     public class BackupService : IBackupService
     {

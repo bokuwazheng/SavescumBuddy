@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using SavescumBuddy.Lib.Enums;
 using SavescumBuddy.Lib;
+using SavescumBuddy.Wpf.Services;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {

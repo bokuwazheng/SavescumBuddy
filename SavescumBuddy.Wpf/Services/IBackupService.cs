@@ -1,6 +1,6 @@
 ﻿using SavescumBuddy.Lib;
 
-namespace SavescumBuddy.Services.Interfaces
+namespace SavescumBuddy.Wpf.Services
 {
     public interface IBackupService
     {
