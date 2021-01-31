@@ -22,8 +22,8 @@ namespace SavescumBuddy.Services
         {
             var whereParams = "";
             var sortParams = "";
-            var whereClauses = new List<string>();
-            var sortClauses = new List<string>();
+            List<string> whereClauses = new();
+            List<string> sortClauses = new();
 
             var order = request.Descending ? "DESC" : "ASC";
 
@@ -83,14 +83,14 @@ namespace SavescumBuddy.Services
 
             if (whereClauses.Count > 0)
             {
-                var sb = new StringBuilder(" WHERE ");
+                StringBuilder sb = new(" WHERE ");
                 sb.AppendJoin(" AND ", whereClauses);
                 whereParams = sb.ToString();
             }
 
             if (sortClauses.Count > 0)
             {
-                var sb = new StringBuilder();
+                StringBuilder sb = new();
                 sb.AppendJoin(" ", sortClauses);
                 sortParams = sb.ToString();
             }
@@ -102,7 +102,7 @@ namespace SavescumBuddy.Services
             sql = string.Format(query, whereParams);
             var count = _sqlService.ExecuteScalar<int>(sql, args);
 
-            return new BackupSearchResponse()
+            return new()
             {
                 Backups = backups,
                 TotalCount = count

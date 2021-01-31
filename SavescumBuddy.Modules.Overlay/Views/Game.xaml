@@ -21,113 +21,112 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <ContentControl Style="{StaticResource DialogPlaceholder}">
-        <Grid Margin="20" MinWidth="400">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="64"/>
-                <RowDefinition Height="64"/>
-                <RowDefinition Height="64"/>
-                <RowDefinition Height="50"/>
-            </Grid.RowDefinitions>
+    <Grid Margin="20" MinWidth="400">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="64"/>
+            <RowDefinition Height="64"/>
+            <RowDefinition Height="64"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
 
-            <!--Savefile path TextBox-->
-            <TextBox 
-                x:Name="SavefileTextBox"
-                Style="{StaticResource MaterialDesignOutlinedTextFieldTextBox}"
-                Grid.Column="0" Grid.Row="0"
-                materialDesign:HintAssist.Hint="Savefile path"
-                materialDesign:HintAssist.HelperText="Double-click to select a file"
-                materialDesign:HintAssist.FloatingScale=".9"
-                materialDesign:ValidationAssist.FontSize="11"
-                materialDesign:ValidationAssist.HorizontalAlignment="Right"
-                VerticalAlignment="Center">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="MouseDoubleClick">
-                        <i:InvokeCommandAction Command="{Binding OpenFilePickerCommand}"/>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-                <TextBox.Text>
-                    <Binding Path="Game.SavefilePath" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
-                        <Binding.ValidationRules>
-                            <validation:DirectoryExistsRule/>
-                            <validation:DirectoryIsNotReadOnlyRule/>
-                        </Binding.ValidationRules>
-                    </Binding>
-                </TextBox.Text>
-            </TextBox>
-            
-            <!--Backup directory-->
-            <TextBox 
-                x:Name="BackupFolderTextBox" 
-                Style="{StaticResource MaterialDesignOutlinedTextFieldTextBox}"
-                Grid.Column="0" Grid.Row="1"
-                materialDesign:HintAssist.Hint="Backup directory"
-                materialDesign:HintAssist.HelperText="Double-click to select a folder"
-                materialDesign:HintAssist.FloatingScale=".9"
-                materialDesign:ValidationAssist.FontSize="11"
-                materialDesign:ValidationAssist.HorizontalAlignment="Right"
-                VerticalAlignment="Center">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="MouseDoubleClick">
-                        <i:InvokeCommandAction Command="{Binding OpenFolderPickerCommand}"/>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-                <TextBox.Text>
-                    <Binding Path="Game.BackupFolder" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
-                        <Binding.ValidationRules>
-                            <validation:DirectoryExistsRule/>
-                            <validation:DirectoryIsNotReadOnlyRule/>
-                        </Binding.ValidationRules>
-                    </Binding>
-                </TextBox.Text>
-            </TextBox>
-            
-            <!--Game title-->
-            <TextBox 
-                x:Name="TitleTextBox" 
-                Text="{Binding Game.Title, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                Style="{StaticResource MaterialDesignOutlinedTextFieldTextBox}"
-                materialDesign:HintAssist.Hint="Game title"
-                materialDesign:HintAssist.FloatingScale=".9"
-                Grid.Column="0" Grid.Row="2"
-                VerticalAlignment="Center"/>
+        <!--Savefile path TextBox-->
+        <TextBox 
+            x:Name="SavefileTextBox"
+            Style="{StaticResource MaterialDesignOutlinedTextFieldTextBox}"
+            Grid.Column="0" Grid.Row="0"
+            materialDesign:HintAssist.Hint="Savefile path"
+            materialDesign:HintAssist.HelperText="Double-click to select a file"
+            materialDesign:HintAssist.FloatingScale=".9"
+            materialDesign:ValidationAssist.FontSize="11"
+            materialDesign:ValidationAssist.HorizontalAlignment="Right"
+            VerticalAlignment="Center">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseDoubleClick">
+                    <i:InvokeCommandAction Command="{Binding OpenFilePickerCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <TextBox.Text>
+                <Binding Path="Game.SavefilePath" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
+                    <Binding.ValidationRules>
+                        <validation:DirectoryExistsRule/>
+                        <validation:DirectoryIsNotReadOnlyRule/>
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
 
-            <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Right">
-                <!--Cancel button-->
-                <Button 
-                    Style="{StaticResource MaterialDesignFlatButton}"
-                    Content="CANCEL" 
-                    Command="{Binding CloseDialogCommand}"
-                    CommandParameter="{x:Static enums:DialogResult.Cancel}"/>
-                <!--Save button-->
-                <Button 
-                    Content="SAVE"
-                    IsDefault="True"
-                    Command="{Binding CloseDialogCommand}" 
-                    CommandParameter="{x:Static enums:DialogResult.OK}">
-                    <Button.Style>
-                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatButton}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Path=Text, ElementName=SavefileTextBox, Converter={StaticResource StringIsNullOrEmptyConverter}}" Value="True">
-                                    <Setter Property="IsEnabled" Value="False"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=Text, ElementName=BackupFolderTextBox, Converter={StaticResource StringIsNullOrEmptyConverter}}" Value="True">
-                                    <Setter Property="IsEnabled" Value="False"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=Text, ElementName=TitleTextBox, Converter={StaticResource StringIsNullOrEmptyConverter}}" Value="True">
-                                    <Setter Property="IsEnabled" Value="False"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=(Validation.HasError), ElementName=SavefileTextBox}" Value="True">
-                                    <Setter Property="IsEnabled" Value="False"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=(Validation.HasError), ElementName=BackupFolderTextBox}" Value="True">
-                                    <Setter Property="IsEnabled" Value="False"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
-            </StackPanel>
-        </Grid>
-    </ContentControl>
+        <!--Backup directory-->
+        <TextBox 
+            x:Name="BackupFolderTextBox" 
+            Style="{StaticResource MaterialDesignOutlinedTextFieldTextBox}"
+            Grid.Column="0" Grid.Row="1"
+            materialDesign:HintAssist.Hint="Backup directory"
+            materialDesign:HintAssist.HelperText="Double-click to select a folder"
+            materialDesign:HintAssist.FloatingScale=".9"
+            materialDesign:ValidationAssist.FontSize="11"
+            materialDesign:ValidationAssist.HorizontalAlignment="Right"
+            VerticalAlignment="Center">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseDoubleClick">
+                    <i:InvokeCommandAction Command="{Binding OpenFolderPickerCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <TextBox.Text>
+                <Binding Path="Game.BackupFolder" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
+                    <Binding.ValidationRules>
+                        <validation:DirectoryExistsRule/>
+                        <validation:DirectoryIsNotReadOnlyRule/>
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
+
+        <!--Game title-->
+        <TextBox 
+            x:Name="TitleTextBox" 
+            Text="{Binding Game.Title, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            Style="{StaticResource MaterialDesignOutlinedTextFieldTextBox}"
+            materialDesign:HintAssist.Hint="Game title"
+            materialDesign:HintAssist.FloatingScale=".9"
+            Grid.Column="0" Grid.Row="2"
+            VerticalAlignment="Center"/>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Right">
+            <!--Cancel button-->
+            <Button 
+                Style="{StaticResource MaterialDesignFlatButton}"
+                Content="CANCEL" 
+                Command="{Binding CloseDialogCommand}"
+                CommandParameter="{x:Static enums:DialogResult.Cancel}"/>
+            <!--Save button-->
+            <Button 
+                Content="SAVE"
+                IsDefault="True"
+                Command="{Binding CloseDialogCommand}" 
+                CommandParameter="{x:Static enums:DialogResult.OK}">
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatButton}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Path=Text, ElementName=SavefileTextBox, Converter={StaticResource StringIsNullOrEmptyConverter}}" Value="True">
+                                <Setter Property="IsEnabled" Value="False"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Path=Text, ElementName=BackupFolderTextBox, Converter={StaticResource StringIsNullOrEmptyConverter}}" Value="True">
+                                <Setter Property="IsEnabled" Value="False"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Path=Text, ElementName=TitleTextBox, Converter={StaticResource StringIsNullOrEmptyConverter}}" Value="True">
+                                <Setter Property="IsEnabled" Value="False"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Path=(Validation.HasError), ElementName=SavefileTextBox}" Value="True">
+                                <Setter Property="IsEnabled" Value="False"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Path=(Validation.HasError), ElementName=BackupFolderTextBox}" Value="True">
+                                <Setter Property="IsEnabled" Value="False"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </StackPanel>
+    </Grid>
+    
 </UserControl>

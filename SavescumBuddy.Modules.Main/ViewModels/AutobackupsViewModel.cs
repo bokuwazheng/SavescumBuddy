@@ -1,20 +1,18 @@
 ﻿using Prism.Events;
-using Prism.Mvvm;
 using Prism.Regions;
 using SavescumBuddy.Wpf.Events;
 using SavescumBuddy.Services.Interfaces;
 using System;
 using System.Windows.Threading;
 using SavescumBuddy.Wpf.Services;
+using SavescumBuddy.Wpf.Mvvm;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
-    public class AutobackupsViewModel : BindableBase
+    public class AutobackupsViewModel : BaseViewModel
     {
-        private readonly IRegionManager _regionManager;
         private readonly IDataAccess _dataAccess;
         private readonly ISettingsAccess _settingsAccess;
-        private readonly IEventAggregator _eventAggregator;
         private readonly IBackupService _backupService;
 
         private int _progress;
@@ -24,12 +22,11 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         public int Progress { get => _progress; private set => SetProperty(ref _progress, value); }
         public int Interval => _settingsAccess.AutobackupInterval * 60;
 
-        public AutobackupsViewModel(IRegionManager regionManager, IDataAccess dataAccess, ISettingsAccess settingsAccess, IEventAggregator eventAggregator, IBackupService backupService)
+        public AutobackupsViewModel(IRegionManager regionManager, IDataAccess dataAccess, ISettingsAccess settingsAccess, IEventAggregator eventAggregator, 
+            IBackupService backupService) : base(regionManager, eventAggregator)
         {
-            _regionManager = regionManager;
             _dataAccess = dataAccess;
             _settingsAccess = settingsAccess;
-            _eventAggregator = eventAggregator;
             _backupService = backupService;
 
             _backupTimer = new DispatcherTimer();
@@ -80,10 +77,10 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 Stop();
                 Start();
             }
-            RaisePropertyChanged(nameof(Interval));
+            RaisePropertyChanged(nameof(Interval)); // TODO: TEST IF NEEDED!
         }
 
-        private void Autobackup()
+        private void Autobackup() => Handle(() =>
         {
             if (!_dataAccess.ScheduledBackupMustBeSkipped())
             {
@@ -95,6 +92,6 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
                 _eventAggregator.GetEvent<BackupListUpdateRequestedEvent>().Publish();
             }
-        }
+        });
     }
 }

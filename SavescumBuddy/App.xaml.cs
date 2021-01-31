@@ -16,9 +16,9 @@ using Prism.Regions;
 using MaterialDesignThemes.Wpf;
 using System.Threading.Tasks;
 using System.Threading;
-using SavescumBuddy.Wpf.Extensions;
 using SavescumBuddy.Wpf.Services;
 using System.Media;
+using SavescumBuddy.Wpf.Domain;
 
 namespace SavescumBuddy
 {
@@ -82,6 +82,12 @@ namespace SavescumBuddy
             moduleCatalog.AddModule<OverlayModule>();
         }
 
+        protected override void ConfigureRegionAdapterMappings(RegionAdapterMappings regionAdapterMappings)
+        {
+            base.ConfigureRegionAdapterMappings(regionAdapterMappings);
+            regionAdapterMappings.RegisterMapping<DialogHost>(Container.Resolve<DialogHostRegionAdapter>());
+        }
+
         private string LoadConnectionString()
         {
 #if DEBUG
@@ -92,11 +98,7 @@ namespace SavescumBuddy
             return id.Replace("%APPDATA%", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
         }
 
-        private void OnErrorOccured(Exception ex)
-        {
-            var regionManager = Container.Resolve<IRegionManager>();
-            regionManager.ShowError(ex.Message);
-        }
+        private void OnErrorOccured(Exception ex) => System.Windows.MessageBox.Show(ex.Message);
 
         private void OnStartProcessRequested(string path)
         {

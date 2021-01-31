@@ -23,7 +23,7 @@
             <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Navigation}"/>
             <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Content}"/>
         </DockPanel>
-        <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Overlay}"/>
+        <materialDesign:DialogHost prism:RegionManager.RegionName="{x:Static core:RegionNames.Overlay}" IsOpen="{Binding DialogHostIsOpen, UpdateSourceTrigger=PropertyChanged}"/>
         <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Autobackups}" VerticalAlignment="Bottom"/>
         <materialDesign:Snackbar MessageQueue="{Binding MessageQueue}"/>
     </Grid>

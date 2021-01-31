@@ -1,6 +1,5 @@
 ﻿using Prism.Commands;
 using Prism.Events;
-using Prism.Mvvm;
 using Prism.Regions;
 using SavescumBuddy.Lib.Enums;
 using SavescumBuddy.Services.Interfaces;
@@ -9,22 +8,22 @@ using MaterialDesignThemes.Wpf;
 using SavescumBuddy.Modules.Main.Models;
 using SavescumBuddy.Wpf.Services;
 using System.Windows.Forms;
+using SavescumBuddy.Wpf.Mvvm;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
-    public class SettingsViewModel : BindableBase, INavigationAware
+    public class SettingsViewModel : BaseViewModel, INavigationAware
     {
         private readonly ISettingsAccess _settingsAccess;
-        private readonly IEventAggregator _eventAggregator;
         private readonly ISnackbarMessageQueue _messageQueue;
         private readonly IGlobalKeyboardHook _keyboardHook;
 
         private HotkeyAction _selectedHotkeyAction;
 
-        public SettingsViewModel(ISettingsAccess settingsAccess, IEventAggregator eventAggregator, ISnackbarMessageQueue messageQueue, IGlobalKeyboardHook keyboardHook)
+        public SettingsViewModel(ISettingsAccess settingsAccess, IEventAggregator eventAggregator, IRegionManager regionManager, ISnackbarMessageQueue messageQueue, IGlobalKeyboardHook keyboardHook) 
+            : base(regionManager, eventAggregator)
         {
             _settingsAccess = settingsAccess;
-            _eventAggregator = eventAggregator;
             _messageQueue = messageQueue;
             _keyboardHook = keyboardHook;
 
@@ -68,9 +67,6 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
             if (propertyName == nameof(SettingsModel.AutobackupInterval))
                 _eventAggregator.GetEvent<AutobackupIntervalChangedEvent>().Publish(Settings.AutobackupsEnabled);
-
-            if (propertyName == nameof(SettingsModel.HotkeysEnabled))
-                _eventAggregator.GetEvent<HookEnabledChangedEvent>().Publish(Settings.HotkeysEnabled);
         }
 
         private void OnKeyDown(object sender, KeyEventArgs e)

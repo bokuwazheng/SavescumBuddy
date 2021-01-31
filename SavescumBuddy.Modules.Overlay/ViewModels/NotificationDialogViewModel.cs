@@ -1,20 +1,15 @@
 ﻿using Prism.Commands;
 using Prism.Events;
-using Prism.Mvvm;
 using Prism.Regions;
-using SavescumBuddy.Wpf.Constants;
 using SavescumBuddy.Lib.Enums;
-using SavescumBuddy.Wpf.Events;
-using SavescumBuddy.Wpf.Extensions;
 using System;
+using SavescumBuddy.Wpf.Mvvm;
 
 namespace SavescumBuddy.Modules.Overlay.ViewModels
 {
-    public class NotificationDialogViewModel : BindableBase, INavigationAware, IJournalAware
+    public class NotificationDialogViewModel : OverlayBaseViewModel, INavigationAware, IJournalAware
     {
         private IRegionNavigationService _navigationService;
-        private IRegionManager _regionManager;
-        private IEventAggregator _eventAggregator;
 
         private string _title;
         private string _message;
@@ -22,11 +17,8 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
         private string _cancelContent;
         private Action<DialogResult> _requestClose;
 
-        public NotificationDialogViewModel(IRegionManager regionManager, IEventAggregator eventAggregator)
+        public NotificationDialogViewModel(IRegionManager regionManager, IEventAggregator eventAggregator) : base(regionManager, eventAggregator)
         {
-            _regionManager = regionManager;
-            _eventAggregator = eventAggregator;
-
             CloseDialogCommand = new DelegateCommand<DialogResult?>(CloseDialog);
         }
 
@@ -35,23 +27,21 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
         public string OkContent { get => _okContent; set => SetProperty(ref _okContent, value); }
         public string CancelContent { get => _cancelContent; set => SetProperty(ref _cancelContent, value); }
 
-        private void CloseDialog(DialogResult? result)
+        private void CloseDialog(DialogResult? result) => Handle(() =>
         {
-            try
+            if (result.HasValue)
             {
-                if (result.HasValue)
-                    _requestClose?.Invoke(result.Value);
+                _requestClose?.Invoke(result.Value);
 
                 if (_navigationService.Journal.CanGoBack)
                     _navigationService.Journal.GoBack();
                 else
-                    _regionManager.Deactivate(RegionNames.Overlay);
+                {
+                    _navigationService.Journal.Clear();
+                    CloseDialog();
+                }
             }
-            catch (Exception ex)
-            {
-                _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
-            }
-        }
+        });
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {

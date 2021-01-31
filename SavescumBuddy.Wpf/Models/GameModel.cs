@@ -6,15 +6,12 @@ namespace SavescumBuddy.Wpf.Models
 {
     public class GameModel : BindableBase
     {
-        private bool _isSelected;
-
         public GameModel(Game game)
         {
             Game = game ?? throw new ArgumentNullException(nameof(game));
         }
 
         public Game Game { get; }
-        public bool IsSelected { get => _isSelected; set => SetProperty(ref _isSelected, value); }
 
         public int Id => Game.Id;
         public string Title { get => Game.Title; set { Game.Title = value; RaisePropertyChanged(nameof(Title)); } }

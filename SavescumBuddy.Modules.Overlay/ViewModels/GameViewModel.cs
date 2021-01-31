@@ -1,33 +1,25 @@
 ﻿using Prism.Commands;
 using Prism.Events;
-using Prism.Mvvm;
 using Prism.Regions;
 using SavescumBuddy.Lib.Enums;
-using SavescumBuddy.Wpf.Events;
-using SavescumBuddy.Wpf.Extensions;
-using SavescumBuddy.Lib;
 using SavescumBuddy.Services.Interfaces;
 using System;
 using SavescumBuddy.Wpf.Models;
-using SavescumBuddy.Wpf.Constants;
 using SavescumBuddy.Wpf.Services;
+using SavescumBuddy.Wpf.Mvvm;
 
 namespace SavescumBuddy.Modules.Overlay.ViewModels
 {
-    public class GameViewModel : BindableBase, INavigationAware
+    public class GameViewModel : OverlayBaseViewModel, INavigationAware
     {
+        public Action<DialogResult> _requestClose;
         private GameModel _game;
-        private Action<DialogResult> _requestClose;
-        private readonly IRegionManager _regionManager;
-        private readonly IEventAggregator _eventAggregator;
         private readonly IOpenFileService _openFileService;
         private readonly IDataAccess _dataAccess;
         private IRegionNavigationService _navigationService;
 
-        public GameViewModel(IRegionManager regionManager, IEventAggregator eventAggregator, IOpenFileService openFileService, IDataAccess dataAccess)
+        public GameViewModel(IRegionManager regionManager, IEventAggregator eventAggregator, IOpenFileService openFileService, IDataAccess dataAccess) : base(regionManager, eventAggregator)
         {
-            _regionManager = regionManager;
-            _eventAggregator = eventAggregator;
             _openFileService = openFileService;
             _dataAccess = dataAccess;
 
@@ -38,7 +30,7 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
 
         public GameModel Game { get => _game; set => SetProperty(ref _game, value); }
 
-        private void CloseDialog(DialogResult? result)
+        private void CloseDialog(DialogResult? result) => Handle(() =>
         {
             if (result.HasValue)
             {
@@ -50,52 +42,35 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
                         _dataAccess.UpdateGame(Game.Game);
                 }
 
-                _regionManager.Deactivate(RegionNames.Overlay);
                 _navigationService.Journal.Clear();
                 _requestClose?.Invoke(result.Value);
+                CloseDialog();
             }
-        }
+        });
 
-        private void GetSavefilePath()
+        private void GetSavefilePath() => Handle(() =>
         {
-            try
-            {
-                _openFileService.IsFolderPicker = false;
-                _openFileService.Multiselect = false;
-                _openFileService.ShowHiddenItems = true;
+            _openFileService.IsFolderPicker = false;
+            _openFileService.Multiselect = false;
+            _openFileService.ShowHiddenItems = true;
 
-                if (_openFileService.OpenFile())
-                    Game.SavefilePath = _openFileService.FileName;
-            }
-            catch (Exception ex)
-            {
-                _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
-            }
-        }
+            if (_openFileService.OpenFile())
+                Game.SavefilePath = _openFileService.FileName;
+        });
 
-        private void GetBackupFolderPath()
+        private void GetBackupFolderPath() => Handle(() =>
         {
-            try
-            {
-                _openFileService.IsFolderPicker = true;
-                _openFileService.Multiselect = false;
-                _openFileService.ShowHiddenItems = true;
+            _openFileService.IsFolderPicker = true;
+            _openFileService.Multiselect = false;
+            _openFileService.ShowHiddenItems = true;
 
-                if (_openFileService.OpenFile())
-                    Game.BackupFolder = _openFileService.FileName;
-            }
-            catch (Exception ex)
-            {
-                _eventAggregator.GetEvent<ErrorOccuredEvent>().Publish(ex);
-            }
-        }
+            if (_openFileService.OpenFile())
+                Game.BackupFolder = _openFileService.FileName;
+        });
 
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;
 
-        public void OnNavigatedFrom(NavigationContext navigationContext)
-        {
-            //_requestClose = null;
-        }
+        public void OnNavigatedFrom(NavigationContext navigationContext) { }
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
@@ -107,11 +82,11 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
             var id = (int)navigationContext.Parameters["gameId"];
 
             if (id is 0)
-                Game = new GameModel(new Game());
+                Game = new(new());
             else
             {
-                var game = _dataAccess.GetGame(id) ?? throw new Exception($"Couldn't file game with id { id }");
-                Game = new GameModel(game);
+                var game = _dataAccess.GetGame(id) ?? throw new($"Couldn't file game with id { id }");
+                Game = new(game);
             }
 
             _requestClose = (Action<DialogResult>)navigationContext.Parameters["callback"];

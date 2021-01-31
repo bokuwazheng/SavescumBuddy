@@ -1,20 +1,17 @@
 ﻿using Prism.Commands;
-using Prism.Mvvm;
+using Prism.Events;
 using Prism.Regions;
 using SavescumBuddy.Wpf.Constants;
+using SavescumBuddy.Wpf.Mvvm;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
-    public class NavigationViewModel : BindableBase
+    public class NavigationViewModel : BaseViewModel
     {
-        private IRegionManager _regionManager;
-
-        public NavigationViewModel(IRegionManager regionManager)
+        public NavigationViewModel(IRegionManager regionManager, IEventAggregator eventAggregator) : base(regionManager, eventAggregator)
         {
-            _regionManager = regionManager;
-
             NavigateCommand = new DelegateCommand<string>(s => _regionManager.RequestNavigate(RegionNames.Content, s));
-            OpenAboutDialogCommand = new DelegateCommand(() => _regionManager.RequestNavigate(RegionNames.Overlay, ViewNames.About));
+            OpenAboutDialogCommand = new DelegateCommand(() => ShowDialog(ViewNames.About, null));
         }
 
         public DelegateCommand<string> NavigateCommand { get; }
