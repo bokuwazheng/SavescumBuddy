@@ -16,7 +16,7 @@ namespace SavescumBuddy.Wpf.Extensions
                 { "message", message },
                 { "okContent", "OK" }
             };
-            regionManager.RequestNavigate(RegionNames.Overlay, ViewNames.NotificationDialog, parameters);
+            regionManager.RequestNavigate(RegionNames.Overlay, ViewNames.Dialog, parameters);
         }
 
         public static void PromptAction(this IRegionManager regionManager, string title, string message, string okContent, string cancelContent, Action<DialogResult> callback)
@@ -29,7 +29,7 @@ namespace SavescumBuddy.Wpf.Extensions
                 { "cancelContent", cancelContent },
                 { "callback", callback }
             };
-            regionManager.RequestNavigate(RegionNames.Overlay, ViewNames.NotificationDialog, parameters);
+            regionManager.RequestNavigate(RegionNames.Overlay, ViewNames.Dialog, parameters);
         }
 
         public static void Deactivate(this IRegionManager regionManager, string regionName)

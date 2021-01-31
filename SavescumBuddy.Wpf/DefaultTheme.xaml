@@ -111,9 +111,10 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type CheckBox}">
                     <Grid Background="Transparent" SnapsToDevicePixels="True">
-                        <ContentPresenter Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" 
-                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        <ContentPresenter 
+                            Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" 
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -328,11 +329,11 @@
                 <ControlTemplate TargetType="ComboBox">
                     <Grid>
                         <ToggleButton Cursor="Hand" Name="ToggleButton" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" Foreground="{TemplateBinding Foreground}" Height="{TemplateBinding Height}"
-                                      Style="{StaticResource ComboBoxToggleButton}" Grid.Column="2" Focusable="False" IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press"/>
+                            Style="{StaticResource ComboBoxToggleButton}" Grid.Column="2" Focusable="False" IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press"/>
                         <ContentPresenter Name="ContentSite" IsHitTestVisible="False" Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" 
-                                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" Margin="10,3,30,3" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                            ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" Margin="10,3,30,3" VerticalAlignment="Center" HorizontalAlignment="Left" />
                         <TextBox x:Name="PART_EditableTextBox" Style="{x:Null}" Template="{StaticResource ComboBoxTextBox}" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                     Margin="3,3,23,3" Focusable="True" Visibility="Hidden" IsReadOnly="{TemplateBinding IsReadOnly}"/>
+                            Margin="3,3,23,3" Focusable="True" Visibility="Hidden" IsReadOnly="{TemplateBinding IsReadOnly}"/>
                         <Popup Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
                             <Grid Name="DropDown" SnapsToDevicePixels="True" MinWidth="{TemplateBinding ActualWidth}" MaxHeight="{TemplateBinding MaxDropDownHeight}">
                                 <Border CornerRadius="7" x:Name="DropDownBorder" Background="White" BorderThickness="1" BorderBrush="#FFE1E1E1"/>
@@ -372,7 +373,7 @@
                 <ControlTemplate TargetType="ComboBoxItem">
                     <Border Name="Border" Padding="5" Margin="0" BorderThickness="0" CornerRadius="0" Background="Transparent" BorderBrush="Red">
                         <TextBlock TextAlignment="Left">
-                                <ContentPresenter />
+                            <ContentPresenter />
                         </TextBlock>
                     </Border>
                     <ControlTemplate.Triggers>
@@ -397,7 +398,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ToolTip">
                     <Border Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" 
-                            Background="#6a6a6a" BorderThickness="0" CornerRadius="3" SnapsToDevicePixels="True">
+                        Background="#6a6a6a" BorderThickness="0" CornerRadius="3" SnapsToDevicePixels="True">
                         <ContentPresenter Margin="12,10" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                     </Border>
                 </ControlTemplate>

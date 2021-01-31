@@ -3,11 +3,11 @@
 namespace SavescumBuddy.Modules.Overlay.Views
 {
     /// <summary>
-    /// Interaction logic for NotificationDialog.xaml
+    /// Interaction logic for Dialog.xaml
     /// </summary>
-    public partial class NotificationDialog : UserControl
+    public partial class Dialog : UserControl
     {
-        public NotificationDialog()
+        public Dialog()
         {
             InitializeComponent();
         }

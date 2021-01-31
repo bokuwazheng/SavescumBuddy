@@ -21,7 +21,7 @@ namespace SavescumBuddy.Modules.Overlay
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterForNavigation<NotificationDialog>();
+            containerRegistry.RegisterForNavigation<Dialog>();
             containerRegistry.RegisterForNavigation<Game>();
             containerRegistry.RegisterForNavigation<About>();
         }

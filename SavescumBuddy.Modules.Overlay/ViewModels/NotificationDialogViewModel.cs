@@ -7,7 +7,7 @@ using SavescumBuddy.Wpf.Mvvm;
 
 namespace SavescumBuddy.Modules.Overlay.ViewModels
 {
-    public class NotificationDialogViewModel : OverlayBaseViewModel, INavigationAware, IJournalAware
+    public class DialogViewModel : OverlayBaseViewModel, INavigationAware, IJournalAware
     {
         private IRegionNavigationService _navigationService;
 
@@ -17,7 +17,7 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
         private string _cancelContent;
         private Action<DialogResult> _requestClose;
 
-        public NotificationDialogViewModel(IRegionManager regionManager, IEventAggregator eventAggregator) : base(regionManager, eventAggregator)
+        public DialogViewModel(IRegionManager regionManager, IEventAggregator eventAggregator) : base(regionManager, eventAggregator)
         {
             CloseDialogCommand = new DelegateCommand<DialogResult?>(CloseDialog);
         }
