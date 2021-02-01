@@ -4,7 +4,6 @@
              xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              xmlns:local="clr-namespace:SavescumBuddy.Modules.Main.Views"
              xmlns:prism="http://prismlibrary.com/"
-
              xmlns:enums="clr-namespace:SavescumBuddy.Lib.Enums;assembly=SavescumBuddy.Lib"
              xmlns:ext="clr-namespace:SavescumBuddy.Wpf.Extensions;assembly=SavescumBuddy.Wpf"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
@@ -20,11 +19,20 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.Wpf;component/DefaultTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="Caption" TargetType="{x:Type TextBlock}">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="FontWeight" Value="Medium"/>
+                <Setter Property="Foreground" Value="{StaticResource Foreground.Static}"/>
+            </Style>
+            
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Center" VerticalAlignment="Top"
-                  Width="380" Background="White">
+    <ScrollViewer 
+        VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Center"
+        Width="380" Background="White">
         <!--MAIN GRID-->
         <Grid HorizontalAlignment="Stretch" Margin="10,20,10,20">
             <Grid.RowDefinitions>
@@ -33,11 +41,8 @@
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-
-            <!--Auto backups-->
-            <!--<materialDesign:Card Grid.RowSpan="2"/>-->
-
 
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Auto Backups" Style="{StaticResource Header}"/>
@@ -100,8 +105,8 @@
                             <ColumnDefinition Width="100"/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        
-                        <TextBlock Text="BACKUP" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+
+                        <TextBlock Text="BACKUP" Style="{StaticResource Caption}"/>
                         <ToggleButton 
                             Grid.Column="1"
                             IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Backup}, Mode=OneWay}" 
@@ -130,7 +135,7 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Text="RESTORE" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBlock Text="RESTORE" Style="{StaticResource Caption}"/>
                         <ToggleButton 
                             Grid.Column="1"
                             IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Restore}, Mode=OneWay}" 
@@ -159,7 +164,7 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Text="OVERWRITE" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBlock Text="OVERWRITE" Style="{StaticResource Caption}"/>
                         <ToggleButton 
                             Grid.Column="1"
                             IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Overwrite}, Mode=OneWay}" 
@@ -187,6 +192,20 @@
                 <TextBlock Text="Sound Cues" Style="{StaticResource Header}"/>
                 <ToggleButton Grid.Row="4" IsChecked="{Binding Settings.SoundCuesEnabled}" Margin="10"/>
             </StackPanel>
+
+            <Button 
+                Style="{StaticResource TextButton}" 
+                Grid.Row="5"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Command="{Binding OpenAboutDialogCommand}">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="InformationOutline" Width="22" Height="22" Margin="5"/>
+                        <TextBlock Text="About" Margin="6,0,0,0" FontWeight="Medium" FontSize="14" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
 
         </Grid>
     </ScrollViewer>

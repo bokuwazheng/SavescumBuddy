@@ -147,13 +147,18 @@
         </Style.Triggers>
     </Style>
 
-    <!--TextBlock Style-->
     <!--Header-->
     <Style x:Key="Header" TargetType="TextBlock">
         <Setter Property="FontSize" Value="{StaticResource HeaderFontSize}"/>
         <Setter Property="Foreground" Value="{StaticResource Dark}"/>
         <Setter Property="HorizontalAlignment" Value="Left"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    
+    <!--Caption-->
+    <Style x:Key="Caption" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{StaticResource CaptionFontSize}"/>
+        <Setter Property="Foreground" Value="{StaticResource Ash}"/>
     </Style>
 
     <!--Animations-->

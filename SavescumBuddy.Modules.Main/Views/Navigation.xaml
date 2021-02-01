@@ -52,12 +52,6 @@
                 </TabItem.Header>
             </TabItem>
         </TabControl>
-        <Button 
-            Style="{StaticResource TextButton}" 
-            Grid.Row="1"
-            Margin="5"
-            Command="{Binding OpenAboutDialogCommand}">
-            <materialDesign:PackIcon Kind="InformationOutline" Width="24" Height="24" Margin="5"/>
-        </Button>
+
     </Grid>
 </UserControl>

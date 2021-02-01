@@ -9,6 +9,7 @@ using SavescumBuddy.Modules.Main.Models;
 using SavescumBuddy.Wpf.Services;
 using System.Windows.Forms;
 using SavescumBuddy.Wpf.Mvvm;
+using SavescumBuddy.Wpf.Constants;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
@@ -31,6 +32,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             Settings.PropertyChanged += (s, e) => OnSettingsPropertyChanged(e.PropertyName);
 
             RegisterHotkeyCommand = new DelegateCommand<HotkeyAction?>(x => { if (x.HasValue) SelectedHotkeyAction = x.Value; });
+            OpenAboutDialogCommand = new DelegateCommand(() => ShowDialog(ViewNames.About, null));
         }
 
         public SettingsModel Settings { get; }
@@ -126,5 +128,6 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         }
 
         public DelegateCommand<HotkeyAction?> RegisterHotkeyCommand { get; }
+        public DelegateCommand OpenAboutDialogCommand { get; }
     }
 }
