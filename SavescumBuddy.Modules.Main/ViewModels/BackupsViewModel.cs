@@ -127,7 +127,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
         private void Add() => Handle(() =>
         {
-            var backup = _dataAccess.CreateBackup(isAutobackup: false);
+            var backup = _dataAccess.CreateBackup(isScheduled: false);
             _backupService.BackupSavefile(backup);
             _backupService.SaveScreenshot(backup.PicturePath);
             UpdateBackups();

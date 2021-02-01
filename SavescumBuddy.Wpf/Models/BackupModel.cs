@@ -21,7 +21,7 @@ namespace SavescumBuddy.Wpf.Models
         public string GoogleDriveId { get => Backup.GoogleDriveId; set { Backup.GoogleDriveId = value; RaisePropertyChanged(); } }
         public string Note { get => Backup.Note; set { Backup.Note = value; RaisePropertyChanged(); } }
         public int IsLiked { get => Backup.IsLiked; set { Backup.IsLiked = value; RaisePropertyChanged(); } }
-        public int IsAutobackup => Backup.IsAutobackup;
+        public int IsScheduled => Backup.IsScheduled;
         public long TimeStamp => Backup.TimeStamp;
         public string PicturePath => Backup.PicturePath;
     }

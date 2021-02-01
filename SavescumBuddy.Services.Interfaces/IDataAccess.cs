@@ -7,7 +7,7 @@ namespace SavescumBuddy.Services.Interfaces
     public interface IDataAccess
     {
         BackupSearchResponse SearchBackups(IBackupSearchRequest request);
-        Backup CreateBackup(bool isAutobackup);
+        Backup CreateBackup(bool isScheduled);
         void DeleteBackup(int id);
         Backup GetLatestBackup();
         void UpdateNote(Backup backup);

@@ -44,9 +44,10 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
+            <!--Scheduler region-->
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Auto Backups" Style="{StaticResource Header}"/>
-                <ToggleButton IsChecked="{Binding Settings.AutobackupsEnabled}" Margin="10"/>
+                <TextBlock Text="Scheduler" Style="{StaticResource Header}"/>
+                <ToggleButton IsChecked="{Binding Settings.SchedulerEnabled}" Margin="10"/>
             </StackPanel>
             <Grid Grid.Row="1">
                 <Grid.RowDefinitions>
@@ -59,7 +60,7 @@
                     Style="{StaticResource MaterialDesignFilledComboBox}"
                     materialDesign:HintAssist.Hint="INTERVAL"
                     Margin="0,10" Grid.Column="1"
-                    SelectedItem="{Binding Settings.AutobackupInterval}" ItemStringFormat='{}{0} min'>
+                    SelectedItem="{Binding Settings.SchedulerInterval}" ItemStringFormat='{}{0} min'>
                     <sys:Int32>5</sys:Int32>
                     <sys:Int32>10</sys:Int32>
                     <sys:Int32>15</sys:Int32>
@@ -75,16 +76,16 @@
                     materialDesign:HintAssist.Hint="SKIP"
                     Margin="0,10" Grid.Row="1" Grid.Column="1"
                     ItemsSource="{ext:EnumToValueDescriptionPairListExtension EnumType={x:Type enums:SkipOption}}"
-                    SelectedValuePath="Value" DisplayMemberPath="Description" SelectedValue="{Binding Settings.AutobackupSkipType}"/>
+                    SelectedValuePath="Value" DisplayMemberPath="Description" SelectedValue="{Binding Settings.SchedulerSkipType}"/>
                 
                 <ComboBox 
                     Style="{StaticResource MaterialDesignFilledComboBox}"
                     materialDesign:HintAssist.Hint="OVERWRITE"
                     Margin="0,10" Grid.Row="2" Grid.Column="1"
                     ItemsSource="{ext:EnumToValueDescriptionPairListExtension EnumType={x:Type enums:OverwriteOption}}"
-                    SelectedValuePath="Value" DisplayMemberPath="Description" SelectedValue="{Binding Settings.AutobackupOverwriteType}"/>
+                    SelectedValuePath="Value" DisplayMemberPath="Description" SelectedValue="{Binding Settings.SchedulerOverwriteType}"/>
             </Grid>
-            <!--Auto backups region ends here-->
+            <!--Scheduler region ends here-->
 
             <!--Hotkeys-->
             <StackPanel Orientation="Horizontal" Grid.Row="2">

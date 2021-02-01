@@ -8,7 +8,7 @@
         public bool Descending { get; set; }
         public string GroupBy { get; set; }
         public bool? IsLiked { get; set; }
-        public bool? IsAutobackup { get; set; }
+        public bool? IsScheduled { get; set; }
         public int GameId { get; set; }
         public bool CurrentGame { get; set; }
         public bool? IsInGoogleDrive { get; set; }

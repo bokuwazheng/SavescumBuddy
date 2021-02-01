@@ -16,7 +16,7 @@ namespace SavescumBuddy.Lib.Enums
         Never,
         [Description("Always")]
         Always,
-        [Description("Keep liked autobackups")]
+        [Description("Keep liked scheduled backups")]
         KeepLiked
     }
 

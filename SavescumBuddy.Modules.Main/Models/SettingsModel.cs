@@ -13,28 +13,28 @@ namespace SavescumBuddy.Modules.Main.Models
             _settingsAccess = settingsAccess ?? throw new ArgumentNullException(nameof(settingsAccess));
         }
         
-        public bool AutobackupsEnabled
+        public bool SchedulerEnabled
         {
-            get => _settingsAccess.AutobackupsEnabled;
-            set { _settingsAccess.AutobackupsEnabled = value; RaisePropertyChanged(nameof(AutobackupsEnabled)); }
+            get => _settingsAccess.SchedulerEnabled;
+            set { _settingsAccess.SchedulerEnabled = value; RaisePropertyChanged(nameof(SchedulerEnabled)); }
         }
 
-        public int AutobackupSkipType
+        public int SchedulerSkipType
         {
-            get => _settingsAccess.AutobackupSkipType;
-            set { _settingsAccess.AutobackupSkipType = value; RaisePropertyChanged(nameof(AutobackupSkipType)); }
+            get => _settingsAccess.SchedulerSkipType;
+            set { _settingsAccess.SchedulerSkipType = value; RaisePropertyChanged(nameof(SchedulerSkipType)); }
         }
 
-        public int AutobackupInterval
+        public int SchedulerInterval
         {
-            get => _settingsAccess.AutobackupInterval;
-            set { _settingsAccess.AutobackupInterval = value; RaisePropertyChanged(nameof(AutobackupInterval)); }
+            get => _settingsAccess.SchedulerInterval;
+            set { _settingsAccess.SchedulerInterval = value; RaisePropertyChanged(nameof(SchedulerInterval)); }
         }
 
-        public int AutobackupOverwriteType
+        public int SchedulerOverwriteType
         {
-            get => _settingsAccess.AutobackupOverwriteType;
-            set { _settingsAccess.AutobackupOverwriteType = value; RaisePropertyChanged(nameof(AutobackupOverwriteType)); }
+            get => _settingsAccess.SchedulerOverwriteType;
+            set { _settingsAccess.SchedulerOverwriteType = value; RaisePropertyChanged(nameof(SchedulerOverwriteType)); }
         }
 
         public bool HotkeysEnabled

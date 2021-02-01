@@ -12,28 +12,28 @@ namespace SavescumBuddy.Services
             _sqlService = sqlService ?? throw new ArgumentNullException(nameof(sqlService));
         }
 
-        public int AutobackupInterval
+        public int SchedulerInterval
         {
-            get => Get<int>(nameof(AutobackupInterval));
-            set => Set(nameof(AutobackupInterval), ref value);
+            get => Get<int>(nameof(SchedulerInterval));
+            set => Set(nameof(SchedulerInterval), ref value);
         }
 
-        public int AutobackupOverwriteType
+        public int SchedulerOverwriteType
         {
-            get => Get<int>(nameof(AutobackupOverwriteType));
-            set => Set(nameof(AutobackupOverwriteType), ref value);
+            get => Get<int>(nameof(SchedulerOverwriteType));
+            set => Set(nameof(SchedulerOverwriteType), ref value);
         }
 
-        public bool AutobackupsEnabled
+        public bool SchedulerEnabled
         {
-            get => Get<bool>(nameof(AutobackupsEnabled));
-            set => Set(nameof(AutobackupsEnabled), ref value);
+            get => Get<bool>(nameof(SchedulerEnabled));
+            set => Set(nameof(SchedulerEnabled), ref value);
         }
 
-        public int AutobackupSkipType
+        public int SchedulerSkipType
         {
-            get => Get<int>(nameof(AutobackupSkipType));
-            set => Set(nameof(AutobackupSkipType), ref value);
+            get => Get<int>(nameof(SchedulerSkipType));
+            set => Set(nameof(SchedulerSkipType), ref value);
         }
 
         public int BackupKey

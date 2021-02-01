@@ -24,7 +24,7 @@
             <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Content}"/>
         </DockPanel>
         <materialDesign:DialogHost prism:RegionManager.RegionName="{x:Static core:RegionNames.Overlay}" IsOpen="{Binding DialogHostIsOpen, UpdateSourceTrigger=PropertyChanged}"/>
-        <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Autobackups}" VerticalAlignment="Bottom"/>
+        <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.Scheduler}" VerticalAlignment="Bottom"/>
         <materialDesign:Snackbar MessageQueue="{Binding MessageQueue}"/>
     </Grid>
 </Window>

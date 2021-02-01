@@ -64,11 +64,11 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
         private void OnSettingsPropertyChanged(string propertyName)
         {
-            if (propertyName == nameof(SettingsModel.AutobackupsEnabled))
-                _eventAggregator.GetEvent<AutobackupsEnabledChangedEvent>().Publish(Settings.AutobackupsEnabled);
+            if (propertyName == nameof(SettingsModel.SchedulerEnabled))
+                _eventAggregator.GetEvent<SchedulerEnabledChangedEvent>().Publish(Settings.SchedulerEnabled);
 
-            if (propertyName == nameof(SettingsModel.AutobackupInterval))
-                _eventAggregator.GetEvent<AutobackupIntervalChangedEvent>().Publish(Settings.AutobackupsEnabled);
+            if (propertyName == nameof(SettingsModel.SchedulerInterval))
+                _eventAggregator.GetEvent<SchedulerIntervalChangedEvent>().Publish(Settings.SchedulerEnabled);
         }
 
         private void OnKeyDown(object sender, KeyEventArgs e)

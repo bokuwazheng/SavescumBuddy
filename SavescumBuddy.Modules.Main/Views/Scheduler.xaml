@@ -1,11 +1,10 @@
-﻿<UserControl x:Class="SavescumBuddy.Modules.Main.Views.Autobackups"
+﻿<UserControl x:Class="SavescumBuddy.Modules.Main.Views.Scheduler"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SavescumBuddy.Modules.Main.Views"
              xmlns:prism="http://prismlibrary.com/"
-             xmlns:controls="clr-namespace:SavescumBuddy.Wpf;assembly=SavescumBuddy.Wpf"
              xmlns:validation="clr-namespace:SavescumBuddy.Wpf.Validation;assembly=SavescumBuddy.Wpf"
              SnapsToDevicePixels="True"
              prism:ViewModelLocator.AutoWireViewModel="True">

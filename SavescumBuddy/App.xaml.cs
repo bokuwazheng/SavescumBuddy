@@ -130,7 +130,7 @@ namespace SavescumBuddy
             {
                 if (e.KeyValue == settings.BackupKey && (int)e.Modifiers == settings.BackupModifier)
                 {
-                    var backup = data.CreateBackup(isAutobackup: false);
+                    var backup = data.CreateBackup(isScheduled: false);
                     backuper.BackupSavefile(backup);
                     backuper.SaveScreenshot(backup.PicturePath);
                     ea.GetEvent<BackupListUpdateRequestedEvent>().Publish();
@@ -163,7 +163,7 @@ namespace SavescumBuddy
                         data.DeleteBackup(latest.Id);
                     }
 
-                    var backup = data.CreateBackup(isAutobackup: false);
+                    var backup = data.CreateBackup(isScheduled: false);
                     backuper.BackupSavefile(backup);
                     backuper.SaveScreenshot(backup.PicturePath);
                     ea.GetEvent<BackupListUpdateRequestedEvent>().Publish();

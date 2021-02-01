@@ -2,10 +2,10 @@
 {
     public interface ISettingsAccess
     {
-        int AutobackupInterval { get; set; }
-        int AutobackupOverwriteType { get; set; }
-        bool AutobackupsEnabled { get; set; }
-        int AutobackupSkipType { get; set; }
+        int SchedulerInterval { get; set; }
+        int SchedulerOverwriteType { get; set; }
+        bool SchedulerEnabled { get; set; }
+        int SchedulerSkipType { get; set; }
         int BackupKey { get; set; }
         int BackupModifier { get; set; }
         bool HotkeysEnabled { get; set; }

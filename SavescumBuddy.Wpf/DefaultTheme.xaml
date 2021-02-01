@@ -10,7 +10,7 @@
         <GradientStop Color="#FFF7D8B2"/>
         <GradientStop Color="#FFE8ABC9" Offset="1"/>
     </LinearGradientBrush>
-    <LinearGradientBrush x:Key="AutobackupsButtonBrush" StartPoint="0,0.5" EndPoint="1,0.5">
+    <LinearGradientBrush x:Key="ScheduledButtonBrush" StartPoint="0,0.5" EndPoint="1,0.5">
         <GradientStop Color="#FFE8ABC9"/>
         <GradientStop Color="#FFD2ABE8" Offset="1"/>
     </LinearGradientBrush>

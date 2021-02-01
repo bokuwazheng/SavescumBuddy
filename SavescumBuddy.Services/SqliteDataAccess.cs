@@ -35,7 +35,7 @@ namespace SavescumBuddy.Services
                     GoogleDriveId,
                     Note,
                     IsLiked,
-                    IsAutobackup,
+                    IsScheduled,
                     TimeStamp,
                     Game.SavefilePath AS OriginPath,
                     Game.BackupFolder || '\' || TimeStamp AS SavefilePath,
@@ -50,8 +50,8 @@ namespace SavescumBuddy.Services
             if (request.IsLiked.HasValue)
                 whereClauses.Add($"IsLiked = { request.IsLiked.Value.ToSqliteBoolean() }");
 
-            if (request.IsAutobackup.HasValue)
-                whereClauses.Add($"IsAutobackup = { request.IsAutobackup.Value.ToSqliteBoolean() }");
+            if (request.IsScheduled.HasValue)
+                whereClauses.Add($"IsScheduled = { request.IsScheduled.Value.ToSqliteBoolean() }");
 
             if (request.CurrentGame)
                 whereClauses.Add($"GameId = (SELECT Id FROM Game WHERE IsCurrent = 1)");
@@ -119,7 +119,7 @@ namespace SavescumBuddy.Services
                     GoogleDriveId,
                     Note,
                     IsLiked,
-                    IsAutobackup,
+                    IsScheduled,
                     TimeStamp,
                     Game.SavefilePath AS OriginPath,
                     Game.BackupFolder || '\' || TimeStamp AS SavefilePath,
@@ -131,19 +131,19 @@ namespace SavescumBuddy.Services
             return _sqlService.QueryFirstOrDefault<Backup>(sql, new { Id = id });
         }
 
-        public Backup CreateBackup(bool isAutobackup)
+        public Backup CreateBackup(bool isScheduled)
         {
             object args = new
             {
                 TimeStamp = DateTime.Now.Ticks,
-                IsAutobackup = isAutobackup.ToSqliteBoolean()
+                IsScheduled = isScheduled.ToSqliteBoolean()
             };
 
             var query = @"
                 INSERT INTO Backup 
-                    (GameId, TimeStamp, IsAutobackup) 
+                    (GameId, TimeStamp, IsScheduled) 
                     values 
-                    ((SELECT Id FROM Game WHERE IsCurrent = 1), @TimeStamp, @IsAutobackup);
+                    ((SELECT Id FROM Game WHERE IsCurrent = 1), @TimeStamp, @IsScheduled);
                 SELECT last_insert_rowid();";
 
             var id = _sqlService.ExecuteScalar<int>(query, args);
@@ -167,7 +167,7 @@ namespace SavescumBuddy.Services
                 LEFT JOIN Game ON Backup.GameId = Game.Id
                 WHERE GameId = (SELECT Id FROM Game WHERE IsCurrent = 1)
                 AND 
-                IsAutobackup = 0 
+                IsScheduled = 0 
                 ORDER BY Backup.Id DESC");
         }
 
@@ -180,13 +180,13 @@ namespace SavescumBuddy.Services
                 WHERE 
                 GameId = (SELECT Id FROM Game WHERE IsCurrent = 1) 
                 AND 
-                IsAutobackup = 0 
+                IsScheduled = 0 
                 ORDER BY Id DESC
                 LIMIT 1";
 
             var timeStamp = DateTime.Now - new DateTime(_sqlService.ExecuteScalar<long>(sql));
 
-            sql = "SELECT AutobackupSkipType FROM Settings WHERE Id = 1;";
+            sql = "SELECT SchedulerSkipType FROM Settings WHERE Id = 1;";
             var skipOption = (SkipOption)_sqlService.ExecuteScalar<int>(sql);
 
             return skipOption switch
@@ -203,7 +203,7 @@ namespace SavescumBuddy.Services
             if (action is null)
                 throw new ArgumentNullException(nameof(action));
             
-            var sql = "SELECT AutobackupOverwriteType FROM Settings WHERE Id = 1;";
+            var sql = "SELECT SchedulerOverwriteType FROM Settings WHERE Id = 1;";
             var overwriteOption = (OverwriteOption)_sqlService.ExecuteScalar<int>(sql);
 
             sql = @"
@@ -214,7 +214,7 @@ namespace SavescumBuddy.Services
                 WHERE 
                 GameId = (SELECT Id from Game WHERE IsCurrent = 1) 
                 AND 
-                IsAutobackup = 1 
+                IsScheduled = 1 
                 ORDER BY Id DESC
                 LIMIT 1";
 
@@ -310,6 +310,11 @@ namespace SavescumBuddy.Services
     {
         public static int ToSqliteBoolean(this bool value) => value ? 1 : 0;
         public static string ToSqliteNullCheck(this bool value) => value ? "IS NOT NULL" : "IS NULL";
-        public static bool SqliteToBoolean(this int value) => value == 0 ? false : value == 1 ? true : throw new InvalidOperationException("Only 0 and 1 can be converted to bool");
+        public static bool SqliteToBoolean(this int value) => value switch
+        {
+            0 => false,
+            1 => true,
+            _ => throw new InvalidOperationException("Only 0 and 1 can be converted to bool"),
+        };
     }
 }

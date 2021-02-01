@@ -329,7 +329,7 @@
                                                         <materialDesign:PackIcon Kind="CloudCheck" Width="20" Height="20"/>
                                                     </Setter.Value>
                                                 </Setter>
-                                                <Setter Property="Foreground" Value="{StaticResource AutobackupsButtonBrush}"/>
+                                                <Setter Property="Foreground" Value="{StaticResource ScheduledButtonBrush}"/>
                                             </Trigger>
                                             <Trigger Property="IsChecked" Value="{x:Null}">
                                                 <Setter Property="Content">
@@ -337,7 +337,7 @@
                                                         <materialDesign:PackIcon Kind="CloudOutline" Width="20" Height="20"/>
                                                     </Setter.Value>
                                                 </Setter>
-                                                <Setter Property="Foreground" Value="{StaticResource AutobackupsButtonBrush}"/>
+                                                <Setter Property="Foreground" Value="{StaticResource ScheduledButtonBrush}"/>
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
@@ -363,7 +363,7 @@
                                                         <materialDesign:PackIcon Kind="CloudCheck" Width="20" Height="20"/>
                                                     </Setter.Value>
                                                 </Setter>
-                                                <Setter Property="Foreground" Value="{StaticResource AutobackupsButtonBrush}"/>
+                                                <Setter Property="Foreground" Value="{StaticResource ScheduledButtonBrush}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -376,7 +376,7 @@
                 <DataGridTemplateColumn IsReadOnly="True">
                     <DataGridTemplateColumn.HeaderTemplate>
                         <DataTemplate>
-                            <CheckBox IsChecked="{Binding Data.Filter.IsAutobackup, Source={StaticResource DataContextProxy}}"
+                            <CheckBox IsChecked="{Binding Data.Filter.IsScheduled, Source={StaticResource DataContextProxy}}"
                                       IsThreeState="True">
                                 <CheckBox.Style>
                                     <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource CheckBoxStyleSimple}">
@@ -410,7 +410,7 @@
                     </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ToggleButton IsChecked="{Binding IsAutobackup, Converter={StaticResource IntToBoolConverter}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            <ToggleButton IsChecked="{Binding IsScheduled, Converter={StaticResource IntToBoolConverter}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                           Cursor="Arrow">
                                 <ToggleButton.Style>
                                     <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
@@ -420,7 +420,7 @@
                                             </Setter.Value>
                                         </Setter>
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsAutobackup, Converter={StaticResource NumberToBoolConverter}}" Value="True">
+                                            <DataTrigger Binding="{Binding IsScheduled, Converter={StaticResource NumberToBoolConverter}}" Value="True">
                                                 <Setter Property="Content">
                                                     <Setter.Value>
                                                         <materialDesign:PackIcon Kind="Timer" Width="20" Height="20"/>

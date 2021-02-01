@@ -11,7 +11,7 @@ namespace SavescumBuddy.Wpf.Models
         private bool _descending;
         private string _groupBy;
         private bool? _isLiked;
-        private bool? _isAutobackup;
+        private bool? _isScheduled;
         private bool? _isInGoogleDrive;
         private string _note;
         private int _gameId;
@@ -29,7 +29,7 @@ namespace SavescumBuddy.Wpf.Models
         public bool Descending { get => _descending ; set => SetProperty(ref _descending, value); }
         public string GroupBy { get => _groupBy; set => SetProperty(ref _groupBy, value); }
         public bool? IsLiked { get => _isLiked; set => SetProperty(ref _isLiked, value); }
-        public bool? IsAutobackup { get => _isAutobackup; set => SetProperty(ref _isAutobackup, value); }
+        public bool? IsScheduled { get => _isScheduled; set => SetProperty(ref _isScheduled, value); }
         public bool? IsInGoogleDrive { get => _isInGoogleDrive; set => SetProperty(ref _isInGoogleDrive, value); }
         public string Note { get => _note; set => SetProperty(ref _note, value); }
         public int GameId { get => _gameId; set => SetProperty(ref _gameId, value); }

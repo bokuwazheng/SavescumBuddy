@@ -9,7 +9,7 @@ using SavescumBuddy.Wpf.Mvvm;
 
 namespace SavescumBuddy.Modules.Main.ViewModels
 {
-    public class AutobackupsViewModel : BaseViewModel
+    public class SchedulerViewModel : BaseViewModel
     {
         private readonly IDataAccess _dataAccess;
         private readonly ISettingsAccess _settingsAccess;
@@ -20,9 +20,9 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         private DispatcherTimer _progressBarTimer;
 
         public int Progress { get => _progress; private set => SetProperty(ref _progress, value); }
-        public int Interval => _settingsAccess.AutobackupInterval * 60;
+        public int Interval => _settingsAccess.SchedulerInterval * 60;
 
-        public AutobackupsViewModel(IRegionManager regionManager, IDataAccess dataAccess, ISettingsAccess settingsAccess, IEventAggregator eventAggregator, 
+        public SchedulerViewModel(IRegionManager regionManager, IDataAccess dataAccess, ISettingsAccess settingsAccess, IEventAggregator eventAggregator, 
             IBackupService backupService) : base(regionManager, eventAggregator)
         {
             _dataAccess = dataAccess;
@@ -31,21 +31,21 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
             _backupTimer = new DispatcherTimer();
             _backupTimer.Interval = TimeSpan.FromMinutes(Interval);
-            _backupTimer.Tick += (s, e) => { Autobackup(); Progress = 0; };
+            _backupTimer.Tick += (s, e) => { Backup(); Progress = 0; };
 
             _progressBarTimer = new DispatcherTimer();
             _progressBarTimer.Interval = TimeSpan.FromSeconds(1);
             _progressBarTimer.Tick += (s, e) => Progress++;
 
-            var isEnabled = _settingsAccess.AutobackupsEnabled;
+            var isEnabled = _settingsAccess.SchedulerEnabled;
             if (isEnabled)
             {
                 _backupTimer.Start();
                 _progressBarTimer.Start();
             }
 
-            _eventAggregator.GetEvent<AutobackupIntervalChangedEvent>().Subscribe(OnIntervalChanged);
-            _eventAggregator.GetEvent<AutobackupsEnabledChangedEvent>().Subscribe(OnIsEnabledChanged);
+            _eventAggregator.GetEvent<SchedulerIntervalChangedEvent>().Subscribe(OnIntervalChanged);
+            _eventAggregator.GetEvent<SchedulerEnabledChangedEvent>().Subscribe(OnIsEnabledChanged);
         }
 
         private void Start()
@@ -80,13 +80,13 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             RaisePropertyChanged(nameof(Interval)); // TODO: TEST IF NEEDED!
         }
 
-        private void Autobackup() => Handle(() =>
+        private void Backup() => Handle(() =>
         {
             if (!_dataAccess.ScheduledBackupMustBeSkipped())
             {
                 _dataAccess.OverwriteScheduledBackup(x => _backupService.DeleteFiles(x));
 
-                var newBackup = _dataAccess.CreateBackup(isAutobackup: true);
+                var newBackup = _dataAccess.CreateBackup(isScheduled: true);
                 _backupService.BackupSavefile(newBackup);
                 _backupService.SaveScreenshot(newBackup.PicturePath);
 
