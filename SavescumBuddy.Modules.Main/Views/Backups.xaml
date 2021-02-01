@@ -23,11 +23,11 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type TextBox}">
                             <Border x:Name="border" BorderBrush="Transparent" BorderThickness="{TemplateBinding BorderThickness}" 
-                                    Background="Transparent" SnapsToDevicePixels="True" CornerRadius="7" VerticalAlignment="Center">
+                                    Background="Transparent" SnapsToDevicePixels="True" CornerRadius="3" VerticalAlignment="Center">
                                 <Grid>
-                                    <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                                    <ScrollViewer x:Name="PART_ContentHost" Focusable="False" Margin="6"/>
                                     <TextBlock x:Name="WatermarkText" Visibility="Hidden" IsHitTestVisible="False" Foreground="{StaticResource Ash}"
-                                               FontFamily="Segoe MDL2 Assets" FontSize="14" Text="{TemplateBinding Tag}" Padding="5,1,10,0"/>
+                                               FontFamily="Segoe MDL2 Assets" FontSize="14" Text="{TemplateBinding Tag}" Padding="8,9,8,0"/>
                                 </Grid>
                             </Border>
                             <ControlTemplate.Triggers>
@@ -37,12 +37,12 @@
                                 <Trigger Property="Text" Value="{x:Null}">
                                     <Setter Property="Visibility" TargetName="WatermarkText" Value="Visible"/>
                                 </Trigger>
-                                <!--<Trigger Property="IsMouseOver" Value="true">
-                                    <Setter Property="BorderBrush" TargetName="border" Value="#FFE1E1E1"/>
+                                <Trigger Property="IsMouseOver" Value="true">
+                                    <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource OrderButtonBrush}"/>
                                 </Trigger>
                                 <Trigger Property="IsFocused" Value="true">
-                                    <Setter Property="BorderBrush" TargetName="border" Value="#FFE1E1E1"/>
-                                </Trigger>-->
+                                    <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource OrderButtonBrush}"/>
+                                </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>
@@ -347,7 +347,8 @@
                     </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ToggleButton IsChecked="{Binding GoogleDriveId, Converter={StaticResource ObjectToBoolConverter}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                            <ToggleButton IsChecked="{Binding GoogleDriveId, Converter={StaticResource ObjectToBoolConverter}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                          Cursor="Arrow">
                                 <ToggleButton.Style>
                                     <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
                                         <Setter Property="Content">
@@ -409,7 +410,8 @@
                     </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ToggleButton IsChecked="{Binding IsAutobackup, Converter={StaticResource IntToBoolConverter}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                            <ToggleButton IsChecked="{Binding IsAutobackup, Converter={StaticResource IntToBoolConverter}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                          Cursor="Arrow">
                                 <ToggleButton.Style>
                                     <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
                                         <Setter Property="Content">
@@ -514,10 +516,15 @@
                                     <ColumnDefinition/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
                                 <!--NoteTextBox-->
                                 <TextBox x:Name="NoteTextBox" Text="{Binding Note, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MaxLength="180" TextWrapping="Wrap"  
-                                         Margin="5,3,5,5" MaxLines="3" Padding="3,0,0,0" Foreground="{StaticResource Dark}" Style="{StaticResource TextBoxStyleFlat2}"
-                                         Grid.ColumnSpan="2" Tag="&#xE70F;">
+                                         Foreground="{StaticResource Dark}" Style="{StaticResource TextBoxStyleFlat2}"
+                                         Grid.ColumnSpan="2" Grid.Row="1" Tag="&#xE70F;">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="LostFocus">
                                             <i:InvokeCommandAction Command="{Binding Data.UpdateNoteCommand, Source={StaticResource DataContextProxy}}"
@@ -526,8 +533,7 @@
                                     </i:Interaction.Triggers>
                                 </TextBox>
                                 <!--Char counter-->
-                                <TextBlock Grid.Column="1" FontSize="10" Foreground="#FF969696" TextAlignment="Right"
-                                           VerticalAlignment="Bottom" Margin="10,8">
+                                <TextBlock Grid.Column="1" Grid.Row="2" FontSize="10" Foreground="#FF969696" TextAlignment="Right" Margin="2" IsHitTestVisible="False">
                                     <Run Text="{Binding Text.Length, ElementName=NoteTextBox, Mode=OneWay}"/>
                                     <Run Text="/"/>
                                     <Run Text="{Binding MaxLength, ElementName=NoteTextBox, Mode=OneWay}"/>
