@@ -4,6 +4,15 @@
                     xmlns:converters="clr-namespace:SavescumBuddy.Wpf.Converters;assembly=SavescumBuddy.Wpf" 
                     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
                     xmlns:enums="clr-namespace:SavescumBuddy.Lib.Enums;assembly=SavescumBuddy.Lib">
+
+    <!--Main brushes-->
+    <SolidColorBrush x:Key="Foreground.Static" Color="#6e6e6e"/>
+    <SolidColorBrush x:Key="Foreground.Selected" Color="#3c3c3c"/>
+    <SolidColorBrush x:Key="Foreground.Disabled" Color="#cdcdcd"/>
+    <SolidColorBrush x:Key="Foreground.MouseOver" Color="#2d2d2d"/>
+    <SolidColorBrush x:Key="Background.Selected" Color="#f5f5f5"/>
+    <SolidColorBrush x:Key="Background.MouseOver" Color="#e6e6e6"/>
+    <SolidColorBrush x:Key="Background.Static" Color="#FFB4B4B4"/>
     
     <!--Sorting buttons brushes-->
     <LinearGradientBrush x:Key="HeartButtonBrush" StartPoint="0,0.5" EndPoint="1,0.5">
@@ -30,7 +39,6 @@
     <!--Font sizes-->
     <sys:Double x:Key="HeaderFontSize">22</sys:Double>
     <sys:Double x:Key="CaptionFontSize">14</sys:Double>
-    <sys:Double x:Key="СommonFontSize">12</sys:Double>
 
     <!--Converters-->
     <BorderGapMaskConverter x:Key="BorderGapMaskConverter"/>
@@ -48,21 +56,6 @@
     <converters:StringIsNullOrEmptyConverter x:Key="StringIsNullOrEmptyConverter"/>
     <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
     <converters:NumberToBoolConverter x:Key="NumberToBoolConverter"/>
-
-    <!--Main brushes-->
-    <SolidColorBrush x:Key="Dark" Color="#FF464646"/>
-    <SolidColorBrush x:Key="Ash" Color="#FF7D7D7D"/>
-    <SolidColorBrush x:Key="Grayish" Color="#FFB4B4B4"/>
-    <SolidColorBrush x:Key="Bright" Color="#FFE6E6E6"/>
-    <SolidColorBrush x:Key="SkyBlue" Color="#FF80C8FA"/>
-    <SolidColorBrush x:Key="SkyBlueInteraction" Color="#FF46A8EE"/>
-    <SolidColorBrush x:Key="SomeGreen" Color="#FF1DB01D"/>
-    <SolidColorBrush x:Key="Foreground.Static" Color="#6e6e6e"/>
-    <SolidColorBrush x:Key="Foreground.Selected" Color="#3c3c3c"/>
-    <SolidColorBrush x:Key="Foreground.Disabled" Color="#cdcdcd"/>
-    <SolidColorBrush x:Key="Foreground.MouseOver" Color="#2d2d2d"/>
-    <SolidColorBrush x:Key="Background.Selected" Color="#f5f5f5"/>
-    <SolidColorBrush x:Key="Background.MouseOver" Color="#e6e6e6"/>
 
     <Style x:Key="DialogPlaceholder" TargetType="{x:Type ContentControl}">
         <Setter Property="Template">
@@ -150,7 +143,7 @@
     <!--Header-->
     <Style x:Key="Header" TargetType="TextBlock">
         <Setter Property="FontSize" Value="{StaticResource HeaderFontSize}"/>
-        <Setter Property="Foreground" Value="{StaticResource Dark}"/>
+        <Setter Property="Foreground" Value="{StaticResource Foreground.Selected}"/>
         <Setter Property="HorizontalAlignment" Value="Left"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
@@ -158,7 +151,7 @@
     <!--Caption-->
     <Style x:Key="Caption" TargetType="TextBlock">
         <Setter Property="FontSize" Value="{StaticResource CaptionFontSize}"/>
-        <Setter Property="Foreground" Value="{StaticResource Ash}"/>
+        <Setter Property="Foreground" Value="{StaticResource Foreground.Static}"/>
     </Style>
 
     <!--Animations-->
@@ -176,8 +169,8 @@
     <!--Record hotkey toggle button-->
     <Style x:Key="RecordHotkeyToggleButton" TargetType="ToggleButton">
         <Setter Property="Margin" Value="8"/>
-        <Setter Property="Background" Value="{StaticResource Bright}"/>
-        <Setter Property="Foreground" Value="{StaticResource Dark}"/>
+        <Setter Property="Background" Value="{StaticResource Background.MouseOver}"/>
+        <Setter Property="Foreground" Value="{StaticResource Foreground.Selected}"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <Setter.Value>

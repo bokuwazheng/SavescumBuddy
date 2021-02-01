@@ -19,10 +19,10 @@
 
     <!--ProgressBar-->
     <Grid>
-        <Border Height="1" Background="{StaticResource Grayish}" VerticalAlignment="Bottom"/>
+        <Border Height="1" Background="{StaticResource Background.Static}" VerticalAlignment="Bottom"/>
         <ProgressBar 
             Minimum="0" Maximum="{Binding Interval, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
             Value="{Binding Progress, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=20}" 
-            Height="2" Foreground="{StaticResource Ash}" BorderBrush="Transparent"/>
+            Height="2" Foreground="{StaticResource Foreground.Static}" BorderBrush="Transparent"/>
     </Grid>
 </UserControl>

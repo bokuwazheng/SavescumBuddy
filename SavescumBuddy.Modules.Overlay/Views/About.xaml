@@ -26,18 +26,18 @@
                 <Run Text="{Binding Version, Mode=OneWay, FallbackValue='1.0.0.0'}"/>
             </TextBlock>
             <TextBlock 
-                FontSize="14" Foreground="{StaticResource Dark}">
+                FontSize="14" Foreground="{StaticResource Foreground.Selected}">
                 This software is 
                 <Hyperlink Command="{Binding StartProcessCommand}" CommandParameter="https://github.com/bokuwazheng/SavescumBuddy/blob/master/LICENSE">
                     unlicensed
                 </Hyperlink>.
             </TextBlock>
             <TextBlock 
-                FontSize="14" Foreground="{StaticResource Dark}" TextWrapping="Wrap" Margin="0,4">
+                FontSize="14" Foreground="{StaticResource Foreground.Selected}" TextWrapping="Wrap" Margin="0,4">
                 Savescum Buddy provides a convenient way to "savescum" in
                 any game that has only a single savefile.
             </TextBlock>
-            <TextBlock FontSize="14" Foreground="{StaticResource Dark}" Margin="0,4">
+            <TextBlock FontSize="14" Foreground="{StaticResource Foreground.Selected}" Margin="0,4">
                 Source code is available on 
                 <Hyperlink Command="{Binding StartProcessCommand}" CommandParameter="https://github.com/bokuwazheng/SavescumBuddy/" >
                     GitHub
