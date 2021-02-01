@@ -186,18 +186,7 @@
                         </Style>
                     </DataGridCheckBoxColumn.HeaderStyle>
                 </DataGridCheckBoxColumn>
-                
-                <!--Error icon-->
-                <!--<DataGridTemplateColumn>
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE783;" ToolTip="Savefile not found" 
-                                       Foreground="IndianRed" FontSize="16" VerticalAlignment="Center" Margin="2"
-                                       Visibility="{Binding SavefilePath, Converter={StaticResource ExistsToVisibilityConverter}}"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>-->
-                
+
                 <!--Image-->
                 <DataGridTemplateColumn>
                     <DataGridTemplateColumn.CellTemplate>
@@ -420,7 +409,7 @@
                     </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ToggleButton IsChecked="{Binding IsAutobackup, Converter={StaticResource ObjectToBoolConverter}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                            <ToggleButton IsChecked="{Binding IsAutobackup, Converter={StaticResource IntToBoolConverter}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
                                 <ToggleButton.Style>
                                     <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
                                         <Setter Property="Content">
