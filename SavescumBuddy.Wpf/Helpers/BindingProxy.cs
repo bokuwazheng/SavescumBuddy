@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace SavescumBuddy.Wpf.Domain
+namespace SavescumBuddy.Wpf.Helpers
 {
     public class BindingProxy : Freezable
     {
@@ -13,6 +13,6 @@ namespace SavescumBuddy.Wpf.Domain
         }
 
         public static readonly DependencyProperty DataProperty =
-            DependencyProperty.Register("Data", typeof(object), typeof(BindingProxy), new UIPropertyMetadata(null));
+            DependencyProperty.Register(nameof(Data), typeof(object), typeof(BindingProxy), new UIPropertyMetadata(null));
     }
 }

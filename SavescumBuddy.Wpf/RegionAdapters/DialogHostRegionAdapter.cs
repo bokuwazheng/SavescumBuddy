@@ -4,7 +4,7 @@ using System;
 using System.Collections.Specialized;
 using System.Linq;
 
-namespace SavescumBuddy.Wpf.Domain
+namespace SavescumBuddy.Wpf.RegionAdapters
 {
     public class DialogHostRegionAdapter : RegionAdapterBase<DialogHost>
     {

@@ -4,7 +4,7 @@
              xmlns:local="clr-namespace:SavescumBuddy.Modules.Main.Views"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:domain="clr-namespace:SavescumBuddy.Wpf.Domain;assembly=SavescumBuddy.Wpf"
+             xmlns:helpers="clr-namespace:SavescumBuddy.Wpf.Helpers;assembly=SavescumBuddy.Wpf"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              SnapsToDevicePixels="True"
              prism:ViewModelLocator.AutoWireViewModel="True">
@@ -129,7 +129,7 @@
         <DataGrid Grid.Row="1" ItemsSource="{Binding Backups}" SelectedItem="{Binding SelectedBackup}" CanUserAddRows="False" AutoGenerateColumns="False" IsReadOnly="True"
                   CanUserResizeColumns="False" CanUserReorderColumns="False" CanUserSortColumns="False">
             <DataGrid.Resources>
-                <domain:BindingProxy x:Key="DataContextProxy" Data="{Binding}"/>
+                <helpers:BindingProxy x:Key="DataContextProxy" Data="{Binding}"/>
             </DataGrid.Resources>
             <!--Data Grid Context Menu-->
             <DataGrid.ContextMenu>

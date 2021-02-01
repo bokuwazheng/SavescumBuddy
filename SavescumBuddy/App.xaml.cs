@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using SavescumBuddy.Wpf.Services;
 using System.Media;
-using SavescumBuddy.Wpf.Domain;
+using SavescumBuddy.Wpf.RegionAdapters;
 
 namespace SavescumBuddy
 {
