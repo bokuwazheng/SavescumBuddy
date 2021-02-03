@@ -77,7 +77,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 Stop();
                 Start();
             }
-            RaisePropertyChanged(nameof(Interval)); // TODO: TEST IF NEEDED!
+            RaisePropertyChanged(nameof(Interval));
         }
 
         private void Backup() => Handle(() =>

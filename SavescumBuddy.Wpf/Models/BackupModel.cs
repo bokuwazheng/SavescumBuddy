@@ -1,5 +1,6 @@
 ﻿using Prism.Mvvm;
 using SavescumBuddy.Lib;
+using SavescumBuddy.Lib.Extensions;
 using System;
 
 namespace SavescumBuddy.Wpf.Models
@@ -18,7 +19,7 @@ namespace SavescumBuddy.Wpf.Models
 
         public int Id => Backup.Id;
         public string GameTitle => Backup.GameTitle;
-        public string GoogleDriveId { get => Backup.GoogleDriveId; set { Backup.GoogleDriveId = value; RaisePropertyChanged(); } }
+        public bool IsInGoogleDrive => Backup.IsInGoogleDrive.SqliteToBoolean();
         public string Note { get => Backup.Note; set { Backup.Note = value; RaisePropertyChanged(); } }
         public int IsLiked { get => Backup.IsLiked; set { Backup.IsLiked = value; RaisePropertyChanged(); } }
         public int IsScheduled => Backup.IsScheduled;

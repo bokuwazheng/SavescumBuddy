@@ -19,6 +19,7 @@ using System.Threading;
 using SavescumBuddy.Wpf.Services;
 using System.Media;
 using SavescumBuddy.Wpf.RegionAdapters;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace SavescumBuddy
 {
@@ -74,6 +75,12 @@ namespace SavescumBuddy
                 .RegisterSingleton<IGlobalKeyboardHook, GlobalKeyboardHook>()
                 .RegisterSingleton<IGoogleDrive, GoogleDrive>()
                 .RegisterSingleton<ISnackbarMessageQueue, SnackbarMessageQueue>();
+
+            ServiceCollection services = new();
+            services.AddHttpClient<GoogleDrive>();
+
+            containerRegistry
+                .RegisterInstance<IServiceProvider>(services.BuildServiceProvider());
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)

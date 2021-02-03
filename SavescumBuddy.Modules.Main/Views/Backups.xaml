@@ -152,7 +152,7 @@
                                     <Style TargetType="{x:Type TextBlock}">
                                         <Setter Property="Text" Value="Delete from Google Drive"/>
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding PlacementTarget.SelectedItem.GoogleDriveId, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}" Value="{x:Null}">
+                                            <DataTrigger Binding="{Binding PlacementTarget.SelectedItem.IsInGoogleDrive, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}" Value="False">
                                                 <Setter Property="Text" Value="Send to Google Drive"/>
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -347,7 +347,7 @@
                     </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ToggleButton IsChecked="{Binding GoogleDriveId, Converter={StaticResource ObjectToBoolConverter}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            <ToggleButton IsChecked="{Binding IsInGoogleDrive, Converter={StaticResource NumberToBoolConverter}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                           Cursor="Arrow">
                                 <ToggleButton.Style>
                                     <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource FilterToggleButton}">
@@ -357,7 +357,7 @@
                                             </Setter.Value>
                                         </Setter>
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding GoogleDriveId, Converter={StaticResource ObjectToBoolConverter}}" Value="True">
+                                            <DataTrigger Binding="{Binding IsInGoogleDrive, Converter={StaticResource NumberToBoolConverter}}" Value="True">
                                                 <Setter Property="Content">
                                                     <Setter.Value>
                                                         <materialDesign:PackIcon Kind="CloudCheck" Width="20" Height="20"/>

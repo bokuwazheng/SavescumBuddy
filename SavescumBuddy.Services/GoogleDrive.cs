@@ -2,19 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Download;
 using Google.Apis.Drive.v3;
 using Google.Apis.Drive.v3.Data;
-using Google.Apis.Services;
 using Google.Apis.Util.Store;
-using SavescumBuddy.Lib;
 using SavescumBuddy.Services.Interfaces;
 using DriveFile = Google.Apis.Drive.v3.Data.File;
-using File = System.IO.File;
 
 namespace SavescumBuddy.Services
 {
@@ -22,44 +19,46 @@ namespace SavescumBuddy.Services
     {
         // If modifying these scopes, delete your previously saved credentials.
         private readonly string[] _scopes;
-        private readonly string _applicationName;
+        private readonly string _applicationName = "Savescum Buddy";
         private readonly string _credentialsFileName = "sb_credentials.json";
         private readonly string _tokenFolderName = "token.json";
 
 #if DEBUG
-        public string CredentialsFileName => _credentialsFileName;
-        public string TokenFolderName => _tokenFolderName;
+        protected string CredentialsFileName => _credentialsFileName;
+        protected string TokenFolderName => _tokenFolderName;
 #else
         public string CredentialsFileName => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "bokuwazheng", _credentialsFileName);
         public string TokenFolderName => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "bokuwazheng", _tokenFolderName);
 #endif
 
-        public UserCredential UserCredential { get; private set; }
-
-        public GoogleDrive()
+        public GoogleDrive(IServiceProvider serviceProvider)
         {
+            HttpClientFactory = (IHttpClientFactory)serviceProvider.GetService(typeof(IHttpClientFactory));
+            HttpClient = HttpClientFactory.CreateClient(nameof(GoogleDrive));
+
             _scopes = new string[] { DriveService.Scope.DriveFile, DriveService.Scope.DriveAppdata };
-            _applicationName = "Savescum Buddy";
         }
 
-        public DriveService GetDriveApiService()
-        {
-            var service = new DriveService(new BaseClientService.Initializer()
+        public bool IsAuthorized => UserCredential is object;
+        protected UserCredential UserCredential { get; private set; }
+        protected HttpClient HttpClient { get; }
+        protected IHttpClientFactory HttpClientFactory { get; }
+
+        protected DriveService DriveService => 
+            new(new()
             {
                 HttpClientInitializer = UserCredential,
                 ApplicationName = _applicationName,
             });
-            return service;
-        }
 
         // The file token.json stores the user's access and refresh tokens, and is created
         // automatically when the authorization flow completes for the first time.
-        public async Task<bool> AuthorizeAsync(CancellationToken ct)
+        public async Task<bool> AuthorizeAsync(CancellationToken ct = default)
         {
             var credentials = CredentialsFileName;
             var token = TokenFolderName;
 
-            using var stream = new FileStream(credentials, FileMode.Open, FileAccess.Read);
+            using FileStream stream = new(credentials, FileMode.Open, FileAccess.Read);
             var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
                 GoogleClientSecrets.Load(stream).Secrets,
                 _scopes,
@@ -87,103 +86,65 @@ namespace SavescumBuddy.Services
                 return false;
         }
 
-        public async Task ReauthorizeAsync(CancellationToken ct)
+        public async Task ReauthorizeAsync(CancellationToken ct = default)
         {
             await GoogleWebAuthorizationBroker.ReauthorizeAsync(UserCredential, ct).ConfigureAwait(false);
         }
 
-        public async Task<string> GetAppRootFolderIdAsync(CancellationToken ct = default) =>
+        protected async Task<string> GetAppRootFolderIdAsync(CancellationToken ct = default) =>
             await GetIdByNameAsync(_applicationName, "root", IGoogleDrive.MimeType.Folder, ct).ConfigureAwait(false)
-            ?? await CreateAppRootFolderAsync().ConfigureAwait(false);
+            ?? await CreateAppRootFolderAsync(ct).ConfigureAwait(false);
 
-        public async Task<string> CreateAppRootFolderAsync(CancellationToken ct = default)
+        protected async Task<string> CreateAppRootFolderAsync(CancellationToken ct = default)
         {
-            var fileMetadata = new DriveFile()
+            DriveFile body = new()
             {
                 Name = _applicationName,
                 MimeType = IGoogleDrive.MimeType.Folder
             };
-            var request = GetDriveApiService().Files.Create(fileMetadata);
+            var request = DriveService.Files.Create(body);
             request.Fields = "id";
             var folder = await request.ExecuteAsync(ct).ConfigureAwait(false);
 
-            var permission = new Permission() { Type = "anyone", Role = "reader" };
-            var service = GetDriveApiService();
-            service.Permissions.Create(permission, folder.Id).Execute();
+            Permission permission = new() { Type = "anyone", Role = "reader" };
+            DriveService.Permissions.Create(permission, folder.Id).Execute();
 
             return folder.Id;
         }
 
-        public async Task<string> CreateFolderAsync(string folderName, string parentId, CancellationToken ct = default)
+        protected async Task UploadFileAsync(string path, string parentId, string mimeType, CancellationToken ct = default)
         {
-            var fileMetadata = new DriveFile()
-            {
-                Name = folderName,
-                MimeType = IGoogleDrive.MimeType.Folder,
-                Parents = new List<string> { parentId },
-            };
-            var request = GetDriveApiService().Files.Create(fileMetadata);
-            request.Fields = "id";
-            var folder = await request.ExecuteAsync(ct).ConfigureAwait(false);
-            return folder.Id;
-        }
-
-        public async Task UploadFileAsync(string path, string parentId, CancellationToken ct = default)
-        {
-            var fileMetadata = new DriveFile()
+            DriveFile body = new()
             {
                 Name = Path.GetFileName(path),
                 Parents = new List<string> { parentId }
             };
-            using var stream = new FileStream(path, FileMode.Open);
-            var request = GetDriveApiService().Files.Create(fileMetadata, stream, IGoogleDrive.MimeType.File);
-            await request.UploadAsync(ct).ConfigureAwait(false);
+            using FileStream fs = new(path, FileMode.Open);
+            var upload = DriveService.Files.Create(body, fs, mimeType);
+            await upload.UploadAsync(ct).ConfigureAwait(false);
         }
 
-        public async Task UploadFilesAsync(string[] paths, string parentId, CancellationToken ct = default)
+        public async Task DeleteAsync(string id, CancellationToken ct = default)
         {
-            var tasks = new List<Task>();
-
-            foreach (var path in paths)
-            {
-                tasks.Add(UploadFileAsync(path, parentId, ct));
-            }
-
-            await Task.WhenAll(tasks).ConfigureAwait(false);
-        }
-
-        public async Task DeleteFromCloudAsync(string id, CancellationToken ct = default)
-        {
-            var service = GetDriveApiService();
-            await service.Files.Delete(id).ExecuteAsync(ct).ConfigureAwait(false);
+            await DriveService.Files.Delete(id).ExecuteAsync(ct).ConfigureAwait(false);
         }
 
         public async Task<string> GetUserEmailAsync(CancellationToken ct = default)
         {
-            var service = GetDriveApiService();
-            var request = service.About.Get();
+            var request = DriveService.About.Get();
             request.Fields = "user(emailAddress)";
             var result = await request.ExecuteAsync(ct).ConfigureAwait(false);
             return result?.User.EmailAddress;
         }
 
-        public async Task<DriveFile> GetAsync(string id, CancellationToken ct = default)
+        protected async Task<List<DriveFile>> GetFilesAsync(string parentId, CancellationToken ct = default)
         {
-            var service = GetDriveApiService();
-            var request = service.Files.Get(id);
-            request.Fields = "*";
-            var result = await request.ExecuteAsync().ConfigureAwait(false);
-            return result;
-        }
-
-        public async Task<List<DriveFile>> GetFilesAsync(string parentId, CancellationToken ct = default)
-        {
-            var request = GetDriveApiService().Files.List();
+            var request = DriveService.Files.List();
             request.PageSize = 100;
             request.Fields = "nextPageToken, files(id, name, mimeType)";
             request.Spaces = "drive";
             request.Q = $"'{ parentId }' in parents and trashed = false";
-            var result = new List<DriveFile>();
+            List<DriveFile> result = new();
             do
             {
                 var files = await request.ExecuteAsync(ct).ConfigureAwait(false);
@@ -195,9 +156,9 @@ namespace SavescumBuddy.Services
             return result;
         }
 
-        public async Task<string> GetIdByNameAsync(string name, string parentId, string mimeType, CancellationToken ct = default)
+        protected async Task<string> GetIdByNameAsync(string name, string parentId, string mimeType, CancellationToken ct = default)
         {
-            var request = GetDriveApiService().Files.List();
+            var request = DriveService.Files.List();
             request.Fields = "nextPageToken, files(id, name)";
             request.Spaces = "drive";
             request.Q = $"mimeType = '{ mimeType }' and '{ parentId }' in parents and trashed = false";
@@ -207,65 +168,33 @@ namespace SavescumBuddy.Services
             return result?.Id;
         }
 
-        // TODO: Transaction-like method?
-        public async Task<string> UploadBackupAsync(Backup backup, CancellationToken ct = default)
+        public async Task<string> UploadAsync(string path, string mimeType, CancellationToken ct = default)
         {
-            if (!File.Exists(backup.SavefilePath))
-                throw new ArgumentException("Savefile does not exist.");
+            var appRootId = await GetAppRootFolderIdAsync(ct).ConfigureAwait(false);
 
-            var gameTitle = backup.GameTitle;
-            var rootId = await GetAppRootFolderIdAsync(ct).ConfigureAwait(false);
-            var gameFolderId = await GetIdByNameAsync(gameTitle, rootId, IGoogleDrive.MimeType.Folder, ct).ConfigureAwait(false);
-            if (gameFolderId is null)
-                gameFolderId = await CreateFolderAsync(gameTitle, rootId, ct).ConfigureAwait(false);
-            var backupCloudFolderId = await CreateFolderAsync(backup.TimeStamp.ToString(), gameFolderId, ct).ConfigureAwait(false);
-            await UploadFileAsync(backup.SavefilePath, backupCloudFolderId, ct).ConfigureAwait(false);
-            await UploadFileAsync(backup.PicturePath, backupCloudFolderId, ct).ConfigureAwait(false);
-            return backupCloudFolderId;
+            await UploadFileAsync(path, appRootId, mimeType, ct).ConfigureAwait(false);
+
+            var fileName = Path.GetFileName(path);
+            var result = await GetIdByNameAsync(fileName, appRootId, mimeType, ct).ConfigureAwait(false);
+
+            return result;
         }
 
-        public async Task DeleteBackupAsync(Backup backup, CancellationToken ct = default)
+        public async Task DownloadAsync(string id, string path, CancellationToken ct = default)
         {
-            await DeleteFromCloudAsync(backup.GoogleDriveId, ct).ConfigureAwait(false);
+            FileStream fs = new(path, FileMode.Create, FileAccess.Write, FileShare.None, 128 * 1024, FileOptions.SequentialScan | FileOptions.Asynchronous);
+            await using (fs.ConfigureAwait(false))
+            {
+                var response = await HttpClient.GetAsync($"https://drive.google.com/uc?export=download&id={ id }", ct).ConfigureAwait(false);
+                await response.Content.CopyToAsync(fs, ct).ConfigureAwait(false);
+            }
         }
 
-        // TODO: only works for DOCS
         public async Task ExportAsync(DriveFile file, string mimeType, Stream stream, Action<long?, IDownloadProgress> onProgressChanged, CancellationToken ct = default)
         {
-            var request = GetDriveApiService().Files.Export(file.Id, mimeType);
+            var request = DriveService.Files.Export(file.Id, mimeType);
             request.MediaDownloader.ProgressChanged += p => onProgressChanged?.Invoke(file.Size, p);
             await request.DownloadAsync(stream, ct);
-        }
-
-        public async Task RecoverAsync(Backup backup, Action onDownloadCompleted, CancellationToken ct = default)
-        {
-            var files = await GetFilesAsync(backup.GoogleDriveId, ct).ConfigureAwait(false);
-            if (files.Count == 2)
-            {
-                var dirName = Path.GetDirectoryName(backup.SavefilePath);
-                if (!Directory.Exists(dirName))
-                    Directory.CreateDirectory(dirName);
-
-                using var client = new WebClient();
-                var tasks = new List<Task>();
-
-                foreach (var file in files)
-                {
-                    var path = file.MimeType switch
-                    {
-                        IGoogleDrive.MimeType.Image => backup.PicturePath,
-                        IGoogleDrive.MimeType.Binary => backup.SavefilePath,
-                        IGoogleDrive.MimeType.File => backup.SavefilePath,
-                        _ => throw new Exception("Unsupported MIME type")
-                    };
-
-                    var task = client.DownloadFileTaskAsync($"https://drive.google.com/uc?export=download&id={ file.Id }", path);
-                    tasks.Add(task);
-                }
-
-                await Task.WhenAll(tasks);
-                onDownloadCompleted.Invoke();
-            }
         }
     }
 }

@@ -5,7 +5,7 @@
         public int Id { get; set; }
         public int GameId { get; set; }
         public string GameTitle { get; set; }
-        public string GoogleDriveId { get; set; }
+        public int IsInGoogleDrive { get; set; }
         public string Note { get; set; }
         public int IsLiked { get; set; }
         public int IsScheduled { get; set; }

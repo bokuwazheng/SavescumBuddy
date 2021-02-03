@@ -1,5 +1,6 @@
 ﻿using SavescumBuddy.Lib;
 using SavescumBuddy.Lib.Enums;
+using SavescumBuddy.Lib.Extensions;
 using SavescumBuddy.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -32,7 +33,7 @@ namespace SavescumBuddy.Services
                     Backup.Id,
                     GameId,
                     Game.Title AS GameTitle,
-                    GoogleDriveId,
+                    iif(GoogleDrive.Id IS NULL, 0, 1) AS IsInGoogleDrive,
                     Note,
                     IsLiked,
                     IsScheduled,
@@ -42,6 +43,7 @@ namespace SavescumBuddy.Services
                     Game.BackupFolder || '\' || TimeStamp || '.jpg' AS PicturePath
                 FROM Backup 
                 LEFT JOIN Game ON Backup.GameId = Game.Id
+                LEFT JOIN GoogleDrive ON Backup.Id = GoogleDrive.BackupId
                 {0} ORDER BY Backup.Id {1} {2}";
 
             if (request.Id.HasValue)
@@ -255,11 +257,6 @@ namespace SavescumBuddy.Services
         {
             _sqlService.Execute("UPDATE Backup SET IsLiked = @IsLiked WHERE Id = @Id;", new { Id = backup.Id, IsLiked = backup.IsLiked });
         }
-
-        public void UpdateGoogleDriveId(Backup backup)
-        {
-            _sqlService.Execute("UPDATE Backup SET GoogleDriveId = @GoogleDriveId WHERE Id = @Id;", new { Id = backup.Id, GoogleDriveId = backup.GoogleDriveId });
-        }
         #endregion
 
         #region Game table methods
@@ -304,17 +301,40 @@ namespace SavescumBuddy.Services
             _sqlService.Execute(sql, new { Id = game.Id, Title = game.Title, SavefilePath = game.SavefilePath, BackupFolder = game.BackupFolder});
         }
         #endregion
-    }
 
-    public static class SqliteExtensions
-    {
-        public static int ToSqliteBoolean(this bool value) => value ? 1 : 0;
-        public static string ToSqliteNullCheck(this bool value) => value ? "IS NOT NULL" : "IS NULL";
-        public static bool SqliteToBoolean(this int value) => value switch
+        public void SaveGoogleDriveInfo(int backupId, string savefileId, string pictureId)
         {
-            0 => false,
-            1 => true,
-            _ => throw new InvalidOperationException("Only 0 and 1 can be converted to bool"),
-        };
+            var args = new
+            {
+                BackupId = backupId,
+                Savefile = savefileId,
+                Picture = pictureId
+            };
+
+            var sql = @"
+                INSERT INTO GoogleDrive
+                (BackupId, Savefile, Picture)
+                VALUES
+                (@BackupId, @Savefile, @Picture);";
+
+            _sqlService.Execute(sql, args);
+        }
+
+        public (string SavefileId, string PictureId) GetGoogleDriveInfo(int backupId)
+        {
+            var sql = @"
+                SELECT
+                Savefile,
+                Picture
+                FROM GoogleDrive 
+                WHERE BackupId = @BackupId;";
+
+            return _sqlService.QueryFirstOrDefault<(string SavefileId, string PictureId)>(sql, new { BackupId = backupId });
+        }
+
+        public void DeleteGoogleDriveInfo(int backupId)
+        {
+            _sqlService.Execute("DELETE FROM GoogleDrive WHERE BackupId = @BackupId;", new { BackupId = backupId });
+        }
     }
 }

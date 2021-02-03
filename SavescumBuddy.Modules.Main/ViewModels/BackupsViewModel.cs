@@ -1,7 +1,6 @@
 ﻿using MaterialDesignThemes.Wpf;
 using Prism.Commands;
 using Prism.Events;
-using Prism.Mvvm;
 using Prism.Regions;
 using SavescumBuddy.Lib.Enums;
 using SavescumBuddy.Wpf.Events;
@@ -46,22 +45,22 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
             RefreshCommand = new DelegateCommand(UpdateBackups);
             AddCommand = new DelegateCommand(Add);
-            RemoveCommand = new DelegateCommand<BackupModel>(Remove, x => x is object).ObservesProperty(() => SelectedBackup);
+            RemoveCommand = new DelegateCommand<BackupModel>(Remove, x => SelectedBackup is object).ObservesProperty(() => SelectedBackup);
             RemoveSelectedCommand = new DelegateCommand(RemoveSelected, () => IsAllItemsSelected ?? true).ObservesProperty(() => IsAllItemsSelected);
-            RestoreCommand = new DelegateCommand<BackupModel>(Restore, x => x is object).ObservesProperty(() => SelectedBackup);
+            RestoreCommand = new DelegateCommand<BackupModel>(Restore, x => SelectedBackup is object).ObservesProperty(() => SelectedBackup);
 
             NavigateForwardCommand = new DelegateCommand(() => ++CurrentPageIndex, () => To < TotalNumberOfBackups);
             NavigateBackwardCommand = new DelegateCommand(() => --CurrentPageIndex, () => From > 1);
             NavigateToStartCommand = new DelegateCommand(() => CurrentPageIndex = 0, () => From > 1);
             NavigateToEndCommand = new DelegateCommand(() => CurrentPageIndex = TotalNumberOfBackups / PageSize, () => To < TotalNumberOfBackups);
 
-            ShowInExplorerCommand = new DelegateCommand<BackupModel>(ShowInExplorer, x => x is object).ObservesProperty(() => SelectedBackup);
-            UpdateNoteCommand = new DelegateCommand<BackupModel>(x => _dataAccess.UpdateNote(x.Backup));
-            UpdateIsLikedCommand = new DelegateCommand<BackupModel>(x => _dataAccess.UpdateIsLiked(x.Backup));
-            ExecuteDriveActionCommand = new DelegateCommand<BackupModel>(async x => await ExecuteCloudAction(x, Ct).ConfigureAwait(false), 
-                x => x is object && _googleDrive.UserCredential is object).ObservesProperty(() => SelectedBackup);
+            ShowInExplorerCommand = new DelegateCommand<BackupModel>(ShowInExplorer, x => SelectedBackup is object).ObservesProperty(() => SelectedBackup);
+            UpdateNoteCommand = new DelegateCommand<BackupModel>(x => _dataAccess.UpdateNote(SelectedBackup.Backup));
+            UpdateIsLikedCommand = new DelegateCommand<BackupModel>(x => _dataAccess.UpdateIsLiked(SelectedBackup.Backup));
+            ExecuteDriveActionCommand = new DelegateCommand<BackupModel>(async x => await ExecuteCloudAction(SelectedBackup, Ct).ConfigureAwait(false), 
+                x => SelectedBackup is object && _googleDrive.IsAuthorized).ObservesProperty(() => SelectedBackup);
             RecoverCommand = new DelegateCommand<BackupModel>(async x => await RecoverAsync(x, Ct).ConfigureAwait(false), 
-                x => x is object && x.GoogleDriveId is object && !File.Exists(x.Backup.SavefilePath) && _googleDrive.UserCredential is object).ObservesProperty(() => SelectedBackup);
+                x => SelectedBackup is object && SelectedBackup.IsInGoogleDrive && !File.Exists(SelectedBackup.Backup.SavefilePath) && _googleDrive.IsAuthorized).ObservesProperty(() => SelectedBackup);
 
             Filter.PropertyChanged += (s, e) => OnFilterPropertyChanged(e.PropertyName);
         }
@@ -138,38 +137,33 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             if (backup is null)
                 return;
 
-            if (backup.GoogleDriveId is object) // TODO: TEST UI UPDATES
+            if (backup.IsInGoogleDrive)
             {
-                _regionManager.PromptAction(
+                PromptAction(
                     "Delete from Google Drive too?",
                     "If you leave the backup in Google Drive you'll be able to recover it later.",
                     "DELETE",
                     "LEAVE BACKUP IN GOOGLE DRIVE",
                     async r =>
                     {
-                        if (r is DialogResult.Abort)
-                            return;
-
                         await HandleAsync(async () =>
                         {
                             if (r is DialogResult.OK)
                             {
-                                await _googleDrive.DeleteBackupAsync(backup.Backup);
-                                _dataAccess.DeleteBackup(backup.Backup.Id);
-                                RaiseDriveActionCanExecute();
+                                await DeleteFromGoogleDriveAsync(backup.Id).ConfigureAwait(true);
+                                _backupService.DeleteFiles(backup.Backup);
+                                _dataAccess.DeleteBackup(backup.Id);
                             }
                             else if (r is DialogResult.Cancel)
-                            {
                                 _backupService.DeleteFiles(backup.Backup);
 
-                            }
                             UpdateBackups();
                         });
                     });
             }
             else
             {
-                _dataAccess.DeleteBackup(backup.Backup.Id);
+                _dataAccess.DeleteBackup(backup.Id);
                 _backupService.DeleteFiles(backup.Backup);
                 UpdateBackups();
             }
@@ -178,11 +172,11 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         public void UpdateBackups() => Handle(() =>
         {
             var response = _dataAccess.SearchBackups(Filter);
-            var backupModels = response.Backups.Select(x => new BackupModel(x)).ToList();
+            var backups = response.Backups.Select(x => new BackupModel(x)).ToList();
 
-            foreach (var model in backupModels)
+            foreach (var backup in backups)
             {
-                model.PropertyChanged += (s, e) =>
+                backup.PropertyChanged += (s, e) =>
                 {
                     if (e.PropertyName == nameof(BackupModel.IsSelected))
                     {
@@ -192,7 +186,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 };
             }
 
-            Backups.ReplaceRange(backupModels);
+            Backups.ReplaceRange(backups);
             TotalNumberOfBackups = response.TotalCount;
 
             RaisePropertyChanged(nameof(From));
@@ -218,32 +212,25 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
             var games = _dataAccess.GetGames();
             games.Add(new Game() { Title = "ALL" });
-            Games.Clear();
-            Games.AddRange(games);
+            Games.ReplaceRange(games);
 
             Filter.GameId = -1;
             Filter.GameId = selected;
         });
 
-        // TODO: lock?
-        // TODO: check if succeeded in finally?
-        // TODO: check if this solution is ok for multiple files/operations
         private async Task ExecuteCloudAction(BackupModel backupModel, CancellationToken ct = default) => await HandleAsync(async () =>
         {
             var backup = backupModel.Backup;
-            if (backup.GoogleDriveId is null)
+            if (!backupModel.IsInGoogleDrive)
             {
-                _messageQueue.Enqueue("Upload started...", "CANCEL", x => _cts?.Cancel(), null, true, true);
+                _messageQueue.Enqueue("Upload started...", "CANCEL", x => _cts?.Cancel(), null, true, true); // TODO: Simplify interface (via extension methods)
 
-                var backupCloudFolderId = await _googleDrive.UploadBackupAsync(backup, ct).ConfigureAwait(true);
+                var savefileId = await _googleDrive.UploadAsync(backup.SavefilePath, IGoogleDrive.MimeType.File, ct).ConfigureAwait(true);
+                var pictureId = await _googleDrive.UploadAsync(backup.PicturePath, IGoogleDrive.MimeType.Image, ct).ConfigureAwait(true);
 
                 _messageQueue.Enqueue("Upload finished!", "", () => { }, true);
 
-                if (backupCloudFolderId is object)
-                {
-                    backupModel.GoogleDriveId = backupCloudFolderId;
-                    _dataAccess.UpdateGoogleDriveId(backup);
-                }
+                _dataAccess.SaveGoogleDriveInfo(backup.Id, savefileId, pictureId);
             }
             else
             {
@@ -251,12 +238,19 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                 _messageQueue.Enqueue("Undo deletion?", "UNDO", x => _cts?.Cancel(), null, true, true, countdown);
                 await Task.Delay(countdown);
 
-                await _googleDrive.DeleteBackupAsync(backup, ct).ConfigureAwait(false);
-
-                backupModel.GoogleDriveId = null;
-                _dataAccess.UpdateGoogleDriveId(backup);
+                await DeleteFromGoogleDriveAsync(backup.Id, ct).ConfigureAwait(true);
             }
+            RefreshCommand.Execute();
         });
+
+        private async Task DeleteFromGoogleDriveAsync(int backupId, CancellationToken ct = default)
+        {
+            ct = CancellationToken.None;
+            var (savefileId, pictureId) = _dataAccess.GetGoogleDriveInfo(backupId);
+            await _googleDrive.DeleteAsync(savefileId, ct).ConfigureAwait(false);
+            await _googleDrive.DeleteAsync(pictureId, ct).ConfigureAwait(false);
+            _dataAccess.DeleteGoogleDriveInfo(backupId);
+        }
 
         private void RemoveSelected() => Handle(() =>
         {
@@ -273,8 +267,11 @@ namespace SavescumBuddy.Modules.Main.ViewModels
 
         private async Task RecoverAsync(BackupModel backup, CancellationToken ct) => await HandleAsync(async () =>
         {
-            await _googleDrive.RecoverAsync(backup.Backup, () => _messageQueue.Enqueue($"Download completed!"), ct).ConfigureAwait(false);
+            var (savefileId, pictureId) = _dataAccess.GetGoogleDriveInfo(backup.Id);
+            await _googleDrive.DownloadAsync(savefileId, backup.Backup.SavefilePath, ct).ConfigureAwait(true);
+            await _googleDrive.DownloadAsync(pictureId, backup.Backup.PicturePath, ct).ConfigureAwait(true);
             RefreshCommand.Execute();
+            _messageQueue.Enqueue($"Download completed!");
         });
 
         public void OnNavigatedTo(NavigationContext navigationContext)
