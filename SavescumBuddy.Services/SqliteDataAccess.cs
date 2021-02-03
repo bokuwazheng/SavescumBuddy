@@ -262,12 +262,34 @@ namespace SavescumBuddy.Services
         #region Game table methods
         public List<Game> GetGames()
         {
-            return _sqlService.Query<Game>("SELECT * FROM Game ORDER BY Id ASC");
+            var sql = @"
+                SELECT 
+                Id,
+                Title,
+                SavefilePath,
+                BackupFolder,
+                IsCurrent,
+                (SELECT COUNT() FROM Backup WHERE GameId = Game.Id) AS BackupCount
+                FROM Game 
+                ORDER BY Id ASC;";
+            
+            return _sqlService.Query<Game>(sql);
         }
 
         public Game GetGame(int id)
         {
-            return _sqlService.QueryFirstOrDefault<Game>("SELECT * FROM Game WHERE Id = @Id", new { Id = id });
+            var sql = @"
+                SELECT 
+                Id,
+                Title,
+                SavefilePath,
+                BackupFolder,
+                IsCurrent,
+                (SELECT COUNT() FROM Backup WHERE GameId = Game.Id) AS BackupCount
+                FROM Game 
+                WHERE Id = @Id;";
+
+            return _sqlService.QueryFirstOrDefault<Game>(sql, new { Id = id });
         }
 
         public void CreateGame(Game game)
