@@ -1,0 +1,83 @@
+﻿<UserControl x:Class="SavescumBuddy.Modules.Main.Views.Games"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:SavescumBuddy.Modules.Main.Views"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:controls="clr-namespace:SavescumBuddy.Wpf;assembly=SavescumBuddy.Wpf"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:validation="clr-namespace:SavescumBuddy.Wpf.Validation;assembly=SavescumBuddy.Wpf"
+             SnapsToDevicePixels="True"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="DeepPurple" SecondaryColor="Lime"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.Wpf;component/DefaultTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <DataGrid ItemsSource="{Binding Games}" HeadersVisibility="Column" CanUserAddRows="False" AutoGenerateColumns="False" IsReadOnly="True" 
+                  CanUserResizeColumns="False" CanUserReorderColumns="False" CanUserSortColumns="False">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseDoubleClick">
+                    <i:InvokeCommandAction Command="{Binding EditCommand}" CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <!--Data Grid Context Menu-->
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Edit"
+                              Command="{Binding EditCommand}"
+                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                    <MenuItem Header="Delete"
+                              Command="{Binding RemoveCommand}"
+                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                    <MenuItem Header="Make Current"
+                              Command="{Binding MakeCurrentCommand}"
+                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                    <Separator/>
+                    <MenuItem Header="Refresh"
+                              Command="{Binding RefreshCommand}"/>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+            <!--Data Grid Columns-->
+            <DataGrid.Columns>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.Style>
+                                    <Style TargetType="{x:Type Grid}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsCurrent}" Value="0">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Grid.Style>
+                                <materialDesign:PackIcon Kind="Check" Foreground="{StaticResource GroupByGameButtonBrush}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Title" Binding="{Binding Title}" ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"/>
+                <DataGridTextColumn Header="Savefile path" Binding="{Binding SavefilePath}" ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"/>
+                <DataGridTextColumn Header="Backup folder" Binding="{Binding BackupFolder}" ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"/>
+                <DataGridTextColumn Header="Backup count" Binding="{Binding BackupCount, UpdateSourceTrigger=PropertyChanged}" ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+                Margin="24,14"
+                VerticalAlignment="Bottom"
+                HorizontalAlignment="Right"
+                Command="{Binding AddCommand}">
+            <materialDesign:PackIcon Kind="Plus" Height="24" Width="24"/>
+        </Button>
+    </Grid>
+</UserControl>

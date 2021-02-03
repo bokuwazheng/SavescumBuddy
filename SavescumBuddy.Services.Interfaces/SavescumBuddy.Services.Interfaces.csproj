@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Apis.Drive.v3" Version="1.49.0.2117" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SavescumBuddy.Lib\SavescumBuddy.Lib.csproj" />
+  </ItemGroup>
+
+</Project>

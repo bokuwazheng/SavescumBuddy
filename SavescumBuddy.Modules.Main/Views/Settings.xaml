@@ -1,0 +1,213 @@
+﻿<UserControl x:Class="SavescumBuddy.Modules.Main.Views.Settings"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:local="clr-namespace:SavescumBuddy.Modules.Main.Views"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:enums="clr-namespace:SavescumBuddy.Lib.Enums;assembly=SavescumBuddy.Lib"
+             xmlns:ext="clr-namespace:SavescumBuddy.Wpf.Extensions;assembly=SavescumBuddy.Wpf"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:controls="clr-namespace:SavescumBuddy.Wpf;assembly=SavescumBuddy.Wpf"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             SnapsToDevicePixels="True"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+    
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="DeepPurple" SecondaryColor="Lime"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.Wpf;component/DefaultTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="Caption" TargetType="{x:Type TextBlock}">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="FontWeight" Value="Medium"/>
+                <Setter Property="Foreground" Value="{StaticResource Foreground.Static}"/>
+            </Style>
+            
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <ScrollViewer 
+        VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Center"
+        Width="380" Background="White">
+        <!--MAIN GRID-->
+        <Grid HorizontalAlignment="Stretch" Margin="10,20,10,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!--Scheduler region-->
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Scheduler" Style="{StaticResource Header}"/>
+                <ToggleButton IsChecked="{Binding Settings.SchedulerEnabled}" Margin="10"/>
+            </StackPanel>
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <ComboBox
+                    Style="{StaticResource MaterialDesignFilledComboBox}"
+                    materialDesign:HintAssist.Hint="INTERVAL"
+                    Margin="0,10" Grid.Column="1"
+                    SelectedItem="{Binding Settings.SchedulerInterval}" ItemStringFormat='{}{0} min'>
+                    <sys:Int32>5</sys:Int32>
+                    <sys:Int32>10</sys:Int32>
+                    <sys:Int32>15</sys:Int32>
+                    <sys:Int32>20</sys:Int32>
+                    <sys:Int32>30</sys:Int32>
+                    <sys:Int32>40</sys:Int32>
+                    <sys:Int32>50</sys:Int32>
+                    <sys:Int32>60</sys:Int32>
+                </ComboBox>
+                
+                <ComboBox 
+                    Style="{StaticResource MaterialDesignFilledComboBox}"
+                    materialDesign:HintAssist.Hint="SKIP"
+                    Margin="0,10" Grid.Row="1" Grid.Column="1"
+                    ItemsSource="{ext:EnumToValueDescriptionPairListExtension EnumType={x:Type enums:SkipOption}}"
+                    SelectedValuePath="Value" DisplayMemberPath="Description" SelectedValue="{Binding Settings.SchedulerSkipType}"/>
+                
+                <ComboBox 
+                    Style="{StaticResource MaterialDesignFilledComboBox}"
+                    materialDesign:HintAssist.Hint="OVERWRITE"
+                    Margin="0,10" Grid.Row="2" Grid.Column="1"
+                    ItemsSource="{ext:EnumToValueDescriptionPairListExtension EnumType={x:Type enums:OverwriteOption}}"
+                    SelectedValuePath="Value" DisplayMemberPath="Description" SelectedValue="{Binding Settings.SchedulerOverwriteType}"/>
+            </Grid>
+            <!--Scheduler region ends here-->
+
+            <!--Hotkeys-->
+            <StackPanel Orientation="Horizontal" Grid.Row="2">
+                <TextBlock Text="Hotkeys" Style="{StaticResource Header}"/>
+                <ToggleButton IsChecked="{Binding Settings.HotkeysEnabled}" Margin="10"/>
+            </StackPanel>
+            <Grid Grid.Row="3" Margin="0,10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="60"/>
+                </Grid.RowDefinitions>
+
+                <!--Backup box-->
+                <materialDesign:Card Margin="5">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="BACKUP" Style="{StaticResource Caption}"/>
+                        <ToggleButton 
+                            Grid.Column="1"
+                            IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Backup}, Mode=OneWay}" 
+                            Style="{StaticResource RecordHotkeyToggleButton}" 
+                            Command="{Binding RegisterHotkeyCommand}" 
+                            CommandParameter="{x:Static enums:HotkeyAction.Backup}">
+                            <ToggleButton.Content>
+                                <TextBlock VerticalAlignment="Center" Margin="10,0" FontWeight="Medium">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource KeysToStringConverter}">
+                                            <Binding Path="Settings.BackupKey"/>
+                                            <Binding Path="Settings.BackupModifier"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </ToggleButton.Content>
+                        </ToggleButton>
+                    </Grid>
+                </materialDesign:Card>
+
+                <!--Restore box-->
+                <materialDesign:Card Margin="5" Grid.Row="1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="RESTORE" Style="{StaticResource Caption}"/>
+                        <ToggleButton 
+                            Grid.Column="1"
+                            IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Restore}, Mode=OneWay}" 
+                            Style="{StaticResource RecordHotkeyToggleButton}" 
+                            Command="{Binding RegisterHotkeyCommand}" 
+                            CommandParameter="{x:Static enums:HotkeyAction.Restore}">
+                            <ToggleButton.Content>
+                                <TextBlock VerticalAlignment="Center" Margin="10,0" FontWeight="Medium">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource KeysToStringConverter}">
+                                            <Binding Path="Settings.RestoreKey"/>
+                                            <Binding Path="Settings.RestoreModifier"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </ToggleButton.Content>
+                        </ToggleButton>
+                    </Grid>
+                </materialDesign:Card>
+
+                <!--Overwrite box-->
+                <materialDesign:Card Margin="5" Grid.Row="2">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="OVERWRITE" Style="{StaticResource Caption}"/>
+                        <ToggleButton 
+                            Grid.Column="1"
+                            IsChecked="{Binding SelectedHotkeyAction, Converter={StaticResource EnumEqualityConverter}, ConverterParameter={x:Static enums:HotkeyAction.Overwrite}, Mode=OneWay}" 
+                            Style="{StaticResource RecordHotkeyToggleButton}" 
+                            Command="{Binding RegisterHotkeyCommand}" 
+                            CommandParameter="{x:Static enums:HotkeyAction.Overwrite}">
+                            <ToggleButton.Content>
+                                <TextBlock VerticalAlignment="Center" Margin="10,0" FontWeight="Medium">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource KeysToStringConverter}">
+                                            <Binding Path="Settings.OverwriteKey"/>
+                                            <Binding Path="Settings.OverwriteModifier"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </ToggleButton.Content>
+                        </ToggleButton>
+                    </Grid>
+                </materialDesign:Card>
+                
+            </Grid>
+
+            <!--Sound cues-->
+            <StackPanel Grid.Row="4" Orientation="Horizontal">
+                <TextBlock Text="Sound Cues" Style="{StaticResource Header}"/>
+                <ToggleButton Grid.Row="4" IsChecked="{Binding Settings.SoundCuesEnabled}" Margin="10"/>
+            </StackPanel>
+
+            <Button 
+                Style="{StaticResource TextButton}" 
+                Grid.Row="5"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Command="{Binding OpenAboutDialogCommand}">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="InformationOutline" Width="22" Height="22" Margin="5"/>
+                        <TextBlock Text="About" Margin="6,0,0,0" FontWeight="Medium" FontSize="14" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+
+        </Grid>
+    </ScrollViewer>
+</UserControl>

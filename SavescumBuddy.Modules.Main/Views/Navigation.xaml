@@ -1,0 +1,57 @@
+﻿<UserControl x:Class="SavescumBuddy.Modules.Main.Views.Navigation"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:core="clr-namespace:SavescumBuddy.Wpf.Constants;assembly=SavescumBuddy.Wpf"
+             xmlns:controls="clr-namespace:SavescumBuddy.Wpf;assembly=SavescumBuddy.Wpf"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             SnapsToDevicePixels="True"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="DeepPurple" SecondaryColor="Lime"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/SavescumBuddy.Wpf;component/DefaultTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TabControl Style="{StaticResource MaterialDesignNavigatilRailTabControl}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding NavigateCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type TabControl}}, Path=SelectedItem.Tag}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <TabItem Style="{StaticResource MaterialDesignNavigationRailTabItem}" Tag="{x:Static core:ViewNames.Backups}">
+                <TabItem.Header>
+                    <materialDesign:PackIcon Kind="ViewList" Width="24" Height="24"/>
+                </TabItem.Header>
+            </TabItem>
+            <TabItem Style="{StaticResource MaterialDesignNavigationRailTabItem}" Tag="{x:Static core:ViewNames.Games}">
+                <TabItem.Header>
+                    <materialDesign:PackIcon Kind="GamepadVariantOutline" Width="24" Height="24"/>
+                </TabItem.Header>
+            </TabItem>
+            <TabItem Style="{StaticResource MaterialDesignNavigationRailTabItem}" Tag="{x:Static core:ViewNames.GoogleDrive}">
+                <TabItem.Header>
+                    <materialDesign:PackIcon Kind="GoogleDrive" Width="24" Height="24"/>
+                </TabItem.Header>
+            </TabItem>
+            <TabItem Style="{StaticResource MaterialDesignNavigationRailTabItem}" Tag="{x:Static core:ViewNames.Settings}">
+                <TabItem.Header>
+                    <materialDesign:PackIcon Kind="Cog" Width="24" Height="24"/>
+                </TabItem.Header>
+            </TabItem>
+        </TabControl>
+
+    </Grid>
+</UserControl>
