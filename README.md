@@ -1,10 +1,10 @@
 # <img src="https://user-images.githubusercontent.com/46743297/61076153-3cf55600-a424-11e9-8daf-c6332aac6f4d.png" alt="cat_icon" width="36" height="36"> Savescum Buddy
 Backup and restore savefiles with hotkeys. Configurable backup scheduler will make backups for you. Upload and recover your backups via Google Drive. Suits any game that has only a single savefile.
 
-![backups](https://user-images.githubusercontent.com/46743297/106929367-55734280-6725-11eb-9e43-001bb7a5a6e1.png)
-![tooltip](https://user-images.githubusercontent.com/46743297/106929377-57d59c80-6725-11eb-913c-e984fce29f52.png)
-![games](https://user-images.githubusercontent.com/46743297/106929374-573d0600-6725-11eb-88b5-c6bdf98ceffd.png)
-![settings](https://user-images.githubusercontent.com/46743297/106929375-573d0600-6725-11eb-96e1-1c0f9480caa4.png)
+![backups](https://user-images.githubusercontent.com/46743297/106932868-4e4e3380-6729-11eb-93e5-10fd4e0b0988.png)
+![games](https://user-images.githubusercontent.com/46743297/106932870-4ee6ca00-6729-11eb-80cc-83756ad21e26.png)
+![settings](https://user-images.githubusercontent.com/46743297/106932873-4ee6ca00-6729-11eb-80e8-d077a4ce298d.png)
+![tooltip](https://user-images.githubusercontent.com/46743297/106932875-4f7f6080-6729-11eb-8863-592f5fac059d.png)
 
 ## How to build
 * Install [Visual Studio 2019](https://visualstudio.microsoft.com/) and run it.
