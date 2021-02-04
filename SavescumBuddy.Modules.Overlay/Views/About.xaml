@@ -23,7 +23,7 @@
             <TextBlock 
                 Style="{StaticResource Caption}" Margin="0,4">
                 <Run Text="version"/>
-                <Run Text="{Binding Version, Mode=OneWay, FallbackValue='1.0.0.0'}"/>
+                <Run Text="{Binding Version, Mode=OneWay, FallbackValue='0.1.0.0'}"/>
             </TextBlock>
             <TextBlock 
                 FontSize="14" Foreground="{StaticResource Foreground.Selected}">
@@ -34,8 +34,9 @@
             </TextBlock>
             <TextBlock 
                 FontSize="14" Foreground="{StaticResource Foreground.Selected}" TextWrapping="Wrap" Margin="0,4">
-                Savescum Buddy provides a convenient way to "savescum" in
-                any game that has only a single savefile.
+                Handy tool for gamers. Provides functionality for savescumming, 
+                learning speedrunning or simply helps make sure your savefiles 
+                don't get lost or corrupted.
             </TextBlock>
             <TextBlock FontSize="14" Foreground="{StaticResource Foreground.Selected}" Margin="0,4">
                 Source code is available on 

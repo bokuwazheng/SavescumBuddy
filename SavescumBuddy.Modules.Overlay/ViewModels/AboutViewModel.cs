@@ -14,7 +14,7 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
             CloseDialogCommand = new DelegateCommand(CloseDialog);
         }
 
-        public string Version => System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        public string Version => System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
 
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;
 

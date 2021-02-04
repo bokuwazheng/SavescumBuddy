@@ -39,6 +39,7 @@
             materialDesign:HintAssist.FloatingScale=".9"
             materialDesign:ValidationAssist.FontSize="11"
             materialDesign:ValidationAssist.HorizontalAlignment="Right"
+            materialDesign:ValidationAssist.Background="Transparent"
             VerticalAlignment="Center">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseDoubleClick">
@@ -65,6 +66,7 @@
             materialDesign:HintAssist.FloatingScale=".9"
             materialDesign:ValidationAssist.FontSize="11"
             materialDesign:ValidationAssist.HorizontalAlignment="Right"
+            materialDesign:ValidationAssist.Background="Transparent"
             VerticalAlignment="Center">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseDoubleClick">
