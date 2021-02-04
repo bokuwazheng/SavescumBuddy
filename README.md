@@ -21,6 +21,6 @@ Backup and restore savefiles with hotkeys. Configurable backup scheduler will ma
 ## Credit
 * [*GlobalKeyboardHook.cs*](https://github.com/bokuwazheng/SavescumBuddy/blob/e3da799978c848f3e020c4d2beffcd2952cb6af2/SavescumBuddy.Wpf/Services/GlobalKeyboardHook.cs) 
 by Johannes Nestler, 2009.
-* [*cat_icon_64px.ico*](https://github.com/bokuwazheng/SavescumBuddy/blob/master/SavescumBuddy/Resources/icon.ico)
+* [*Icon*](https://github.com/bokuwazheng/SavescumBuddy/blob/master/SavescumBuddy/Resources/icon.ico)
 from Segoe UI Emoji.
 * Sound cues from [낙원](https://music.apple.com/ca/album/paradise/1384386163?i=1384386840) by BTS (cropped and denoised with Adobe Premiere Pro).
