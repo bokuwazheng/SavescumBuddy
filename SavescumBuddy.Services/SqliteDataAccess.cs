@@ -111,28 +111,6 @@ namespace SavescumBuddy.Services
             };
         }
 
-        public Backup GetBackup(int id)
-        {
-            var sql = @"
-                SELECT 
-                    Backup.Id,
-                    GameId,
-                    Game.Title AS GameTitle,
-                    GoogleDriveId,
-                    Note,
-                    IsLiked,
-                    IsScheduled,
-                    TimeStamp,
-                    Game.SavefilePath AS OriginPath,
-                    Game.BackupFolder || '\' || TimeStamp AS SavefilePath,
-                    Game.BackupFolder || '\' || TimeStamp || '.jpg' AS PicturePath
-                FROM Backup 
-                LEFT JOIN Game ON Backup.GameId = Game.Id
-                WHERE Backup.Id = @Id";
-
-            return _sqlService.QueryFirstOrDefault<Backup>(sql, new { Id = id });
-        }
-
         public Backup CreateBackup(bool isScheduled)
         {
             object args = new
@@ -200,11 +178,8 @@ namespace SavescumBuddy.Services
             };
         }
 
-        public void OverwriteScheduledBackup(Action<Backup> action)
+        public Backup GetScheduledBackupToOverwrite()
         {
-            if (action is null)
-                throw new ArgumentNullException(nameof(action));
-            
             var sql = "SELECT SchedulerOverwriteType FROM Settings WHERE Id = 1;";
             var overwriteOption = (OverwriteOption)_sqlService.ExecuteScalar<int>(sql);
 
@@ -243,9 +218,10 @@ namespace SavescumBuddy.Services
 
                     DELETE FROM Backup WHERE Id = @Id;";
 
-                var backup =_sqlService.QueryFirstOrDefault<Backup>(sql, new { Id = latestScheduledBackup.Id });
-                action(backup);
+                return _sqlService.QueryFirstOrDefault<Backup>(sql, new { Id = latestScheduledBackup.Id });
             }
+            else
+                return null;
         }
 
         public void UpdateNote(Backup backup)
