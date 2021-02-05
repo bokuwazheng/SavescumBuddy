@@ -118,12 +118,6 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             NavigateToEndCommand.RaiseCanExecuteChanged();
         }
 
-        private void RaiseDriveActionCanExecute()
-        {
-            ExecuteDriveActionCommand.RaiseCanExecuteChanged();
-            RecoverCommand.RaiseCanExecuteChanged();
-        }
-
         private void Add() => Handle(() =>
         {
             var backup = _dataAccess.CreateBackup(isScheduled: false);
