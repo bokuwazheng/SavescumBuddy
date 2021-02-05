@@ -20,7 +20,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         private DispatcherTimer _progressBarTimer;
 
         public int Progress { get => _progress; private set => SetProperty(ref _progress, value); }
-        public int Interval => _settingsAccess.SchedulerInterval * 60;
+        public int Interval => _settingsAccess.SchedulerInterval;
 
         public SchedulerViewModel(IRegionManager regionManager, IDataAccess dataAccess, ISettingsAccess settingsAccess, IEventAggregator eventAggregator, 
             IBackupService backupService) : base(regionManager, eventAggregator)
@@ -29,12 +29,10 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             _settingsAccess = settingsAccess;
             _backupService = backupService;
 
-            _backupTimer = new DispatcherTimer();
-            _backupTimer.Interval = TimeSpan.FromMinutes(Interval);
+            _backupTimer = new() { Interval = TimeSpan.FromMinutes(Interval) };
             _backupTimer.Tick += (s, e) => { Backup(); Progress = 0; };
 
-            _progressBarTimer = new DispatcherTimer();
-            _progressBarTimer.Interval = TimeSpan.FromSeconds(1);
+            _progressBarTimer = new() { Interval = TimeSpan.FromSeconds(1) };
             _progressBarTimer.Tick += (s, e) => Progress++;
 
             var isEnabled = _settingsAccess.SchedulerEnabled;
