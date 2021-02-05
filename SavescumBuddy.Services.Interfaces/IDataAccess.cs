@@ -22,6 +22,6 @@ namespace SavescumBuddy.Services.Interfaces
         void SetGameAsCurrent(int id);
         void UpdateGame(Game game);
         bool ScheduledBackupMustBeSkipped();
-        void OverwriteScheduledBackup(Action<Backup> action);
+        Backup GetScheduledBackupToOverwrite();
     }
 }

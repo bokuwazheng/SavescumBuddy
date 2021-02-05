@@ -9,8 +9,8 @@ namespace SavescumBuddy.Services
 {
     public class SqliteDbService : ISqliteDbService
     {
-        public string _connectionString;
-        private static readonly object _locker = new object();
+        private string _connectionString;
+        private static readonly object _locker = new();
 
         public SqliteDbService(string connectionString)
         {

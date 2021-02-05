@@ -84,7 +84,9 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         {
             if (!_dataAccess.ScheduledBackupMustBeSkipped())
             {
-                _dataAccess.OverwriteScheduledBackup(x => _backupService.DeleteFiles(x));
+                var backup =_dataAccess.GetScheduledBackupToOverwrite();
+                if (backup is object)
+                    _backupService.DeleteFiles(backup);
 
                 var newBackup = _dataAccess.CreateBackup(isScheduled: true);
                 _backupService.BackupSavefile(newBackup);
