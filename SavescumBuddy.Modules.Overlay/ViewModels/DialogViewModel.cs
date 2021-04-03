@@ -19,7 +19,7 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
 
         public DialogViewModel(IRegionManager regionManager, IEventAggregator eventAggregator) : base(regionManager, eventAggregator)
         {
-            CloseDialogCommand = new DelegateCommand<DialogResult?>(CloseDialog);
+            CloseDialogCommand = new(CloseDialog);
         }
 
         public string Title { get => _title; set => SetProperty(ref _title, value); }
@@ -31,8 +31,6 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
         {
             if (result.HasValue)
             {
-                _requestClose?.Invoke(result.Value);
-
                 if (_navigationService.Journal.CanGoBack)
                     _navigationService.Journal.GoBack();
                 else
@@ -40,6 +38,8 @@ namespace SavescumBuddy.Modules.Overlay.ViewModels
                     _navigationService.Journal.Clear();
                     CloseDialog();
                 }
+
+                _requestClose?.Invoke(result.Value);
             }
         });
 

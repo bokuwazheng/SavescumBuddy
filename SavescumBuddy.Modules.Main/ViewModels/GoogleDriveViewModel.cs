@@ -20,9 +20,9 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         {
             _googleDrive = googleDrive;
 
-            AuthorizeCommand = new DelegateCommand(async () => await AuthorizeAsync(Ct).ConfigureAwait(false));
-            ReauthorizeCommand = new DelegateCommand(async () => await ReauthorizeAsync(Ct).ConfigureAwait(false));
-            UpdateUserEmailCommand = new DelegateCommand(async () => await UpdateUserEmailAsync(Ct).ConfigureAwait(false));
+            AuthorizeCommand = new DelegateCommand(() => AuthorizeAsync(Ct).ConfigureAwait(false));
+            ReauthorizeCommand = new DelegateCommand(() => ReauthorizeAsync(Ct).ConfigureAwait(false));
+            UpdateUserEmailCommand = new DelegateCommand(() => UpdateUserEmailAsync(Ct).ConfigureAwait(false));
             CancelCommand = new DelegateCommand(() => _cts?.Cancel()); // TODO: NEVER USED!
         }
 
@@ -37,7 +37,7 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         }
         public string UserEmail { get => _userEmail; set => SetProperty(ref _userEmail, value); }
 
-        private async Task AuthorizeAsync(CancellationToken ct) => await HandleAsync(async () =>
+        private Task AuthorizeAsync(CancellationToken ct) => HandleAsync(async () =>
         {
             var succeeded = await _googleDrive.AuthorizeAsync(ct).ConfigureAwait(false);
             if (!succeeded)
@@ -46,19 +46,23 @@ namespace SavescumBuddy.Modules.Main.ViewModels
             await UpdateUserEmailAsync(ct).ConfigureAwait(false);
         });
 
-        private async Task ReauthorizeAsync(CancellationToken ct) => await HandleAsync(async () =>
+        private Task ReauthorizeAsync(CancellationToken ct) => HandleAsync(async () =>
         {
             await _googleDrive.ReauthorizeAsync(ct).ConfigureAwait(false);
             await UpdateUserEmailAsync(ct).ConfigureAwait(false);
         });
 
-        private async Task UpdateUserEmailAsync(CancellationToken ct) => await HandleAsync(async () =>
+        private Task UpdateUserEmailAsync(CancellationToken ct) => HandleAsync(async () =>
         {
             if (_googleDrive.CredentialExists())
                 UserEmail = await _googleDrive.GetUserEmailAsync(ct).ConfigureAwait(false);
         });
 
-        public void OnNavigatedTo(NavigationContext navigationContext) => UpdateUserEmailCommand.Execute();
+        public void OnNavigatedTo(NavigationContext navigationContext) 
+        { 
+            if (UserEmail is null)
+                UpdateUserEmailCommand.Execute(); 
+        }
 
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;
 
