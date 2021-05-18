@@ -57,6 +57,12 @@ namespace SavescumBuddy.Modules.Main.ViewModels
         private void Remove(Game game) => Handle(() =>
         {
             var anyBackups = _dataAccess.GetGame(game.Id).BackupCount > 0; // Check backup count cuz it doesn't update when a backup is created via hotkey or when a scheduled backup happen.
+
+            void removeGame() // Backups are removed via FK constraint. 
+            {
+                Games.Remove(game);
+                _dataAccess.DeleteGame(game);
+            }
             
             if (anyBackups)
             {
@@ -67,27 +73,18 @@ namespace SavescumBuddy.Modules.Main.ViewModels
                     "CANCEL",
                     r =>
                     {
-                        try
+                        if (r is DialogResult.OK)
                         {
-                            if (r is DialogResult.OK)
-                            {
-                                var backups = _dataAccess.SearchBackups(new BackupSearchRequest() { GameId = game.Id });
-                                backups.Backups.ForEach(x => _backupService.DeleteFiles(x));
+                            var response = _dataAccess.SearchBackups(new BackupSearchRequest() { GameId = game.Id });
+                            response.Backups.ForEach(x => _backupService.DeleteFiles(x));
 
-                                Games.Remove(game);
-                                _dataAccess.DeleteGame(game);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            ShowError(ex);
+                            removeGame();
                         }
                     });
             }
             else
             {
-                Games.Remove(game);
-                _dataAccess.DeleteGame(game);
+                removeGame();
             }
         });
 
