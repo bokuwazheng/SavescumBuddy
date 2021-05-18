@@ -44,6 +44,7 @@ namespace SavescumBuddy.Wpf.Mvvm
             {
                 await action();
             }
+            catch (TaskCanceledException) { }
             catch (Exception ex)
             {
                 onException?.Invoke();
@@ -57,20 +58,22 @@ namespace SavescumBuddy.Wpf.Mvvm
 
         protected void ShowDialog(string viewName, NavigationParameters navigationParameters)
         {
-            _eventAggregator.GetEvent<DialogIsOpenChangedEvent>().Publish(true);
+            OpenDialog();
             _regionManager.RequestNavigate(RegionNames.Overlay, viewName, navigationParameters);
         }
 
         protected void PromptAction(string title, string message, string okContent, string cancelContent, Action<DialogResult> callback)
         {
-            _eventAggregator.GetEvent<DialogIsOpenChangedEvent>().Publish(true);
+            OpenDialog();
             _regionManager.PromptAction(title, message, okContent, cancelContent, callback);
         }
 
         protected void ShowError(Exception ex)
         {
-            _eventAggregator.GetEvent<DialogIsOpenChangedEvent>().Publish(true);
+            OpenDialog();
             _regionManager.ShowError(ex.Message);
         }
+
+        private void OpenDialog() => _eventAggregator.GetEvent<DialogIsOpenChangedEvent>().Publish(true);
     }
 }
